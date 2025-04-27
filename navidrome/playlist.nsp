@@ -1,0 +1,8 @@
+{
+  "name": "All music",
+  "comment": "all music that are in navidrome",
+  "all": [
+    {"gt": {"playCount":-1}}
+  ],
+  "sort": "random"
+}
