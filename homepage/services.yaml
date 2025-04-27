@@ -1,0 +1,31 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/services/
+
+- Homelab:
+    - Home Assistant:
+        icon: https://svgl.app/library/home-assistant.svg
+        href: http://192.168.1.11:8123/
+        description: Home Automation
+    - Blocky:
+        icon: https://simpleicons.org/icons/adblock.svg
+        href: http://192.168.1.19:4000/
+        description: Home DNS
+
+- Professional Tools:
+    - Stirling PDF:
+        href: http://192.168.1.13:8080/
+        description: Web Application to Edit PDF
+    - Excalidraw:
+        icon: https://simpleicons.org/icons/excalidraw.svg
+        href: http://192.168.1.12:3000/
+        description: Web Application to draw
+
+- Entertainment:
+    - NAS Synology:
+        icon: https://simpleicons.org/icons/synology.svg
+        href: https://192.168.1.1:5001/
+        description: NAS
+    - Navidrome:
+        href: http://192.168.1.18:4533/
+        description: Music player
