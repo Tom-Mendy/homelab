@@ -1,0 +1,32 @@
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: Upgrade system packages
+  apt:
+    upgrade: dist
+    autoremove: yes
+    autoclean: yes
+  become: yes
+
+- name: Set timezone
+  timezone:
+    name: Europe/Paris
+  become: yes
+
+- name: Install essential packages
+  apt:
+    name:
+      - git
+      - curl
+      - vim
+      - htop
+      - python3-pip
+      - unzip
+      - wget
+      - tree
+      - nano
+    state: present
+    update_cache: yes
+  become: yes
