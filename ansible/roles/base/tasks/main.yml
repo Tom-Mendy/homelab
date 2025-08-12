@@ -1,22 +1,22 @@
 - name: Update apt cache
-  apt:
-    update_cache: yes
-  become: yes
+  ansible.builtin.apt:
+    update_cache: true
+  become: true
 
 - name: Upgrade system packages
-  apt:
+  ansible.builtin.apt:
     upgrade: dist
-    autoremove: yes
-    autoclean: yes
-  become: yes
+    autoremove: true
+    autoclean: true
+  become: true
 
 - name: Set timezone
-  timezone:
+  community.general.timezone:
     name: Europe/Paris
-  become: yes
+  become: true
 
 - name: Install essential packages
-  apt:
+  ansible.builtin.apt:
     name:
       - git
       - curl
@@ -29,5 +29,5 @@
       - tree
       - nano
     state: present
-    update_cache: yes
-  become: yes
+    update_cache: true
+  become: true

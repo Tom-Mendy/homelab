@@ -30,4 +30,13 @@ if [ ! -d "${HOME}/.ansible/collections/ansible_collections/kubernetes_sigs/kube
 
 fi
 
-ansible-playbook playbooks/install.yml
+
+read -p "Enter the name of the playbook to run (e.g., site.yml): " PLAYBOOK
+
+if [ ! -f "$PLAYBOOK" ]; then
+    echo "Error: Playbook '$PLAYBOOK' not found."
+    exit 1
+fi
+
+echo "Running playbook: $PLAYBOOK"
+ansible-playbook "$PLAYBOOK"
