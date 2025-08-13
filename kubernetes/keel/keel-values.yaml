@@ -1,0 +1,15 @@
+# keel-values.yaml
+
+# Disable Helm provider (Keel won't try to upgrade Helm releases itself)
+helmProvider:
+  enabled: false
+
+# Enable basic authentication for the admin dashboard
+basicauth:
+  enabled: true
+  user: admin
+  password: admin
+
+# Enable the Keel service so Traefik can route traffic
+service:
+  enabled: true

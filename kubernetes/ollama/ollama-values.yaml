@@ -1,0 +1,29 @@
+ollama:
+  gpu:
+    # -- Enable GPU integration
+    enabled: true
+
+    # -- GPU type: 'nvidia' or 'amd'
+    type: 'nvidia'
+
+    # -- Specify the number of GPU to 1
+    number: 1
+
+  # -- List of models to pull at container startup
+  models:
+    pull:
+      - devstral:24b
+      - deepseek-r1:70b
+      - gpt-oss:20b
+      - gpt-oss:120b
+      - qwen3:30b
+
+tolerations: []
+nodeSelector:
+  gpu: "true"
+
+resources:
+  limits:
+    nvidia.com/gpu: 1 # Number of GPUs to allocate
+
+runtimeClassName: nvidia # Use the NVIDIA runtime for GPU support
