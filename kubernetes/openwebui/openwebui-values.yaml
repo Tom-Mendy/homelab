@@ -1,6 +1,6 @@
 # openwebui-values.yaml
 ollama:
-  enabled: false # Don't install Ollama inside WebUI
+  enabled: true
   host: ollama.ollama.svc.cluster.local
   port: 11434
 
@@ -13,6 +13,7 @@ persistence:
   storageClass: "local-path"
   size: 50Gi
 pipelines:
+  enabled: false
   persistence:
     storageClass: local-path
     size: 50Gi
