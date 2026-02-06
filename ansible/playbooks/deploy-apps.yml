@@ -21,6 +21,40 @@
             labels:
               gpu: "true"
 
+    - name: Deploy MetalLB
+      kubernetes.core.k8s:
+        state: present
+        src: https://raw.githubusercontent.com/metallb/metallb/v0.14.5/config/manifests/metallb-native.yaml
+
+    - name: Wait for MetalLB Controller to be ready
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: metallb-system
+        label_selectors:
+          - component=controller
+      register: metallb_pods
+      until: metallb_pods.resources | count > 0 and (metallb_pods.resources | map(attribute='status.phase') | unique | list == ['Running'])
+      retries: 24
+      delay: 5
+
+    - name: Configure MetalLB (IP Pool and L2 advertisement)
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/metallb/metallb-config.yaml') | from_yaml_all }}"
+
+    - name: Add Traefik Helm repo
+      kubernetes.core.helm_repository:
+        name: traefik
+        repo_url: https://traefik.github.io/charts
+
+    - name: Deploy Traefik Ingress Controller
+      kubernetes.core.helm:
+        name: traefik
+        chart_ref: traefik/traefik
+        release_namespace: traefik
+        create_namespace: true
+        values: "{{ lookup('file', playbook_dir + '/../../kubernetes/traefik/traefik-values.yaml') | from_yaml }}"
+
     - name: Deploy Blocky
       kubernetes.core.k8s:
         state: present
