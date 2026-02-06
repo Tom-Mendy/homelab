@@ -24,7 +24,7 @@
     - name: Deploy MetalLB
       kubernetes.core.k8s:
         state: present
-        src: https://raw.githubusercontent.com/metallb/metallb/v0.14.5/config/manifests/metallb-native.yaml
+        src: https://raw.githubusercontent.com/metallb/metallb/main/config/manifests/metallb-native.yaml
 
     - name: Wait for MetalLB Controller to be ready
       kubernetes.core.k8s_info:
@@ -63,7 +63,7 @@
     - name: Deploy Trilium
       kubernetes.core.k8s:
         state: present
-        definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/tritium.yml') | from_yaml_all }}"
+        definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/trilium/trilium.yaml') | from_yaml_all }}"
 
     - name: Add Keel Helm repo
       kubernetes.core.helm_repository:
