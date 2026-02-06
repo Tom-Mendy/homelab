@@ -13,3 +13,7 @@ basicauth:
 # Enable the Keel service so Traefik can route traffic
 service:
   enabled: true
+
+deployment:
+  podAnnotations:
+    keel.sh/policy: minor

@@ -4,8 +4,9 @@ ollama:
   host: ollama.ollama.svc.cluster.local
   port: 11434
 
-podAnnotations:
-  keel.sh/policy: all
+deployment:
+  podAnnotations:
+    keel.sh/policy: all
 
 service:
   type: ClusterIP

@@ -1,8 +1,9 @@
 service:
   type: LoadBalancer
 
-podAnnotations:
-  keel.sh/policy: minor
+deployment:
+  podAnnotations:
+    keel.sh/policy: minor
 
 ports:
   web:
