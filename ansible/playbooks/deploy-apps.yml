@@ -1,13 +1,14 @@
 - name: Deploy Kubernetes Applications
   hosts: kube_control_plane
-  become: false
   tasks:
-    - name: Ensure kubernetes python library is installed
-      pip:
+    - name: Ensure kubernetes and yaml python libraries are installed (APT)
+      become: true
+      ansible.builtin.apt:
         name:
-          - kubernetes
-          - pyyaml
+          - python3-kubernetes
+          - python3-yaml
         state: present
+        update_cache: yes
 
     - name: Label node-3 for GPU
       kubernetes.core.k8s:
@@ -23,12 +24,12 @@
     - name: Deploy Blocky
       kubernetes.core.k8s:
         state: present
-        src: ../../kubernetes/blocky/blocky.yaml
+        definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/blocky/blocky.yaml') | from_yaml_all }}"
 
     - name: Deploy Trilium
       kubernetes.core.k8s:
         state: present
-        src: ../../kubernetes/tritium.yml
+        definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/tritium.yml') | from_yaml_all }}"
 
     - name: Add Keel Helm repo
       kubernetes.core.helm_repository:
@@ -41,13 +42,12 @@
         chart_ref: keel/keel
         release_namespace: keel
         create_namespace: true
-        values_files:
-          - ../../kubernetes/keel/keel-values.yaml
+        values: "{{ lookup('file', playbook_dir + '/../../kubernetes/keel/keel-values.yaml') | from_yaml }}"
 
     - name: Apply Keel Ingress
       kubernetes.core.k8s:
         state: present
-        src: ../../kubernetes/keel/keel-ingress.yaml
+        definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/keel/keel-ingress.yaml') | from_yaml }}"
 
     - name: Add Ollama Helm repo
       kubernetes.core.helm_repository:
@@ -60,13 +60,12 @@
         chart_ref: otwld/ollama
         release_namespace: ollama
         create_namespace: true
-        values_files:
-          - ../../kubernetes/ollama/ollama-values.yaml
+        values: "{{ lookup('file', playbook_dir + '/../../kubernetes/ollama/ollama-values.yaml') | from_yaml }}"
 
     - name: Apply Ollama Ingress
       kubernetes.core.k8s:
         state: present
-        src: ../../kubernetes/ollama/ollama-ingress.yaml
+        definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/ollama/ollama-ingress.yaml') | from_yaml }}"
 
     - name: Add OpenWebUI Helm repo
       kubernetes.core.helm_repository:
@@ -84,10 +83,9 @@
         chart_ref: open-webui/open-webui
         release_namespace: openwebui
         create_namespace: true
-        values_files:
-          - ../../kubernetes/openwebui/openwebui-values.yaml
+        values: "{{ lookup('file', playbook_dir + '/../../kubernetes/openwebui/openwebui-values.yaml') | from_yaml }}"
 
     - name: Apply OpenWebUI Ingress
       kubernetes.core.k8s:
         state: present
-        src: ../../kubernetes/openwebui/openwebui-ingress.yaml
+        definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/openwebui/openwebui-ingress.yaml') | from_yaml }}"
