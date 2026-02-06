@@ -9,11 +9,13 @@ This repository contains configuration files, documentation, and automation scri
 ## Architecture
 
 ### Hardware
+
 - **Main Server**: [Add your hardware specs here]
 - **Network Equipment**: [Router, switches, etc.]
 - **Storage**: [NAS, external drives, etc.]
 
 ### Software Stack
+
 - **Operating System**: [Ubuntu Server]
 - **Orchestration**: [Kubernetes]
 - **Monitoring**: [Prometheus, Grafana, etc.]
@@ -22,6 +24,7 @@ This repository contains configuration files, documentation, and automation scri
 ## Services
 
 ### Core Services
+
 - [ ] DNS Server (Blocky)
 - [ ] Reverse Proxy (Traefik, nginx)
 - [ ] Certificate Management (Let's Encrypt)
@@ -30,6 +33,7 @@ This repository contains configuration files, documentation, and automation scri
 - [ ] Authentication (Authelia, Keycloak)
 
 ### Applications
+
 - [ ] Admin Panel (Portainer, Keel + admin dashboard)
 - [ ] Document Storage (Paperless-gnx, Paperless-AI)
 - [ ] Note App (Trilium)
@@ -43,10 +47,10 @@ This repository contains configuration files, documentation, and automation scri
 - [ ] Database (PostgreSQL, CloudBeaver)
 - [ ] Tools ([wol-web](https://github.com/HuakunShen/wol-web), UpTimeKuma)
 
-
 ## Getting Started
 
 ### Prerequisites
+
 - Linux server with Docker installed
 - Domain name (optional, for external access)
 - Basic understanding of Docker and networking
@@ -54,20 +58,22 @@ This repository contains configuration files, documentation, and automation scri
 ### Installation
 
 1. Clone this repository:
+
 ```bash
 git clone https://github.com/Tom-Mendy/homelab.git
 cd homelab
 ```
 
-2. Copy and customize environment files:
+1. Copy and customize environment files:
+
 ```bash
 cd ansible
 cp /path/to/ssh-key ./ansible/private_key
 # Edit inventory.ini with your specific configuration
 ```
 
+1. Start core services:
 
-3. Start core services:
 ```bash
 docker-compose up -d
 ```
@@ -75,10 +81,12 @@ docker-compose up -d
 ### Configuration
 
 #### Network Setup
+
 - **Internal Network**: `192.168.1.0/24`
 - **Docker Network**: `172.18.0.0/16`
 
 #### DNS Configuration
+
 Update your router's DNS settings to point to your Pi-hole instance for network-wide ad blocking.
 
 ## Directory Structure
@@ -136,11 +144,13 @@ homelab/
 ## Backup Strategy
 
 ### Automated Backups
+
 - **Configuration**: Daily backup of all config files
 - **Application Data**: Weekly full backups
 - **Media**: Monthly incremental backups
 
 ### Backup Locations
+
 - Local NAS
 - Cloud storage (encrypted)
 - Off-site location
@@ -148,6 +158,7 @@ homelab/
 ## Security
 
 ### Best Practices
+
 - [ ] Regular security updates
 - [ ] Strong passwords and 2FA
 - [ ] Firewall configuration
@@ -156,6 +167,7 @@ homelab/
 - [ ] SSL/TLS encryption for all services
 
 ### Access Control
+
 - Internal services accessible only via VPN
 - Public services protected by authentication
 - Regular audit of user access
@@ -163,6 +175,7 @@ homelab/
 ## Monitoring
 
 ### Key Metrics
+
 - System resources (CPU, RAM, Disk)
 - Network traffic
 - Service uptime
@@ -170,6 +183,7 @@ homelab/
 - Storage usage
 
 ### Alerts
+
 - Service downtime
 - High resource usage
 - Backup failures
@@ -178,12 +192,14 @@ homelab/
 ## Maintenance
 
 ### Regular Tasks
+
 - [ ] Weekly: Check service status
 - [ ] Monthly: Update containers
 - [ ] Quarterly: Security audit
 - [ ] Annually: Hardware health check
 
 ### Update Process
+
 1. Review changelogs
 2. Test in development environment
 3. Create backup
@@ -195,6 +211,7 @@ homelab/
 ### Common Issues
 
 #### Service won't start
+
 ```bash
 # Check container logs
 docker logs <container_name>
@@ -205,6 +222,7 @@ df -h
 ```
 
 #### Network connectivity issues
+
 ```bash
 # Test internal connectivity
 ping <service_ip>
@@ -226,6 +244,7 @@ sudo ufw status
 ## Contributing
 
 This is a personal homelab project, but feel free to:
+
 - Submit issues for bugs or suggestions
 - Fork the repository for your own use
 - Share improvements via pull requests
@@ -233,12 +252,14 @@ This is a personal homelab project, but feel free to:
 ## Resources
 
 ### Useful Links
+
 - [Awesome Selfhosted](https://github.com/awesome-selfhosted/awesome-selfhosted)
 - [r/homelab](https://www.reddit.com/r/homelab/)
 - [Docker Documentation](https://docs.docker.com/)
 - [Homelab Wiki](https://github.com/khuedoan/homelab)
 
 ### Learning Resources
+
 - [Docker Compose Tutorial](https://docs.docker.com/compose/gettingstarted/)
 - [Linux System Administration](https://linuxjourney.com/)
 - [Networking Fundamentals](https://www.cisco.com/c/en/us/solutions/small-business/resource-center/networking/networking-basics.html)
@@ -250,11 +271,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Changelog
 
 ### [1.0.0] - 2025-07-24
+
 - Initial homelab setup
 - Kubernetes installation via ansible (kubespray)
 - Documentation creation
 
 ### [1.0.1] - 2025-08-12
+
 - Kubernetes cluster working
 - setup blocky DNS + traefik as ingress + metallb for app / service access via *.tom-mendy.local
 - install keel on cluster accessible via keel.tom-mendy.local

@@ -1,0 +1,93 @@
+- name: Deploy Kubernetes Applications
+  hosts: kube_control_plane
+  become: false
+  tasks:
+    - name: Ensure kubernetes python library is installed
+      pip:
+        name:
+          - kubernetes
+          - pyyaml
+        state: present
+
+    - name: Label node-3 for GPU
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Node
+          metadata:
+            name: node-3
+            labels:
+              gpu: "true"
+
+    - name: Deploy Blocky
+      kubernetes.core.k8s:
+        state: present
+        src: ../../kubernetes/blocky/blocky.yaml
+
+    - name: Deploy Trilium
+      kubernetes.core.k8s:
+        state: present
+        src: ../../kubernetes/tritium.yml
+
+    - name: Add Keel Helm repo
+      kubernetes.core.helm_repository:
+        name: keel
+        repo_url: https://keel-hq.github.io/keel
+
+    - name: Deploy Keel via Helm
+      kubernetes.core.helm:
+        name: keel
+        chart_ref: keel/keel
+        release_namespace: keel
+        create_namespace: true
+        values_files:
+          - ../../kubernetes/keel/keel-values.yaml
+
+    - name: Apply Keel Ingress
+      kubernetes.core.k8s:
+        state: present
+        src: ../../kubernetes/keel/keel-ingress.yaml
+
+    - name: Add Ollama Helm repo
+      kubernetes.core.helm_repository:
+        name: otwld
+        repo_url: https://helm.otwld.com/
+
+    - name: Deploy Ollama via Helm
+      kubernetes.core.helm:
+        name: ollama
+        chart_ref: otwld/ollama
+        release_namespace: ollama
+        create_namespace: true
+        values_files:
+          - ../../kubernetes/ollama/ollama-values.yaml
+
+    - name: Apply Ollama Ingress
+      kubernetes.core.k8s:
+        state: present
+        src: ../../kubernetes/ollama/ollama-ingress.yaml
+
+    - name: Add OpenWebUI Helm repo
+      kubernetes.core.helm_repository:
+        name: open-webui
+        repo_url: https://helm.openwebui.com/
+
+    - name: Deploy Local Path Provisioner
+      kubernetes.core.k8s:
+        state: present
+        src: https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.32/deploy/local-path-storage.yaml
+
+    - name: Deploy OpenWebUI via Helm
+      kubernetes.core.helm:
+        name: openwebui
+        chart_ref: open-webui/open-webui
+        release_namespace: openwebui
+        create_namespace: true
+        values_files:
+          - ../../kubernetes/openwebui/openwebui-values.yaml
+
+    - name: Apply OpenWebUI Ingress
+      kubernetes.core.k8s:
+        state: present
+        src: ../../kubernetes/openwebui/openwebui-ingress.yaml
