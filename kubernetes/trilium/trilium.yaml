@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: trilium
   namespace: default
+  annotations:
+    keel.sh/policy: all
 spec:
   replicas: 1
   selector:
