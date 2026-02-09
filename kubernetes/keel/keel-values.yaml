@@ -1,4 +1,7 @@
 # keel-values.yaml
+keel:
+  # keel policy (all/major/minor/patch/force)
+  policy: patch
 
 # Disable Helm provider (Keel won't try to upgrade Helm releases itself)
 helmProvider:

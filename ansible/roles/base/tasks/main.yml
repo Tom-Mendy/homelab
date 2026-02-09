@@ -28,6 +28,7 @@
       - wget
       - tree
       - nano
+      - nfs-common
     state: present
     update_cache: true
   become: true

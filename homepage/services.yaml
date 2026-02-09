@@ -27,5 +27,5 @@
         href: https://192.168.1.1:5001/
         description: NAS
     - Navidrome:
-        href: http://192.168.1.18:4533/
+        href: http://navidrome.tom-mendy.local/
         description: Music player
