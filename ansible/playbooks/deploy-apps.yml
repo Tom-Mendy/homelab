@@ -8,7 +8,7 @@
           - python3-kubernetes
           - python3-yaml
         state: present
-        update_cache: yes
+        update_cache: true
 
     - name: Label node-3 for GPU
       kubernetes.core.k8s:
@@ -60,10 +60,10 @@
         state: present
         definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/blocky/blocky.yaml') | from_yaml_all }}"
 
-    - name: Deploy Trilium
-      kubernetes.core.k8s:
-        state: present
-        definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/trilium/trilium.yaml') | from_yaml_all }}"
+    # - name: Deploy Trilium
+    #   kubernetes.core.k8s:
+    #     state: present
+    #     definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/trilium/trilium.yaml') | from_yaml_all }}"
 
     - name: Add Keel Helm repo
       kubernetes.core.helm_repository:
@@ -83,43 +83,52 @@
         state: present
         definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/keel/keel-ingress.yaml') | from_yaml }}"
 
-    - name: Add Ollama Helm repo
-      kubernetes.core.helm_repository:
-        name: otwld
-        repo_url: https://helm.otwld.com/
+    # - name: Add Ollama Helm repo
+    #   kubernetes.core.helm_repository:
+    #     name: otwld
+    #     repo_url: https://helm.otwld.com/
 
-    - name: Deploy Ollama via Helm
-      kubernetes.core.helm:
-        name: ollama
-        chart_ref: otwld/ollama
-        release_namespace: ollama
-        create_namespace: true
-        values: "{{ lookup('file', playbook_dir + '/../../kubernetes/ollama/ollama-values.yaml') | from_yaml }}"
+    # - name: Deploy Ollama via Helm
+    #   kubernetes.core.helm:
+    #     name: ollama
+    #     chart_ref: otwld/ollama
+    #     release_namespace: ollama
+    #     create_namespace: true
+    #     values: "{{ lookup('file', playbook_dir + '/../../kubernetes/ollama/ollama-values.yaml') | from_yaml }}"
 
-    - name: Apply Ollama Ingress
+    # - name: Apply Ollama Ingress
+    #   kubernetes.core.k8s:
+    #     state: present
+    #     definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/ollama/ollama-ingress.yaml') | from_yaml }}"
+
+    # - name: Add OpenWebUI Helm repo
+    #   kubernetes.core.helm_repository:
+    #     name: open-webui
+    #     repo_url: https://helm.openwebui.com/
+
+    # - name: Deploy Local Path Provisioner
+    #   kubernetes.core.k8s:
+    #     state: present
+    #     src: https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.32/deploy/local-path-storage.yaml
+
+    # - name: Deploy OpenWebUI via Helm
+    #   kubernetes.core.helm:
+    #     name: openwebui
+    #     chart_ref: open-webui/open-webui
+    #     release_namespace: openwebui
+    #     create_namespace: true
+    #     values: "{{ lookup('file', playbook_dir + '/../../kubernetes/openwebui/openwebui-values.yaml') | from_yaml }}"
+
+    # - name: Apply OpenWebUI Ingress
+    #   kubernetes.core.k8s:
+    #     state: present
+    #     definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/openwebui/openwebui-ingress.yaml') | from_yaml }}"
+
+    - name: Load Navidrome manifest
+      ansible.builtin.set_fact:
+        navidrome_definitions: "{{ lookup('file', playbook_dir + '/../../kubernetes/navidrome/navidrome.yaml') | from_yaml_all }}"
+
+    - name: Deploy Navidrome
       kubernetes.core.k8s:
         state: present
-        definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/ollama/ollama-ingress.yaml') | from_yaml }}"
-
-    - name: Add OpenWebUI Helm repo
-      kubernetes.core.helm_repository:
-        name: open-webui
-        repo_url: https://helm.openwebui.com/
-
-    - name: Deploy Local Path Provisioner
-      kubernetes.core.k8s:
-        state: present
-        src: https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.32/deploy/local-path-storage.yaml
-
-    - name: Deploy OpenWebUI via Helm
-      kubernetes.core.helm:
-        name: openwebui
-        chart_ref: open-webui/open-webui
-        release_namespace: openwebui
-        create_namespace: true
-        values: "{{ lookup('file', playbook_dir + '/../../kubernetes/openwebui/openwebui-values.yaml') | from_yaml }}"
-
-    - name: Apply OpenWebUI Ingress
-      kubernetes.core.k8s:
-        state: present
-        definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/openwebui/openwebui-ingress.yaml') | from_yaml }}"
+        definition: "{{ navidrome_definitions }}"
