@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: blocky
-        image: spx01/blocky:v0.26
+        image: spx01/blocky:latest
         ports:
         - containerPort: 53
           name: dns
