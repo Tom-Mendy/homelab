@@ -4,8 +4,8 @@
 - **Infrastructure**: Managed via Ansible using Kubespray.
 - **Orchestration**: Kubernetes (K8s) cluster on multiple nodes (see [ansible/inventory.ini](../ansible/inventory.ini)).
 - **Ingress Controller**: Traefik (configured via annotations on Ingress resources).
-- **DNS**: Blocky handles local `.tom-mendy.local` resolution (defined in [kubernetes/blocky/blocky.yaml](../kubernetes/blocky/blocky.yaml)).
-- **Naming Convention**: All internal services use `*.tom-mendy.local`.
+- **DNS**: Blocky handles local `.home.tom-mendy.com` resolution (defined in [kubernetes/blocky/blocky.yaml](../kubernetes/blocky/blocky.yaml)).
+- **Naming Convention**: All internal services use `*.home.tom-mendy.com`.
 
 ## Critical Workflows
 - **Ansible Management**:

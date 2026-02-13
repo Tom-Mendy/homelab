@@ -46,7 +46,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
 spec:
   rules:
-  - host: trilium.tom-mendy.local
+  - host: trilium.home.tom-mendy.com
     http:
       paths:
       - path: /

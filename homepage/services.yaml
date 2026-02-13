@@ -27,8 +27,8 @@
         href: https://192.168.1.1:5001/
         description: NAS
     - Navidrome:
-        href: http://navidrome.tom-mendy.local/
+        href: https://navidrome.home.tom-mendy.com/
         description: Music player
     - Vaultwarden:
-        href: https://vaultwarden.tom-mendy.local/
+        href: https://vaultwarden.home.tom-mendy.com/
         description: Password manager

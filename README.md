@@ -279,8 +279,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ### [1.0.1] - 2025-08-12
 
 - Kubernetes cluster working
-- setup blocky DNS + traefik as ingress + metallb for app / service access via *.tom-mendy.local
-- install keel on cluster accessible via keel.tom-mendy.local
+- setup blocky DNS + traefik as ingress + metallb for app / service access via *.home.tom-mendy.com
+- install keel on cluster accessible via keel.home.tom-mendy.com
 
 ![keel dashboard](./docs/images/keel.png)
 ---

@@ -57,7 +57,7 @@ spec:
           name: http
         env:
         - name: DOMAIN
-          value: https://vaultwarden.tom-mendy.local
+          value: https://vaultwarden.home.tom-mendy.com
         volumeMounts:
         - name: data
           mountPath: /data
@@ -88,12 +88,13 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
 spec:
   tls:
   - hosts:
-    - vaultwarden.tom-mendy.local
+    - vaultwarden.home.tom-mendy.com
   rules:
-  - host: vaultwarden.tom-mendy.local
+  - host: vaultwarden.home.tom-mendy.com
     http:
       paths:
       - path: /

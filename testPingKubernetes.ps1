@@ -1,4 +1,4 @@
 $sw = [System.Diagnostics.Stopwatch]::StartNew()
-Invoke-WebRequest http://keel.tom-mendy.local/ -UseBasicParsing | Out-Null
+Invoke-WebRequest https://keel.home.tom-mendy.com/ -UseBasicParsing | Out-Null
 $sw.Stop()
 $sw.ElapsedMilliseconds

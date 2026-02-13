@@ -108,9 +108,14 @@ metadata:
   namespace: navidrome
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
 spec:
+  tls:
+  - hosts:
+    - navidrome.home.tom-mendy.com
   rules:
-  - host: navidrome.tom-mendy.local
+  - host: navidrome.home.tom-mendy.com
     http:
       paths:
       - path: /

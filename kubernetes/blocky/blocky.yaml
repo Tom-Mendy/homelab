@@ -52,13 +52,13 @@ data:
         - 192.168.1.254
     customDNS:
       mapping:
-        keel.tom-mendy.local: 192.168.1.20
-        trilium.tom-mendy.local: 192.168.1.20
-        blocky.tom-mendy.local: 192.168.1.20
-        ollama.tom-mendy.local: 192.168.1.20
-        openwebui.tom-mendy.local: 192.168.1.20
-        navidrome.tom-mendy.local: 192.168.1.20
-        vaultwarden.tom-mendy.local: 192.168.1.20
+        keel.home.tom-mendy.com: 192.168.1.20
+        trilium.home.tom-mendy.com: 192.168.1.20
+        blocky.home.tom-mendy.com: 192.168.1.20
+        ollama.home.tom-mendy.com: 192.168.1.20
+        openwebui.home.tom-mendy.com: 192.168.1.20
+        navidrome.home.tom-mendy.com: 192.168.1.20
+        vaultwarden.home.tom-mendy.com: 192.168.1.20
     port: 53
     httpPort: 4000
 ---
