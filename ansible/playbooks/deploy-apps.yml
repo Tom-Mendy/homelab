@@ -132,3 +132,12 @@
       kubernetes.core.k8s:
         state: present
         definition: "{{ navidrome_definitions }}"
+
+    - name: Load Vaultwarden manifest
+      ansible.builtin.set_fact:
+        vaultwarden_definitions: "{{ lookup('file', playbook_dir + '/../../kubernetes/vaultwarden/vaultwarden.yaml') | from_yaml_all }}"
+
+    - name: Deploy Vaultwarden
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ vaultwarden_definitions }}"

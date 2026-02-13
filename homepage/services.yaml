@@ -29,3 +29,6 @@
     - Navidrome:
         href: http://navidrome.tom-mendy.local/
         description: Music player
+    - Vaultwarden:
+        href: https://vaultwarden.tom-mendy.local/
+        description: Password manager
