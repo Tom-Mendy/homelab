@@ -4,7 +4,7 @@ metadata:
   name: keel-ingress
   namespace: keel
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
 spec:
   rules:
   - host: keel.tom-mendy.local

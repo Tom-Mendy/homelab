@@ -43,7 +43,7 @@ metadata:
   name: trilium
   namespace: default
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
 spec:
   rules:
   - host: trilium.tom-mendy.local
