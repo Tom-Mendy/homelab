@@ -10,7 +10,7 @@ env:
 
 deployment:
   replicas: 1
-  podAnnotations:
+  annotations:
     keel.sh/policy: minor
 
 additionalArguments:

@@ -18,5 +18,5 @@ service:
   enabled: true
 
 deployment:
-  podAnnotations:
+  annotations:
     keel.sh/policy: minor

@@ -15,7 +15,7 @@ ollama:
       - qwen3:8b
 
 deployment:
-  podAnnotations:
+  annotations:
     keel.sh/policy: minor
 
 tolerations: []
