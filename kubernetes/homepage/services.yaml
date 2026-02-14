@@ -11,6 +11,9 @@
         icon: https://simpleicons.org/icons/adblock.svg
         href: http://192.168.1.19:4000/
         description: Home DNS
+    - Prometheus:
+        href: http://prometheus.home.tom-mendy.com/
+        description: Metrics and monitoring
 
 - Professional Tools:
     - Stirling PDF:
