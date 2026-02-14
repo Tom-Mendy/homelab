@@ -1,0 +1,26 @@
+- name: Run Kubernetes deployment prerequisites
+  ansible.builtin.include_tasks: prereqs.yml
+
+- name: Deploy MetalLB
+  ansible.builtin.include_tasks: metallb.yml
+
+- name: Deploy Traefik
+  ansible.builtin.include_tasks: traefik.yml
+
+- name: Deploy Blocky
+  ansible.builtin.include_tasks: blocky.yml
+
+- name: Deploy Homepage
+  ansible.builtin.include_tasks: homepage.yml
+
+- name: Deploy Keel
+  ansible.builtin.include_tasks: keel.yml
+
+- name: Deploy Prometheus
+  ansible.builtin.include_tasks: prometheus.yml
+
+- name: Deploy Navidrome
+  ansible.builtin.include_tasks: navidrome.yml
+
+- name: Deploy Vaultwarden
+  ansible.builtin.include_tasks: vaultwarden.yml

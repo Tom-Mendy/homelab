@@ -1,0 +1,53 @@
+- name: Ensure Homepage namespace exists
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: homepage
+
+- name: Ensure Homepage config directory exists on control plane
+  become: true
+  ansible.builtin.file:
+    path: /etc/homepage
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Copy Homepage services config on control plane
+  become: true
+  ansible.builtin.copy:
+    src: "{{ playbook_dir + '/../../kubernetes/homepage/services.yaml' }}"
+    dest: /etc/homepage/services.yaml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Read copied Homepage services config
+  become: true
+  ansible.builtin.slurp:
+    src: /etc/homepage/services.yaml
+  register: homepage_services_file
+
+- name: Ensure Homepage services ConfigMap exists
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: homepage-config
+        namespace: homepage
+      data:
+        services.yaml: "{{ homepage_services_file.content | b64decode }}"
+
+- name: Load Homepage manifest
+  ansible.builtin.set_fact:
+    homepage_definitions: "{{ lookup('file', playbook_dir + '/../../kubernetes/homepage/homepage.yaml') | from_yaml_all }}"
+
+- name: Deploy Homepage
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ homepage_definitions }}"

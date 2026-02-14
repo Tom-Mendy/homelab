@@ -1,0 +1,8 @@
+- name: Load Navidrome manifest
+  ansible.builtin.set_fact:
+    navidrome_definitions: "{{ lookup('file', playbook_dir + '/../../kubernetes/navidrome/navidrome.yaml') | from_yaml_all }}"
+
+- name: Deploy Navidrome
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ navidrome_definitions }}"

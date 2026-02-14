@@ -1,0 +1,17 @@
+- name: Add Keel Helm repo
+  kubernetes.core.helm_repository:
+    name: keel
+    repo_url: https://keel-hq.github.io/keel
+
+- name: Deploy Keel via Helm
+  kubernetes.core.helm:
+    name: keel
+    chart_ref: keel/keel
+    release_namespace: keel
+    create_namespace: true
+    values: "{{ lookup('file', playbook_dir + '/../../kubernetes/keel/keel-values.yaml') | from_yaml }}"
+
+- name: Apply Keel Ingress
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/keel/keel-ingress.yaml') | from_yaml }}"

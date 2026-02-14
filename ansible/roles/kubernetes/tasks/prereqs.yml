@@ -1,0 +1,19 @@
+- name: Ensure kubernetes and yaml python libraries are installed (APT)
+  become: true
+  ansible.builtin.apt:
+    name:
+      - python3-kubernetes
+      - python3-yaml
+    state: present
+    update_cache: true
+
+- name: Label node-3 for GPU
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Node
+      metadata:
+        name: node-3
+        labels:
+          gpu: "true"
