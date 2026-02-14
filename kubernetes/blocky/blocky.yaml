@@ -39,30 +39,6 @@ spec:
           name: blocky-config
 ---
 apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: blocky-config
-  namespace: blocky
-data:
-  config.yml: |
-    upstream:
-      default:
-        - 1.1.1.1
-        - 8.8.8.8
-        - 192.168.1.254
-    customDNS:
-      mapping:
-        keel.home.tom-mendy.com: 192.168.1.20
-        trilium.home.tom-mendy.com: 192.168.1.20
-        blocky.home.tom-mendy.com: 192.168.1.20
-        ollama.home.tom-mendy.com: 192.168.1.20
-        openwebui.home.tom-mendy.com: 192.168.1.20
-        navidrome.home.tom-mendy.com: 192.168.1.20
-        vaultwarden.home.tom-mendy.com: 192.168.1.20
-    port: 53
-    httpPort: 4000
----
-apiVersion: v1
 kind: Service
 metadata:
   name: blocky
