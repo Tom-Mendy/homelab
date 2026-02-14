@@ -1,7 +1,9 @@
 - name: Add Keel Helm repo
   kubernetes.core.helm_repository:
     name: keel
-    repo_url: https://keel-hq.github.io/keel
+    repo_url: https://charts.keel.sh
+  register: keel_repo_add
+  failed_when: keel_repo_add.failed and ('already have a repository named keel' not in (keel_repo_add.msg | default('') | lower))
 
 - name: Deploy Keel via Helm
   kubernetes.core.helm:
