@@ -1,28 +1,23 @@
 ---
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/services/
+# icons found here https://github.com/homarr-labs/dashboard-icons
 
 - Homelab:
     - Home Assistant:
-        icon: https://svgl.app/library/home-assistant.svg
+        icon: home-assistant.svg
         href: http://192.168.1.11:8123/
         description: Home Automation
-    - Blocky:
-        icon: https://simpleicons.org/icons/adblock.svg
-        href: http://192.168.1.19:4000/
-        description: Home DNS
     - Prometheus:
-        href: http://prometheus.home.tom-mendy.com/
+        icon: prometheus.svg
+        href: https://prometheus.home.tom-mendy.com
         description: Metrics and monitoring
 
 - Professional Tools:
     - Stirling PDF:
-        href: http://192.168.1.13:8080/
+        icon: stirling-pdf.svg
+        href: https://stirling-pdf.home.tom-mendy.com/
         description: Web Application to Edit PDF
-    - Excalidraw:
-        icon: https://simpleicons.org/icons/excalidraw.svg
-        href: http://192.168.1.12:3000/
-        description: Web Application to draw
 
 - Entertainment:
     - NAS Synology:
@@ -30,8 +25,10 @@
         href: https://192.168.1.1:5001/
         description: NAS
     - Navidrome:
+        icon: navidrome.svg
         href: https://navidrome.home.tom-mendy.com/
         description: Music player
     - Vaultwarden:
+        icon: vaultwarden.svg
         href: https://vaultwarden.home.tom-mendy.com/
         description: Password manager
