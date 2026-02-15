@@ -93,6 +93,9 @@ cd ansible
 Local Helm charts are used for app manifests and addon resources in:
 
 - `kubernetes/blocky`
+- `kubernetes/navidrome`
+- `kubernetes/vaultwarden`
+- `kubernetes/forgejo`
 - `kubernetes/homepage`
 - `kubernetes/prometheus`
 - `kubernetes/grafana`
@@ -112,7 +115,7 @@ Update your router's DNS settings to point to your Pi-hole instance for network-
 
 ## Directory Structure
 
-```
+```text
 homelab/
 ├── ansible/                   # Ansible playbooks and configs
 │   ├── kubespray/             # Kubespray for K8s installation
@@ -305,4 +308,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - install keel on cluster accessible via keel.home.tom-mendy.com
 
 ![keel dashboard](./docs/images/keel.png)
----

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: forgejo-local
+description: Local Helm chart for Forgejo manifests
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

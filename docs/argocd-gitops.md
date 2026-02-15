@@ -10,13 +10,20 @@
 - Nouveau mode Ansible: `kubernetes_deploy_mode`
   - `gitops` (par défaut): bootstrap Argo CD + app racine GitOps
   - `legacy`: comportement historique (Ansible déploie chaque service)
+    - Les ressources applicatives additionnelles sont maintenant déployées via des charts Helm locaux (plus de Kustomize).
 - App racine Argo CD: `homelab-root`
   - source repo: `argocd_gitops_repo_url`
   - path: `kubernetes/argocd/apps`
 - Applications Argo CD créées pour:
   - `traefik`, `blocky`, `homepage`, `keel`, `prometheus`, `grafana`, `navidrome`, `vaultwarden`, `forgejo`, `trilium`
+- Ordre de bootstrap Argo CD via `sync-wave` (dans `kubernetes/argocd/apps/*.yaml`):
+  - wave `0`: `traefik`
+  - wave `1`: `blocky`
+  - wave `2`: `homepage`, `keel`, `prometheus`
+  - wave `3`: `grafana`, `navidrome`, `vaultwarden`, `trilium`
+  - wave `4`: `forgejo`
 - Ajout de charts Helm locaux pour gérer les manifests complémentaires:
-  - `kubernetes/traefik`, `kubernetes/keel`, `kubernetes/prometheus`, `kubernetes/grafana`, `kubernetes/blocky`, `kubernetes/homepage`
+  - `kubernetes/traefik`, `kubernetes/keel`, `kubernetes/prometheus`, `kubernetes/grafana`, `kubernetes/blocky`, `kubernetes/homepage`, `kubernetes/navidrome`, `kubernetes/vaultwarden`, `kubernetes/forgejo`
 
 ## Variables Ansible utiles
 

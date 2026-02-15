@@ -1,8 +1,6 @@
-- name: Load Forgejo manifest
-  ansible.builtin.set_fact:
-    forgejo_definitions: "{{ lookup('file', playbook_dir + '/../../kubernetes/forgejo/forgejo.yaml') | from_yaml_all }}"
-
-- name: Deploy Forgejo
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ forgejo_definitions }}"
+- name: Deploy Forgejo local Helm chart
+  kubernetes.core.helm:
+    name: forgejo-local
+    chart_ref: "{{ playbook_dir + '/../../kubernetes/forgejo' }}"
+    release_namespace: forgejo
+    create_namespace: true
