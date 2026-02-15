@@ -2,104 +2,104 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-	name: sonarr-config-pvc
-	namespace: {{ .Values.namespace }}
+  name: sonarr-config-pvc
+  namespace: {{ .Values.namespace }}
 spec:
-	accessModes:
-		- ReadWriteOnce
-	resources:
-		requests:
-			storage: {{ default .Values.configStorage.defaultSize $app.configSize }}
-	storageClassName: {{ .Values.configStorage.className }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ default .Values.configStorage.defaultSize $app.configSize }}
+  storageClassName: {{ .Values.configStorage.className }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-	name: sonarr
-	namespace: {{ .Values.namespace }}
-	annotations:
-		keel.sh/policy: all
+  name: sonarr
+  namespace: {{ .Values.namespace }}
+  annotations:
+    keel.sh/policy: all
 spec:
-	replicas: 1
-	selector:
-		matchLabels:
-			app: sonarr
-	template:
-		metadata:
-			labels:
-				app: sonarr
-		spec:
-			containers:
-				- name: sonarr
-					image: {{ $app.image | quote }}
-					env:
-						- name: PUID
-							value: {{ .Values.securityContext.puid | quote }}
-						- name: PGID
-							value: {{ .Values.securityContext.pgid | quote }}
-						- name: TZ
-							value: {{ .Values.timezone | quote }}
-					ports:
-						- containerPort: {{ $app.port }}
-							name: http
-					volumeMounts:
-						- name: config
-							mountPath: /config
-						{{- if $app.mounts.downloads }}
-						- name: downloads
-							mountPath: /data/downloads
-						{{- end }}
-						{{- if $app.mounts.series }}
-						- name: series
-							mountPath: /data/media/tv
-						{{- end }}
-			volumes:
-				- name: config
-					persistentVolumeClaim:
-						claimName: sonarr-config-pvc
-				{{- if $app.mounts.downloads }}
-				- name: downloads
-					persistentVolumeClaim:
-						claimName: media-downloads-pvc
-				{{- end }}
-				{{- if $app.mounts.series }}
-				- name: series
-					persistentVolumeClaim:
-						claimName: media-series-pvc
-				{{- end }}
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarr
+  template:
+    metadata:
+      labels:
+        app: sonarr
+    spec:
+      containers:
+        - name: sonarr
+          image: {{ $app.image | quote }}
+          env:
+            - name: PUID
+              value: {{ .Values.securityContext.puid | quote }}
+            - name: PGID
+              value: {{ .Values.securityContext.pgid | quote }}
+            - name: TZ
+              value: {{ .Values.timezone | quote }}
+          ports:
+            - containerPort: {{ $app.port }}
+              name: http
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            {{- if $app.mounts.downloads }}
+            - name: downloads
+              mountPath: /data/downloads
+            {{- end }}
+            {{- if $app.mounts.series }}
+            - name: series
+              mountPath: /data/media/tv
+            {{- end }}
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: sonarr-config-pvc
+        {{- if $app.mounts.downloads }}
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: media-downloads-pvc
+        {{- end }}
+        {{- if $app.mounts.series }}
+        - name: series
+          persistentVolumeClaim:
+            claimName: media-series-pvc
+        {{- end }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-	name: sonarr
-	namespace: {{ .Values.namespace }}
+  name: sonarr
+  namespace: {{ .Values.namespace }}
 spec:
-	type: ClusterIP
-	selector:
-		app: sonarr
-	ports:
-		- name: http
-			port: {{ $app.port }}
-			targetPort: {{ $app.port }}
+  type: ClusterIP
+  selector:
+    app: sonarr
+  ports:
+    - name: http
+      port: {{ $app.port }}
+      targetPort: {{ $app.port }}
 ---
 {{- if .Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-	name: sonarr-ingress
-	namespace: {{ .Values.namespace }}
-	annotations:
+  name: sonarr-ingress
+  namespace: {{ .Values.namespace }}
+  annotations:
 {{ toYaml .Values.ingress.annotations | nindent 4 }}
 spec:
-	rules:
-		- host: {{ $app.host }}
-			http:
-				paths:
-					- path: /
-						pathType: Prefix
-						backend:
-							service:
-								name: sonarr
-								port:
-									number: {{ $app.port }}
+  rules:
+    - host: {{ $app.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sonarr
+                port:
+                  number: {{ $app.port }}
 {{- end }}

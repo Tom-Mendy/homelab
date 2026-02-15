@@ -2,131 +2,131 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-	name: nzbget-config-pvc
-	namespace: {{ .Values.namespace }}
+  name: nzbget-config-pvc
+  namespace: {{ .Values.namespace }}
 spec:
-	accessModes:
-		- ReadWriteOnce
-	resources:
-		requests:
-			storage: {{ default .Values.configStorage.defaultSize $app.configSize }}
-	storageClassName: {{ .Values.configStorage.className }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ default .Values.configStorage.defaultSize $app.configSize }}
+  storageClassName: {{ .Values.configStorage.className }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-	name: nzbget
-	namespace: {{ .Values.namespace }}
-	annotations:
-		keel.sh/policy: all
+  name: nzbget
+  namespace: {{ .Values.namespace }}
+  annotations:
+    keel.sh/policy: all
 spec:
-	replicas: 1
-	selector:
-		matchLabels:
-			app: nzbget
-	template:
-		metadata:
-			labels:
-				app: nzbget
-		spec:
-			containers:
-				{{- if and .Values.vpn.enabled $app.vpn }}
-				- name: gluetun
-					image: qmcgaw/gluetun:latest
-					securityContext:
-						capabilities:
-							add:
-								- NET_ADMIN
-					env:
-						- name: VPN_SERVICE_PROVIDER
-							value: {{ .Values.vpn.serviceProvider | quote }}
-						- name: VPN_TYPE
-							value: {{ .Values.vpn.type | quote }}
-						- name: OPENVPN_USER
-							valueFrom:
-								secretKeyRef:
-									name: {{ .Values.vpn.secretName }}
-									key: OPENVPN_USER
-						- name: OPENVPN_PASSWORD
-							valueFrom:
-								secretKeyRef:
-									name: {{ .Values.vpn.secretName }}
-									key: OPENVPN_PASSWORD
-						- name: FIREWALL
-							value: {{ .Values.vpn.firewall | quote }}
-						- name: SERVER_COUNTRIES
-							value: {{ .Values.vpn.serverCountries | quote }}
-					volumeMounts:
-						- name: tun
-							mountPath: /dev/net/tun
-				{{- end }}
-				- name: nzbget
-					image: {{ $app.image | quote }}
-					env:
-						- name: PUID
-							value: {{ .Values.securityContext.puid | quote }}
-						- name: PGID
-							value: {{ .Values.securityContext.pgid | quote }}
-						- name: TZ
-							value: {{ .Values.timezone | quote }}
-					ports:
-						- containerPort: {{ $app.port }}
-							name: http
-					volumeMounts:
-						- name: config
-							mountPath: /config
-						{{- if $app.mounts.downloads }}
-						- name: downloads
-							mountPath: /data/downloads
-						{{- end }}
-			volumes:
-				- name: config
-					persistentVolumeClaim:
-						claimName: nzbget-config-pvc
-				{{- if $app.mounts.downloads }}
-				- name: downloads
-					persistentVolumeClaim:
-						claimName: media-downloads-pvc
-				{{- end }}
-				{{- if and .Values.vpn.enabled $app.vpn }}
-				- name: tun
-					hostPath:
-						path: /dev/net/tun
-						type: CharDevice
-				{{- end }}
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nzbget
+  template:
+    metadata:
+      labels:
+        app: nzbget
+    spec:
+      containers:
+        {{- if and .Values.vpn.enabled $app.vpn }}
+        - name: gluetun
+          image: qmcgaw/gluetun:latest
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          env:
+            - name: VPN_SERVICE_PROVIDER
+              value: {{ .Values.vpn.serviceProvider | quote }}
+            - name: VPN_TYPE
+              value: {{ .Values.vpn.type | quote }}
+            - name: OPENVPN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.vpn.secretName }}
+                  key: OPENVPN_USER
+            - name: OPENVPN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.vpn.secretName }}
+                  key: OPENVPN_PASSWORD
+            - name: FIREWALL
+              value: {{ .Values.vpn.firewall | quote }}
+            - name: SERVER_COUNTRIES
+              value: {{ .Values.vpn.serverCountries | quote }}
+          volumeMounts:
+            - name: tun
+              mountPath: /dev/net/tun
+        {{- end }}
+        - name: nzbget
+          image: {{ $app.image | quote }}
+          env:
+            - name: PUID
+              value: {{ .Values.securityContext.puid | quote }}
+            - name: PGID
+              value: {{ .Values.securityContext.pgid | quote }}
+            - name: TZ
+              value: {{ .Values.timezone | quote }}
+          ports:
+            - containerPort: {{ $app.port }}
+              name: http
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            {{- if $app.mounts.downloads }}
+            - name: downloads
+              mountPath: /data/downloads
+            {{- end }}
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: nzbget-config-pvc
+        {{- if $app.mounts.downloads }}
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: media-downloads-pvc
+        {{- end }}
+        {{- if and .Values.vpn.enabled $app.vpn }}
+        - name: tun
+          hostPath:
+            path: /dev/net/tun
+            type: CharDevice
+        {{- end }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-	name: nzbget
-	namespace: {{ .Values.namespace }}
+  name: nzbget
+  namespace: {{ .Values.namespace }}
 spec:
-	type: ClusterIP
-	selector:
-		app: nzbget
-	ports:
-		- name: http
-			port: {{ $app.port }}
-			targetPort: {{ $app.port }}
+  type: ClusterIP
+  selector:
+    app: nzbget
+  ports:
+    - name: http
+      port: {{ $app.port }}
+      targetPort: {{ $app.port }}
 ---
 {{- if .Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-	name: nzbget-ingress
-	namespace: {{ .Values.namespace }}
-	annotations:
+  name: nzbget-ingress
+  namespace: {{ .Values.namespace }}
+  annotations:
 {{ toYaml .Values.ingress.annotations | nindent 4 }}
 spec:
-	rules:
-		- host: {{ $app.host }}
-			http:
-				paths:
-					- path: /
-						pathType: Prefix
-						backend:
-							service:
-								name: nzbget
-								port:
-									number: {{ $app.port }}
+  rules:
+    - host: {{ $app.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nzbget
+                port:
+                  number: {{ $app.port }}
 {{- end }}
