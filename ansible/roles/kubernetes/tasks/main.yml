@@ -24,3 +24,6 @@
 
 - name: Deploy Vaultwarden
   ansible.builtin.include_tasks: vaultwarden.yml
+
+- name: Deploy Forgejo
+  ansible.builtin.include_tasks: forgejo.yml

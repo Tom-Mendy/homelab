@@ -16,6 +16,7 @@ customDNS:
     vaultwarden.home.tom-mendy.com: 192.168.1.20
     homepage.home.tom-mendy.com: 192.168.1.20
     prometheus.home.tom-mendy.com: 192.168.1.20
+    forgejo.home.tom-mendy.com: 192.168.1.20
 prometheus:
   enable: true
   path: /metrics
