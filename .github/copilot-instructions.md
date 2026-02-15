@@ -1,38 +1,44 @@
 # Copilot Instructions - Homelab Infrastructure
 
 ## Architecture & Tech Stack
-- **Infrastructure**: Managed via Ansible using Kubespray.
-- **Orchestration**: Kubernetes (K8s) cluster on multiple nodes (see [ansible/inventory.ini](../ansible/inventory.ini)).
-- **Ingress Controller**: Traefik (configured via annotations on Ingress resources).
-- **DNS**: Blocky handles local `.home.tom-mendy.com` resolution (defined in [kubernetes/blocky/blocky.yaml](../kubernetes/blocky/blocky.yaml)).
-- **Naming Convention**: All internal services use `*.home.tom-mendy.com`.
+- **Infrastructure**: Managed with Ansible + Kubespray workflows.
+- **Orchestration**: Kubernetes cluster managed from [ansible/](../ansible/), inventory in [ansible/inventory.ini](../ansible/inventory.ini).
+- **GitOps**: Argo CD is the default deployment mode (`kubernetes_deploy_mode: gitops`) configured in [ansible/roles/kubernetes/defaults/main.yml](../ansible/roles/kubernetes/defaults/main.yml).
+- **Ingress Controller**: Traefik.
+- **LoadBalancer**: MetalLB.
+- **DNS**: Blocky for `.home.tom-mendy.com` service resolution.
+- **Naming Convention**: Internal services use `*.home.tom-mendy.com`.
 
 ## Critical Workflows
-- **Ansible Management**:
-  - Entry point is [ansible/run.sh](../ansible/run.sh), which manages a virtual environment and installs dependencies.
-  - Playbooks live in [ansible/playbooks/](../ansible/playbooks/) and are executed from the `ansible/` directory.
+- **Ansible execution**:
+  - Use [ansible/run.sh](../ansible/run.sh) as the single entry point; it manages `.venv`, Python deps, and Ansible collections.
+  - Run playbooks from the `ansible/` directory.
   - SSH access relies on [ansible/private_key](../ansible/private_key).
-- **Service Deployment**:
-  - Services are organized in individual directories under [kubernetes/](../kubernetes/).
-  - Deployment typically uses `helm` (for Keel, Ollama, Open WebUI) or raw manifests.
-  - Check for `install.sh` in service folders for specific installation logic.
-- **Hardware Integrations**:
-  - NVIDIA GPU support via specialized runtime classes (see [kubernetes/ollama/runtimeclass-nvidia.yaml](../kubernetes/ollama/runtimeclass-nvidia.yaml)).
-  - MetalLB handles LoadBalancer IP allocation.
+- **Primary playbooks**:
+  - Install cluster: [ansible/playbooks/install.yml](../ansible/playbooks/install.yml)
+  - Deploy apps/platform: [ansible/playbooks/deploy-apps.yml](../ansible/playbooks/deploy-apps.yml)
+  - Update nodes: [ansible/playbooks/update.yml](../ansible/playbooks/update.yml)
+  - Reboot nodes: [ansible/playbooks/reboot.yml](../ansible/playbooks/reboot.yml)
+  - Reset cluster: [ansible/playbooks/reset.yml](../ansible/playbooks/reset.yml)
+- **Application deployment model**:
+  - App definitions live under [kubernetes/](../kubernetes/).
+  - GitOps applications are declared in [kubernetes/argocd/apps/](../kubernetes/argocd/apps/).
+  - Additional manifests can exist outside Argo CD app declarations (for example `ollama` and `openwebui`).
+- **Hardware integrations**:
+  - NVIDIA runtime class lives at [kubernetes/ollama/runtimeclass-nvidia.yaml](../kubernetes/ollama/runtimeclass-nvidia.yaml).
 
 ## Project Patterns & Conventions
-- **Ingresses**: Use the annotation `traefik.ingress.kubernetes.io/router.entrypoints: web`.
-- **DNS Mapping**: When adding a new service, update the `customDNS` mapping in [kubernetes/blocky/blocky.yaml](../kubernetes/blocky/blocky.yaml).
-- **Dashboard**: New services should be added to [homepage/services.yaml](../homepage/services.yaml) for appearing on the `homepage` dashboard.
-- **Maintenance**: Use [ansible/playbooks/update.yml](../ansible/playbooks/update.yml) for cluster-wide updates and [ansible/playbooks/reboot.yml](../ansible/playbooks/reboot.yml) for managed reboots.
+- **Ingress annotations**: Use `traefik.ingress.kubernetes.io/router.entrypoints: web, websecure` for Traefik-routed services.
+- **DNS mapping**: Update `customDNS.mapping` in [kubernetes/blocky/config.yml](../kubernetes/blocky/config.yml) when adding internal hostnames.
+- **Dashboard entries**: Add services to [kubernetes/homepage/services.yaml](../kubernetes/homepage/services.yaml).
+- **GitOps onboarding**: For GitOps-managed services, add an Application manifest in [kubernetes/argocd/apps/](../kubernetes/argocd/apps/).
 
 ## Data Storage Policy
-- **NAS Usage**: Store only content data on the NAS. Application data must remain on local cluster storage.
+- **NAS usage**: Keep only content/media data on NAS; keep application state/config data on cluster-local storage unless explicitly documented otherwise.
 
-## Directory Structure
+## Current Repository Layout
 - [.github/](../.github/): Repository automation and Copilot instructions.
-- [ansible/](../ansible/): Cluster lifecycle and node maintenance; includes [ansible/playbooks/](../ansible/playbooks/) and [ansible/inventory/](../ansible/inventory/).
-- [kubernetes/](../kubernetes/): Application manifests and Helm chart configurations.
-- [docs/](../docs/): Technical documentation and network diagrams.
-- [homepage/](../homepage/): Dashboard configuration using `gethomepage.dev`.
-- [navidrome/](../navidrome/): Local utility scripts and media playlist helpers.
+- [ansible/](../ansible/): Cluster lifecycle, inventory, roles, playbooks, and runner script.
+- [kubernetes/](../kubernetes/): Helm charts/manifests, Argo CD applications, and platform service configs.
+- [docs/](../docs/): Operational runbooks and architecture/network documentation.
+- [navidrome/](../navidrome/): Local utility scripts.
