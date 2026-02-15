@@ -4,10 +4,22 @@ This setup gives browser-trusted HTTPS certificates **without** installing a pri
 
 ## Domain pattern
 
-Services are moved to:
+Internal services use:
 
+- `*.home.tom-mendy.com`
+
+Examples currently present in DNS mapping (`kubernetes/blocky/config.yml`):
+
+- `argocd.home.tom-mendy.com`
+- `forgejo.home.tom-mendy.com`
+- `grafana.home.tom-mendy.com`
+- `homepage.home.tom-mendy.com`
 - `keel.home.tom-mendy.com`
 - `navidrome.home.tom-mendy.com`
+- `openwebui.home.tom-mendy.com`
+- `ollama.home.tom-mendy.com`
+- `prometheus.home.tom-mendy.com`
+- `trilium.home.tom-mendy.com`
 - `vaultwarden.home.tom-mendy.com`
 
 ## Why DNS-01
@@ -20,18 +32,17 @@ Traefik's ACME DNS challenge uses LEGO DNS providers. If your DNS provider is no
 
 ## Required DNS records
 
-In Cloudflare DNS (or your supported provider), create:
+For DNS-01 certificate issuance, the authoritative public zone must be manageable by your DNS API token.
 
-- `keel.home.tom-mendy.com` -> `192.168.1.20` (A)
-- `navidrome.home.tom-mendy.com` -> `192.168.1.20` (A)
-- `vaultwarden.home.tom-mendy.com` -> `192.168.1.20` (A)
+Practical options:
 
-If you only want those records usable inside your LAN, keep using Blocky custom DNS and avoid publishing public A records.
+1. **Private-only resolution in LAN**: keep service A records in Blocky (`customDNS.mapping`) and use DNS-01 only for certificate issuance.
+2. **Public DNS records**: publish A records to your ingress IP if that matches your security model.
 
 ## Apply steps
 
-1. Create a Cloudflare API token with zone DNS edit permission for `tom-mendy.com`.
-2. Apply the Traefik secret (replace token first):
+1. Create a Cloudflare API token with Zone DNS edit permission for `tom-mendy.com`.
+2. Create the Kubernetes secret from `kubernetes/traefik/traefik-cloudflare-secret.example.yaml` (replace token first).
 
 ```bash
 kubectl apply -f kubernetes/traefik/traefik-cloudflare-secret.example.yaml
@@ -62,6 +73,13 @@ kubectl apply -f kubernetes/vaultwarden/vaultwarden.yaml
 kubectl -n traefik logs deploy/traefik | grep -Ei "acme|certificate|letsencrypt|dns-01"
 ```
 
+1. Verify host routing and certificate presentation:
+
+```bash
+curl -Ik https://keel.home.tom-mendy.com
+curl -Ik https://vaultwarden.home.tom-mendy.com
+```
+
 ## Result
 
-Browsers trust certificates for these domains using public CA trust roots, with no client certificate installation.
+Browsers trust certificates for these domains using public CA trust roots, with no client CA installation.

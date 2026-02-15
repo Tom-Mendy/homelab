@@ -1,310 +1,126 @@
 # Homelab Infrastructure
 
-A personal homelab setup for learning, experimentation, and self-hosting various services.
+Kubernetes homelab managed with Ansible + Kubespray, with Argo CD GitOps for app reconciliation.
 
-## Overview
+## What is in this repo
 
-This repository contains configuration files, documentation, and automation scripts for my homelab infrastructure. The goal is to create a reproducible, scalable, and well-documented environment for hosting various services and applications.
+- Cluster lifecycle automation in `ansible/`
+- Kubernetes apps and manifests in `kubernetes/`
+- Operational runbooks in `docs/`
+- Homepage dashboard configuration in `kubernetes/homepage/services.yaml`
 
-## Architecture
+## Current architecture
 
-### Hardware
+- **Nodes**: `node1` (`192.168.1.11`), `node2` (`192.168.1.12`), `node3` (`192.168.1.13`)
+- **Control plane**: `node1`
+- **Workers**: `node2`, `node3`
+- **Ingress**: Traefik
+- **LoadBalancer IPs**: MetalLB (`192.168.1.20-192.168.1.49`)
+- **DNS**: Blocky (`blocky` service exposed at `192.168.1.21`)
+- **Domain convention**: `*.home.tom-mendy.com`
 
-- **Main Server**: [Add your hardware specs here]
-- **Network Equipment**: [Router, switches, etc.]
-- **Storage**: [NAS, external drives, etc.]
+## Deployed services
 
-### Software Stack
+### GitOps-managed (Argo CD Applications)
 
-- **Operating System**: [Ubuntu Server]
-- **Orchestration**: [Kubernetes]
-- **Monitoring**: [Prometheus, Grafana, etc.]
-- **Networking**: [Traefik, nginx, etc.]
+- `traefik`
+- `blocky`
+- `homepage`
+- `keel`
+- `prometheus`
+- `grafana`
+- `navidrome`
+- `vaultwarden`
+- `forgejo`
+- `trilium`
 
-## Services
+### Additional manifests in repository
 
-### Core Services
+- `kubernetes/ollama/`
+- `kubernetes/openwebui/`
 
-- [ ] DNS Server (Blocky)
-- [ ] Reverse Proxy (Traefik, nginx)
-- [ ] Certificate Management (Let's Encrypt)
-- [ ] Monitoring & Logging (Prometheus, Grafana, Loki, Promtail)
-- [ ] Backup Solutions
-- [ ] Authentication (Authelia, Keycloak)
+These are present in the repo but are not part of `kubernetes/argocd/apps`.
 
-### Applications
+## Quick start
 
-- [ ] Admin Panel (Portainer, Keel + admin dashboard)
-- [ ] Document Storage (Paperless-gnx, Paperless-AI)
-- [ ] Note App (Trilium)
-- [ ] Container Registry (Harbort)
-- [ ] Home Automation (Home Assistant)
-- [ ] Remote Access (twingate)
-- [ ] Git Runner Server (GitLab, Github)
-- [ ] Pod Container (Gitpod)
-- [ ] Password Manager (Vaultwarden)
-- [ ] AI usage (Ollama, Ollama-WebUI)
-- [ ] Database (PostgreSQL, CloudBeaver)
-- [ ] Tools ([wol-web](https://github.com/HuakunShen/wol-web), UpTimeKuma)
+### 1) Prepare access
 
-## Getting Started
+1. Clone repository:
 
-### Prerequisites
+ ```bash
+ git clone https://github.com/Tom-Mendy/homelab.git
+ cd homelab
+ ```
 
-- Linux nodes reachable via SSH (inventory configured)
-- Ansible dependencies managed via `ansible/run.sh`
-- Basic understanding of Kubernetes and networking
+2. Place SSH key for Ansible at `ansible/private_key`.
+3. Review `ansible/inventory.ini`.
 
-### Installation
-
-1. Clone this repository:
-
-```bash
-git clone https://github.com/Tom-Mendy/homelab.git
-cd homelab
-```
-
-1. Configure SSH key and inventory:
+### 2) Install cluster (first bootstrap)
 
 ```bash
 cd ansible
-cp /path/to/ssh-key ./private_key
-# Edit inventory.ini with your specific configuration
+./run.sh playbooks/install.yml
 ```
 
-1. Deploy applications:
+### 3) Deploy platform + apps
 
 ```bash
+cd ansible
 ./run.sh playbooks/deploy-apps.yml
 ```
 
-### Deployment modes
+## Ansible playbooks
 
-- `gitops` (default): Ansible bootstraps Argo CD, then Argo CD keeps apps in sync from Git.
-- `legacy`: Ansible deploys apps directly.
+From `ansible/`:
+
+- Install base + Kubernetes: `./run.sh playbooks/install.yml`
+- Deploy apps/platform: `./run.sh playbooks/deploy-apps.yml`
+- OS update tasks: `./run.sh playbooks/update.yml`
+- Reboot all nodes: `./run.sh playbooks/reboot.yml`
+- Reset Kubernetes cluster: `./run.sh playbooks/reset.yml`
+
+## Deployment mode
+
+`ansible/roles/kubernetes/defaults/main.yml` defines:
+
+- `kubernetes_deploy_mode=gitops` (default)
+- `kubernetes_deploy_mode=legacy` (direct Ansible service deployment)
+
+Override example:
 
 ```bash
 cd ansible
 ./run.sh playbooks/deploy-apps.yml -e kubernetes_deploy_mode=legacy
 ```
 
-### Local Helm charts
+## Service onboarding checklist
 
-Local Helm charts are used for app manifests and addon resources in:
+When adding a new internal service:
 
-- `kubernetes/blocky`
-- `kubernetes/navidrome`
-- `kubernetes/vaultwarden`
-- `kubernetes/forgejo`
-- `kubernetes/homepage`
-- `kubernetes/prometheus`
-- `kubernetes/grafana`
-- `kubernetes/keel`
-- `kubernetes/traefik`
+1. Add Kubernetes manifests/chart under `kubernetes/<service>/`
+2. Add DNS mapping in `kubernetes/blocky/config.yml` (`customDNS.mapping`)
+3. Add homepage entry in `kubernetes/homepage/services.yaml`
+4. If GitOps-managed, add an Argo CD Application in `kubernetes/argocd/apps/`
 
-### Configuration
-
-#### Network Setup
-
-- **Internal Network**: `192.168.1.0/24`
-- **Docker Network**: `172.18.0.0/16`
-
-#### DNS Configuration
-
-Update your router's DNS settings to point to your Pi-hole instance for network-wide ad blocking.
-
-## Directory Structure
+## Repository layout (summary)
 
 ```text
 homelab/
-├── ansible/                   # Ansible playbooks and configs
-│   ├── kubespray/             # Kubespray for K8s installation
-│   ├── inventory/             # Host inventories
-│   └── playbooks/             # Custom playbooks
-├── kubernetes/                # Kubernetes manifests
-│   ├── core/                  # Core services (DNS, proxy, certs)
-│   │   ├── blocky/           # DNS server configs
-│   │   ├── traefik/          # Reverse proxy
-│   │   └── cert-manager/     # Certificate management
-│   ├── monitoring/           # Monitoring stack
-│   │   ├── prometheus/       # Metrics collection
-│   │   ├── grafana/          # Dashboards
-│   │   └── loki/             # Log aggregation
-│   ├── auth/                 # Authentication services
-│   │   ├── authelia/         # Auth middleware
-│   │   └── keycloak/         # Identity provider
-│   ├── apps/                 # Application deployments
-│   │   ├── portainer/        # Container management
-│   │   ├── paperless/        # Document storage
-│   │   ├── trilium/          # Note-taking
-│   │   ├── vaultwarden/      # Password manager
-│   │   ├── home-assistant/   # Home automation
-│   │   └── ollama/           # AI services
-│   └── storage/              # Storage configs
-│       ├── postgresql/       # Database
-│       └── persistent-volumes/
-├── configs/                  # Configuration files
-│   ├── .env.example         # Environment template
-│   ├── hosts                # Host definitions
-│   └── secrets/             # Secret templates
-├── scripts/                 # Automation scripts
-│   ├── backup.sh           # Backup automation
-│   ├── update.sh           # Update procedures
-│   └── deploy.sh           # Deployment scripts
-├── docs/                    # Documentation
-│   ├── network-diagram.md   # Network topology
-│   ├── backup-procedures.md # Backup guides
-│   └── disaster-recovery.md # Recovery procedures
-├── monitoring/              # Monitoring configs
-│   ├── alerts/             # Alert rules
-│   └── dashboards/         # Grafana dashboards
-├── backups/                # Backup configurations
-│   └── policies/           # Backup policies
-├── .gitignore              # Git ignore rules
-├── LICENSE                 # License file
-└── README.md               # This file
+├── ansible/                 # Playbooks, inventory, roles, run.sh
+├── docs/                    # Runbooks and architecture docs
+├── kubernetes/              # App manifests/charts and GitOps apps
+├── navidrome/               # Local utility script(s)
+└── README.md
 ```
 
-## Backup Strategy
+## Documentation index
 
-### Automated Backups
+- `docs/network-diagram.md`
+- `docs/argocd-gitops.md`
+- `docs/acme-dns01-private-services.md`
+- `docs/backup-procedures.md`
+- `docs/disaster-recovery.md`
+- `kubernetes/kube-config-to-normal-user.md`
+- `kubernetes/ollama/README.md`
 
-- **Configuration**: Daily backup of all config files
-- **Application Data**: Weekly full backups
-- **Media**: Monthly incremental backups
-
-### Backup Locations
-
-- Local NAS
-- Cloud storage (encrypted)
-- Off-site location
-
-## Security
-
-### Best Practices
-
-- [ ] Regular security updates
-- [ ] Strong passwords and 2FA
-- [ ] Firewall configuration
-- [ ] VPN access for external connections
-- [ ] Regular backup testing
-- [ ] SSL/TLS encryption for all services
-
-### Access Control
-
-- Internal services accessible only via VPN
-- Public services protected by authentication
-- Regular audit of user access
-
-## Monitoring
-
-### Key Metrics
-
-- System resources (CPU, RAM, Disk)
-- Network traffic
-- Service uptime
-- Container health
-- Storage usage
-
-### Alerts
-
-- Service downtime
-- High resource usage
-- Backup failures
-- Security events
-
-## Maintenance
-
-### Regular Tasks
-
-- [ ] Weekly: Check service status
-- [ ] Monthly: Update containers
-- [ ] Quarterly: Security audit
-- [ ] Annually: Hardware health check
-
-### Update Process
-
-1. Review changelogs
-2. Test in development environment
-3. Create backup
-4. Deploy updates
-5. Verify functionality
-
-## Troubleshooting
-
-### Common Issues
-
-#### Service won't start
-
-```bash
-# Check container logs
-docker logs <container_name>
-
-# Check system resources
-htop
-df -h
-```
-
-#### Network connectivity issues
-
-```bash
-# Test internal connectivity
-ping <service_ip>
-
-# Check DNS resolution
-nslookup <domain>
-
-# Verify firewall rules
-sudo ufw status
-```
-
-## Documentation
-
-- [Service-specific documentation](docs/)
-- [Network diagram](docs/network-diagram.md)
-- [Backup procedures](docs/backup-procedures.md)
-- [Disaster recovery](docs/disaster-recovery.md)
-- [Argo CD GitOps migration](docs/argocd-gitops.md)
-
-## Contributing
-
-This is a personal homelab project, but feel free to:
-
-- Submit issues for bugs or suggestions
-- Fork the repository for your own use
-- Share improvements via pull requests
-
-## Resources
-
-### Useful Links
-
-- [Awesome Selfhosted](https://github.com/awesome-selfhosted/awesome-selfhosted)
-- [r/homelab](https://www.reddit.com/r/homelab/)
-- [Docker Documentation](https://docs.docker.com/)
-- [Homelab Wiki](https://github.com/khuedoan/homelab)
-
-### Learning Resources
-
-- [Docker Compose Tutorial](https://docs.docker.com/compose/gettingstarted/)
-- [Linux System Administration](https://linuxjourney.com/)
-- [Networking Fundamentals](https://www.cisco.com/c/en/us/solutions/small-business/resource-center/networking/networking-basics.html)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Changelog
-
-### [1.0.0] - 2025-07-24
-
-- Initial homelab setup
-- Kubernetes installation via ansible (kubespray)
-- Documentation creation
-
-### [1.0.1] - 2025-08-12
-
-- Kubernetes cluster working
-- setup blocky DNS + traefik as ingress + metallb for app / service access via *.home.tom-mendy.com
-- install keel on cluster accessible via keel.home.tom-mendy.com
-
-![keel dashboard](./docs/images/keel.png)
+![Keel dashboard](./docs/images/keel.png)

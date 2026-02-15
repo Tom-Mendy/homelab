@@ -1,76 +1,84 @@
-# Migration vers Argo CD (GitOps) en conservant Ansible
+# Argo CD GitOps with Ansible Bootstrap
 
-## Objectif
+## Goal
 
-- Conserver Ansible pour le **bootstrap cluster** (prérequis, MetalLB, Argo CD).
-- Déléguer le déploiement et la réconciliation des applications Kubernetes à **Argo CD**.
+- Keep Ansible for cluster/bootstrap tasks (prereqs, MetalLB, Argo CD).
+- Use Argo CD to deploy and continuously reconcile Kubernetes applications.
 
-## Ce qui a été mis en place
+## Current behavior
 
-- Nouveau mode Ansible: `kubernetes_deploy_mode`
-  - `gitops` (par défaut): bootstrap Argo CD + app racine GitOps
-  - `legacy`: comportement historique (Ansible déploie chaque service)
-    - Les ressources applicatives additionnelles sont maintenant déployées via des charts Helm locaux (plus de Kustomize).
-- App racine Argo CD: `homelab-root`
-  - source repo: `argocd_gitops_repo_url`
-  - path: `kubernetes/argocd/apps`
-- Applications Argo CD créées pour:
-  - `traefik`, `blocky`, `homepage`, `keel`, `prometheus`, `grafana`, `navidrome`, `vaultwarden`, `forgejo`, `trilium`
-- Ordre de bootstrap Argo CD via `sync-wave` (dans `kubernetes/argocd/apps/*.yaml`):
-  - wave `0`: `traefik`
-  - wave `1`: `blocky`
-  - wave `2`: `homepage`, `keel`, `prometheus`
-  - wave `3`: `grafana`, `navidrome`, `vaultwarden`, `trilium`
-  - wave `4`: `forgejo`
-- Ajout de charts Helm locaux pour gérer les manifests complémentaires:
-  - `kubernetes/traefik`, `kubernetes/keel`, `kubernetes/prometheus`, `kubernetes/grafana`, `kubernetes/blocky`, `kubernetes/homepage`, `kubernetes/navidrome`, `kubernetes/vaultwarden`, `kubernetes/forgejo`
-  - Tous ces charts utilisent désormais des templates Helm explicites (namespace/deployment/service/ingress/pv/pvc/secret selon le service), sans wrapper `resources.yaml`.
+`ansible/roles/kubernetes/tasks/main.yml` always runs:
 
-## Variables Ansible utiles
+1. prerequisites (`prereqs.yml`)
+2. MetalLB (`metallb.yml`)
+3. Argo CD (`argocd.yml`)
 
-Les valeurs par défaut sont dans `ansible/roles/kubernetes/defaults/main.yml`.
+Then behavior depends on `kubernetes_deploy_mode`:
 
-Variables principales:
+- `gitops` (default): configure Argo CD repo credentials and apply root app bootstrap
+- `legacy`: deploy apps directly from Ansible role task files
 
-- `kubernetes_deploy_mode`: `gitops` ou `legacy`
-- `argocd_gitops_repo_url`: URL Git suivie par Argo CD
-- `argocd_gitops_repo_revision`: branche/tag (ex: `main`)
-- `argocd_gitops_apps_path`: chemin des `Application` Argo CD
-- `argocd_gitops_repo_ssh_private_key`: clé privée SSH (si repo SSH)
-- `argocd_gitops_repo_insecure_ignore_host_key`: `true`/`false`
+## GitOps app source
 
-## Repo Forgejo via SSH
+- Repo URL: `argocd_gitops_repo_url`
+- Revision: `argocd_gitops_repo_revision`
+- Applications path: `argocd_gitops_apps_path` (default `kubernetes/argocd/apps`)
 
-Pour une URL SSH (ex: `ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git`), Argo CD a besoin d’une clé privée.
+Defined Argo CD Applications:
 
-Le rôle Ansible crée automatiquement un Secret repository Argo CD (`argocd-repo-homelab`) **si** `argocd_gitops_repo_ssh_private_key` est renseignée.
+- `traefik`, `blocky`, `homepage`, `keel`, `prometheus`, `grafana`, `navidrome`, `vaultwarden`, `forgejo`, `trilium`
 
-Recommandation:
+## Sync-wave order
 
-- stocker cette variable dans un fichier chiffré Ansible Vault.
+From `kubernetes/argocd/apps/*.yaml`:
 
-## Exécution
+- wave `0`: `traefik`
+- wave `1`: `blocky`
+- wave `2`: `homepage`, `keel`, `prometheus`
+- wave `3`: `grafana`, `navidrome`, `vaultwarden`, `trilium`
+- wave `4`: `forgejo`
 
-Depuis `ansible/`:
+## Important Ansible variables
+
+Defaults are in `ansible/roles/kubernetes/defaults/main.yml`:
+
+- `kubernetes_deploy_mode`
+- `argocd_gitops_repo_url`
+- `argocd_gitops_repo_revision`
+- `argocd_gitops_apps_path`
+- `argocd_gitops_repo_ssh_private_key`
+- `argocd_gitops_repo_insecure_ignore_host_key`
+
+## SSH repository access
+
+If Argo CD tracks a private SSH repository (default URL points to internal Forgejo), set `argocd_gitops_repo_ssh_private_key`.
+
+When provided, Ansible creates the Argo CD repository Secret automatically.
+
+Recommendation: store private key material with Ansible Vault.
+
+## Commands
+
+From `ansible/`:
 
 ```bash
 ./run.sh playbooks/deploy-apps.yml
 ```
 
-Avec override temporaire:
+Force GitOps mode explicitly:
 
 ```bash
 ./run.sh playbooks/deploy-apps.yml -e kubernetes_deploy_mode=gitops
 ```
 
-Retour arrière (mode historique):
+Use legacy mode:
 
 ```bash
 ./run.sh playbooks/deploy-apps.yml -e kubernetes_deploy_mode=legacy
 ```
 
-## Notes importantes
+## Operational notes
 
-- Éviter d’utiliser Ansible et Argo CD en parallèle sur les mêmes ressources (hors mode `legacy`).
-- Les changements applicatifs doivent passer par Git pour rester cohérents avec GitOps.
-- Les manifests de secrets en clair sont à éviter; préférer Vault/SealedSecrets/SOPS à terme.
+- In GitOps mode, treat Git as the source of truth for app resources.
+- Avoid changing the same resources through both direct `kubectl` and Argo CD.
+- Keep secrets out of plaintext manifests whenever possible.
