@@ -30,10 +30,10 @@
         "credentials": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["openvpnUser", "openvpnPassword"],
           "properties": {
             "openvpnUser": { "type": "string", "minLength": 1 },
-            "openvpnPassword": { "type": "string", "minLength": 1 }
+            "openvpnPassword": { "type": "string", "minLength": 1 },
+            "wireguardPrivateKey": { "type": "string", "minLength": 1 }
           }
         }
       }

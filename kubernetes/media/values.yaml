@@ -11,12 +11,11 @@ vpn:
   createSecret: true
   secretName: protonvpn-credentials
   serviceProvider: protonvpn
-  type: openvpn
+  type: wireguard
   firewall: "on"
-  serverCountries: Netherlands
+  serverCountries: Switzerland
   credentials:
-    openvpnUser: nainjoueur
-    openvpnPassword: bZ3^6m&@!&w4Z@
+    wireguardPrivateKey: "REMOVED_API_KEY"
 
 storage:
   nfsServer: 192.168.1.1

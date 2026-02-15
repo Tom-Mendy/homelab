@@ -30,12 +30,15 @@ Container identity defaults:
 
 ## ProtonVPN credentials
 
-Credentials are configured in `values.yaml` under:
+For WireGuard, configure in `values.yaml`:
+
+- `vpn.type=wireguard`
+- `vpn.credentials.wireguardPrivateKey`
+
+If you use OpenVPN instead, configure:
 
 - `vpn.credentials.openvpnUser`
 - `vpn.credentials.openvpnPassword`
-
-Use Proton OpenVPN credentials (not your account password).
 
 For safer handling, set `vpn.createSecret=false` and provide a pre-created secret named by `vpn.secretName`.
 

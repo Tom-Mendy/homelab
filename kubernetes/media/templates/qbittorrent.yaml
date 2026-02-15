@@ -42,6 +42,13 @@ spec:
               value: {{ .Values.vpn.serviceProvider | quote }}
             - name: VPN_TYPE
               value: {{ .Values.vpn.type | quote }}
+            {{- if eq (lower .Values.vpn.type) "wireguard" }}
+            - name: WIREGUARD_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.vpn.secretName }}
+                  key: WIREGUARD_PRIVATE_KEY
+            {{- else }}
             - name: OPENVPN_USER
               valueFrom:
                 secretKeyRef:
@@ -52,8 +59,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.vpn.secretName }}
                   key: OPENVPN_PASSWORD
+            {{- end }}
             - name: FIREWALL
               value: {{ .Values.vpn.firewall | quote }}
+            - name: FIREWALL_INPUT_PORTS
+              value: {{ $app.port | quote }}
             - name: SERVER_COUNTRIES
               value: {{ .Values.vpn.serverCountries | quote }}
           volumeMounts:
