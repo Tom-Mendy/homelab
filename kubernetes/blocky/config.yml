@@ -23,6 +23,7 @@ customDNS:
     navidrome.home.tom-mendy.com: 192.168.1.20
     vaultwarden.home.tom-mendy.com: 192.168.1.20
     homepage.home.tom-mendy.com: 192.168.1.20
+    kasm.home.tom-mendy.com: 192.168.1.20
     prometheus.home.tom-mendy.com: 192.168.1.20
     forgejo.home.tom-mendy.com: 192.168.1.20
     grafana.home.tom-mendy.com: 192.168.1.20

@@ -18,6 +18,9 @@
         description: NAS
 
 - Professional Tools:
+    - Kasm:
+        href: https://kasm.home.tom-mendy.com/
+        description: Browser-based remote workspaces
     - Stirling PDF:
         icon: stirling-pdf.svg
         href: https://stirling-pdf.home.tom-mendy.com/
