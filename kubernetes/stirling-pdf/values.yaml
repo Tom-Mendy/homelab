@@ -1,0 +1,22 @@
+namespace: stirling-pdf
+
+replicaCount: 1
+
+image:
+  repository: stirlingtools/stirling-pdf
+  tag: latest
+  pullPolicy: IfNotPresent
+
+deploymentAnnotations:
+  keel.sh/policy: all
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  host: stirling-pdf.home.tom-mendy.com
+  className: ""
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
