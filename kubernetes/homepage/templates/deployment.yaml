@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homepage
+  namespace: {{ .Values.namespace }}
+  annotations:
+{{ toYaml .Values.deploymentAnnotations | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: homepage
+  template:
+    metadata:
+      labels:
+        app: homepage
+      annotations:
+        checksum/services: {{ .Files.Get "services.yaml" | sha256sum }}
+    spec:
+      containers:
+        - name: homepage
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: HOMEPAGE_ALLOWED_HOSTS
+              value: {{ .Values.allowedHosts | quote }}
+          ports:
+            - containerPort: 3000
+              name: http
+          volumeMounts:
+            - name: config
+              mountPath: /app/config/services.yaml
+              subPath: services.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: homepage-config
