@@ -7,6 +7,13 @@ upstream:
     - 192.168.1.254
 customDNS:
   mapping:
+    prowlarr.home.tom-mendy.com: 192.168.1.20
+    sonarr.home.tom-mendy.com: 192.168.1.20
+    radarr.home.tom-mendy.com: 192.168.1.20
+    bazarr.home.tom-mendy.com: 192.168.1.20
+    qbittorrent.home.tom-mendy.com: 192.168.1.20
+    nzbget.home.tom-mendy.com: 192.168.1.20
+    autobrr.home.tom-mendy.com: 192.168.1.20
     keel.home.tom-mendy.com: 192.168.1.20
     trilium.home.tom-mendy.com: 192.168.1.20
     blocky.home.tom-mendy.com: 192.168.1.20

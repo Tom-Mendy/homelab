@@ -1,0 +1,105 @@
+{{- $app := .Values.apps.radarr }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+	name: radarr-config-pvc
+	namespace: {{ .Values.namespace }}
+spec:
+	accessModes:
+		- ReadWriteOnce
+	resources:
+		requests:
+			storage: {{ default .Values.configStorage.defaultSize $app.configSize }}
+	storageClassName: {{ .Values.configStorage.className }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+	name: radarr
+	namespace: {{ .Values.namespace }}
+	annotations:
+		keel.sh/policy: all
+spec:
+	replicas: 1
+	selector:
+		matchLabels:
+			app: radarr
+	template:
+		metadata:
+			labels:
+				app: radarr
+		spec:
+			containers:
+				- name: radarr
+					image: {{ $app.image | quote }}
+					env:
+						- name: PUID
+							value: {{ .Values.securityContext.puid | quote }}
+						- name: PGID
+							value: {{ .Values.securityContext.pgid | quote }}
+						- name: TZ
+							value: {{ .Values.timezone | quote }}
+					ports:
+						- containerPort: {{ $app.port }}
+							name: http
+					volumeMounts:
+						- name: config
+							mountPath: /config
+						{{- if $app.mounts.downloads }}
+						- name: downloads
+							mountPath: /data/downloads
+						{{- end }}
+						{{- if $app.mounts.movies }}
+						- name: movies
+							mountPath: /data/media/movies
+						{{- end }}
+			volumes:
+				- name: config
+					persistentVolumeClaim:
+						claimName: radarr-config-pvc
+				{{- if $app.mounts.downloads }}
+				- name: downloads
+					persistentVolumeClaim:
+						claimName: media-downloads-pvc
+				{{- end }}
+				{{- if $app.mounts.movies }}
+				- name: movies
+					persistentVolumeClaim:
+						claimName: media-movies-pvc
+				{{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+	name: radarr
+	namespace: {{ .Values.namespace }}
+spec:
+	type: ClusterIP
+	selector:
+		app: radarr
+	ports:
+		- name: http
+			port: {{ $app.port }}
+			targetPort: {{ $app.port }}
+---
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+	name: radarr-ingress
+	namespace: {{ .Values.namespace }}
+	annotations:
+{{ toYaml .Values.ingress.annotations | nindent 4 }}
+spec:
+	rules:
+		- host: {{ $app.host }}
+			http:
+				paths:
+					- path: /
+						pathType: Prefix
+						backend:
+							service:
+								name: radarr
+								port:
+									number: {{ $app.port }}
+{{- end }}

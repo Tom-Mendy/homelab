@@ -1,0 +1,115 @@
+namespace: media
+
+timezone: Europe/Paris
+
+securityContext:
+  puid: 1023
+  pgid: 100
+
+vpn:
+  enabled: true
+  createSecret: true
+  secretName: protonvpn-credentials
+  serviceProvider: protonvpn
+  type: openvpn
+  firewall: "on"
+  serverCountries: Netherlands
+  credentials:
+    openvpnUser: nainjoueur
+    openvpnPassword: bZ3^6m&@!&w4Z@
+
+storage:
+  nfsServer: 192.168.1.1
+  downloads:
+    path: /volume1/Downloads
+    size: 2Ti
+  movies:
+    path: /volume1/video/Film
+    size: 4Ti
+  series:
+    path: /volume1/video/Serie
+    size: 4Ti
+
+configStorage:
+  className: local-path
+  defaultSize: 5Gi
+
+ingress:
+  enabled: true
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+
+apps:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    port: 8080
+    host: qbittorrent.home.tom-mendy.com
+    vpn: true
+    mounts:
+      downloads: true
+      movies: false
+      series: false
+    extraEnv:
+      WEBUI_PORT: "8080"
+
+  nzbget:
+    image: lscr.io/linuxserver/nzbget:latest
+    port: 6789
+    host: nzbget.home.tom-mendy.com
+    vpn: true
+    mounts:
+      downloads: true
+      movies: false
+      series: false
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    port: 8989
+    host: sonarr.home.tom-mendy.com
+    vpn: false
+    mounts:
+      downloads: true
+      movies: false
+      series: true
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    port: 7878
+    host: radarr.home.tom-mendy.com
+    vpn: false
+    mounts:
+      downloads: true
+      movies: true
+      series: false
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    port: 9696
+    host: prowlarr.home.tom-mendy.com
+    vpn: false
+    mounts:
+      downloads: false
+      movies: false
+      series: false
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    port: 6767
+    host: bazarr.home.tom-mendy.com
+    vpn: false
+    mounts:
+      downloads: false
+      movies: true
+      series: true
+
+  autobrr:
+    image: ghcr.io/autobrr/autobrr:latest
+    port: 7474
+    host: autobrr.home.tom-mendy.com
+    vpn: false
+    mounts:
+      downloads: false
+      movies: false
+      series: false

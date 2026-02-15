@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["namespace", "timezone", "securityContext", "vpn", "storage", "configStorage", "ingress", "apps"],
+  "properties": {
+    "namespace": { "type": "string", "minLength": 1 },
+    "timezone": { "type": "string", "minLength": 1 },
+    "securityContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["puid", "pgid"],
+      "properties": {
+        "puid": { "type": "integer", "minimum": 1 },
+        "pgid": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "vpn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "createSecret", "secretName", "serviceProvider", "type", "firewall", "serverCountries", "credentials"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "createSecret": { "type": "boolean" },
+        "secretName": { "type": "string", "minLength": 1 },
+        "serviceProvider": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "minLength": 1 },
+        "firewall": { "type": "string", "minLength": 1 },
+        "serverCountries": { "type": "string", "minLength": 1 },
+        "credentials": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["openvpnUser", "openvpnPassword"],
+          "properties": {
+            "openvpnUser": { "type": "string", "minLength": 1 },
+            "openvpnPassword": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "storage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nfsServer", "downloads", "movies", "series"],
+      "properties": {
+        "nfsServer": { "type": "string", "minLength": 1 },
+        "downloads": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "size"],
+          "properties": {
+            "path": { "type": "string", "minLength": 1 },
+            "size": { "type": "string", "minLength": 1 }
+          }
+        },
+        "movies": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "size"],
+          "properties": {
+            "path": { "type": "string", "minLength": 1 },
+            "size": { "type": "string", "minLength": 1 }
+          }
+        },
+        "series": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "size"],
+          "properties": {
+            "path": { "type": "string", "minLength": 1 },
+            "size": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "configStorage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["className", "defaultSize"],
+      "properties": {
+        "className": { "type": "string", "minLength": 1 },
+        "defaultSize": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "annotations"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "annotations": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
+    "apps": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["image", "port", "host", "vpn", "mounts"],
+        "properties": {
+          "image": { "type": "string", "minLength": 1 },
+          "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+          "host": { "type": "string", "minLength": 1 },
+          "vpn": { "type": "boolean" },
+          "mounts": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["downloads", "movies", "series"],
+            "properties": {
+              "downloads": { "type": "boolean" },
+              "movies": { "type": "boolean" },
+              "series": { "type": "boolean" }
+            }
+          },
+          "extraEnv": { "type": "object", "additionalProperties": { "type": "string" } },
+          "configSize": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{{- $app := .Values.apps.prowlarr }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+	name: prowlarr-config-pvc
+	namespace: {{ .Values.namespace }}
+spec:
+	accessModes:
+		- ReadWriteOnce
+	resources:
+		requests:
+			storage: {{ default .Values.configStorage.defaultSize $app.configSize }}
+	storageClassName: {{ .Values.configStorage.className }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+	name: prowlarr
+	namespace: {{ .Values.namespace }}
+	annotations:
+		keel.sh/policy: all
+spec:
+	replicas: 1
+	selector:
+		matchLabels:
+			app: prowlarr
+	template:
+		metadata:
+			labels:
+				app: prowlarr
+		spec:
+			containers:
+				- name: prowlarr
+					image: {{ $app.image | quote }}
+					env:
+						- name: PUID
+							value: {{ .Values.securityContext.puid | quote }}
+						- name: PGID
+							value: {{ .Values.securityContext.pgid | quote }}
+						- name: TZ
+							value: {{ .Values.timezone | quote }}
+					ports:
+						- containerPort: {{ $app.port }}
+							name: http
+					volumeMounts:
+						- name: config
+							mountPath: /config
+			volumes:
+				- name: config
+					persistentVolumeClaim:
+						claimName: prowlarr-config-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+	name: prowlarr
+	namespace: {{ .Values.namespace }}
+spec:
+	type: ClusterIP
+	selector:
+		app: prowlarr
+	ports:
+		- name: http
+			port: {{ $app.port }}
+			targetPort: {{ $app.port }}
+---
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+	name: prowlarr-ingress
+	namespace: {{ .Values.namespace }}
+	annotations:
+{{ toYaml .Values.ingress.annotations | nindent 4 }}
+spec:
+	rules:
+		- host: {{ $app.host }}
+			http:
+				paths:
+					- path: /
+						pathType: Prefix
+						backend:
+							service:
+								name: prowlarr
+								port:
+									number: {{ $app.port }}
+{{- end }}

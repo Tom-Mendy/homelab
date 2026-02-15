@@ -32,6 +32,34 @@
         description: Git forge
 
 - Entertainment:
+    - Prowlarr:
+        icon: prowlarr.svg
+        href: http://prowlarr.home.tom-mendy.com/
+        description: Indexer manager
+    - Sonarr:
+        icon: sonarr.svg
+        href: http://sonarr.home.tom-mendy.com/
+        description: TV series manager
+    - Radarr:
+        icon: radarr.svg
+        href: http://radarr.home.tom-mendy.com/
+        description: Movies manager
+    - Bazarr:
+        icon: bazarr.svg
+        href: http://bazarr.home.tom-mendy.com/
+        description: Subtitle manager
+    - qBittorrent:
+        icon: qbittorrent.svg
+        href: http://qbittorrent.home.tom-mendy.com/
+        description: Torrent downloader (VPN)
+    - NZBGet:
+        icon: nzbget.svg
+        href: http://nzbget.home.tom-mendy.com/
+        description: Usenet downloader (VPN)
+    - Autobrr:
+        icon: autobrr.svg
+        href: http://autobrr.home.tom-mendy.com/
+        description: Automation and racing
     - NAS Synology:
         icon: https://simpleicons.org/icons/synology.svg
         href: https://192.168.1.1:5001/
