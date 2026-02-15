@@ -24,6 +24,7 @@
   - wave `4`: `forgejo`
 - Ajout de charts Helm locaux pour gérer les manifests complémentaires:
   - `kubernetes/traefik`, `kubernetes/keel`, `kubernetes/prometheus`, `kubernetes/grafana`, `kubernetes/blocky`, `kubernetes/homepage`, `kubernetes/navidrome`, `kubernetes/vaultwarden`, `kubernetes/forgejo`
+  - Tous ces charts utilisent désormais des templates Helm explicites (namespace/deployment/service/ingress/pv/pvc/secret selon le service), sans wrapper `resources.yaml`.
 
 ## Variables Ansible utiles
 

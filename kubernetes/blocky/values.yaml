@@ -1,1 +1,24 @@
-{}
+namespace: blocky
+createNamespace: true
+
+replicaCount: 1
+
+image:
+  repository: spx01/blocky
+  tag: latest
+  pullPolicy: IfNotPresent
+
+deploymentAnnotations:
+  keel.sh/policy: minor
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: /metrics
+  prometheus.io/port: "4000"
+
+service:
+  type: LoadBalancer
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: 192.168.1.21
+  dnsPort: 53
+  httpPort: 4000

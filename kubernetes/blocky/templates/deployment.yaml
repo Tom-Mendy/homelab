@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blocky
+  namespace: {{ .Values.namespace }}
+  {{- with .Values.deploymentAnnotations }}
+  annotations:
+{{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: blocky
+  template:
+    metadata:
+      labels:
+        app: blocky
+      annotations:
+        checksum/config: {{ .Files.Get "config.yml" | sha256sum }}
+        {{- with .Values.podAnnotations }}
+{{ toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      containers:
+        - name: blocky
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.dnsPort }}
+              name: dns
+              protocol: UDP
+            - containerPort: {{ .Values.service.httpPort }}
+              name: http
+          volumeMounts:
+            - name: config
+              mountPath: /app/config.yml
+              subPath: config.yml
+      volumes:
+        - name: config
+          configMap:
+            name: blocky-config

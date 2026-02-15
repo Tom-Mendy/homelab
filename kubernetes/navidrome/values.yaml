@@ -1,1 +1,37 @@
-{}
+namespace: navidrome
+createNamespace: true
+
+replicaCount: 1
+
+image:
+  repository: deluan/navidrome
+  tag: latest
+  pullPolicy: IfNotPresent
+
+deploymentAnnotations:
+  keel.sh/policy: all
+
+service:
+  type: ClusterIP
+  port: 4533
+
+ingress:
+  enabled: true
+  host: navidrome.home.tom-mendy.com
+  className: ""
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+
+musicStorage:
+  pvName: navidrome-music-pv
+  pvcName: navidrome-music-pvc
+  size: 200Gi
+  nfsServer: 192.168.1.1
+  nfsPath: /volume1/music
+
+dataStorage:
+  pvcName: navidrome-data-pvc
+  size: 5Gi
+  storageClassName: local-path

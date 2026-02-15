@@ -1,3 +1,0 @@
-{{ .Files.Get "prometheus-storage.yaml" }}
----
-{{ .Files.Get "prometheus-ingress.yaml" }}

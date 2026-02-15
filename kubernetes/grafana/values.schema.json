@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["namespace", "secret"],
+  "properties": {
+    "namespace": { "type": "string", "minLength": 1 },
+    "secret": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "adminUser", "adminPassword"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "adminUser": { "type": "string", "minLength": 1 },
+        "adminPassword": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

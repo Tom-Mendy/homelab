@@ -1,1 +1,14 @@
-{}
+namespace: keel
+
+service:
+  name: keel
+  port: 9300
+
+ingress:
+  name: keel-ingress
+  host: keel.home.tom-mendy.com
+  className: ""
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt

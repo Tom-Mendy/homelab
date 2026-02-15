@@ -1,1 +1,0 @@
-{{ .Files.Get "traefik-cloudflare-secret.example.yaml" }}

@@ -1,1 +1,39 @@
-{}
+namespace: forgejo
+createNamespace: true
+
+replicaCount: 1
+
+image:
+  repository: codeberg.org/forgejo/forgejo
+  tag: "13"
+  pullPolicy: IfNotPresent
+
+deploymentAnnotations:
+  keel.sh/policy: all
+
+user:
+  uid: "1023"
+  gid: "100"
+
+rootUrl: http://forgejo.home.tom-mendy.com/
+
+service:
+  type: ClusterIP
+  httpPort: 3000
+  sshPort: 22
+
+ingress:
+  enabled: true
+  host: forgejo.home.tom-mendy.com
+  className: ""
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+
+storage:
+  pvName: forgejo-data-pv
+  pvcName: forgejo-data-pvc
+  size: 20Gi
+  nfsServer: 192.168.1.1
+  nfsPath: /volume1/forgejo

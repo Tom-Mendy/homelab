@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.musicStorage.pvName }}
+spec:
+  capacity:
+    storage: {{ .Values.musicStorage.size }}
+  accessModes:
+    - ReadOnlyMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  nfs:
+    server: {{ .Values.musicStorage.nfsServer }}
+    path: {{ .Values.musicStorage.nfsPath }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.musicStorage.pvcName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: {{ .Values.musicStorage.size }}
+  storageClassName: ""
+  volumeName: {{ .Values.musicStorage.pvName }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.dataStorage.pvcName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.dataStorage.size }}
+  storageClassName: {{ .Values.dataStorage.storageClassName }}

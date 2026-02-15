@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["namespace", "createNamespace", "storage", "ingress"],
+  "properties": {
+    "namespace": { "type": "string", "minLength": 1 },
+    "createNamespace": { "type": "boolean" },
+    "storage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pvName", "pvcName", "size", "nfsServer", "nfsPath"],
+      "properties": {
+        "pvName": { "type": "string", "minLength": 1 },
+        "pvcName": { "type": "string", "minLength": 1 },
+        "size": { "type": "string", "minLength": 1 },
+        "nfsServer": { "type": "string", "minLength": 1 },
+        "nfsPath": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "host", "className", "serviceName", "servicePort", "annotations"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "host": { "type": "string", "minLength": 1 },
+        "className": { "type": "string" },
+        "serviceName": { "type": "string", "minLength": 1 },
+        "servicePort": { "type": "integer", "minimum": 1, "maximum": 65535 },
+        "annotations": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    }
+  }
+}

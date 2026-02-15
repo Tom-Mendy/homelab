@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["namespace", "createNamespace", "replicaCount", "image", "service", "ingress", "musicStorage", "dataStorage"],
+  "properties": {
+    "namespace": { "type": "string", "minLength": 1 },
+    "createNamespace": { "type": "boolean" },
+    "replicaCount": { "type": "integer", "minimum": 1 },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "tag", "pullPolicy"],
+      "properties": {
+        "repository": { "type": "string", "minLength": 1 },
+        "tag": { "type": "string", "minLength": 1 },
+        "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] }
+      }
+    },
+    "deploymentAnnotations": { "type": "object", "additionalProperties": { "type": "string" } },
+    "service": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "port"],
+      "properties": {
+        "type": { "type": "string" },
+        "port": { "type": "integer", "minimum": 1, "maximum": 65535 }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "host", "className", "annotations"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "host": { "type": "string", "minLength": 1 },
+        "className": { "type": "string" },
+        "annotations": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
+    "musicStorage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pvName", "pvcName", "size", "nfsServer", "nfsPath"],
+      "properties": {
+        "pvName": { "type": "string", "minLength": 1 },
+        "pvcName": { "type": "string", "minLength": 1 },
+        "size": { "type": "string", "minLength": 1 },
+        "nfsServer": { "type": "string", "minLength": 1 },
+        "nfsPath": { "type": "string", "minLength": 1 }
+      }
+    },
+    "dataStorage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pvcName", "size", "storageClassName"],
+      "properties": {
+        "pvcName": { "type": "string", "minLength": 1 },
+        "size": { "type": "string", "minLength": 1 },
+        "storageClassName": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

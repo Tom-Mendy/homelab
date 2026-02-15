@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["namespace", "createNamespace", "replicaCount", "image", "service"],
+  "properties": {
+    "namespace": { "type": "string", "minLength": 1 },
+    "createNamespace": { "type": "boolean" },
+    "replicaCount": { "type": "integer", "minimum": 1 },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "tag", "pullPolicy"],
+      "properties": {
+        "repository": { "type": "string", "minLength": 1 },
+        "tag": { "type": "string", "minLength": 1 },
+        "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] }
+      }
+    },
+    "deploymentAnnotations": { "type": "object", "additionalProperties": { "type": "string" } },
+    "podAnnotations": { "type": "object", "additionalProperties": { "type": "string" } },
+    "service": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "dnsPort", "httpPort"],
+      "properties": {
+        "type": { "type": "string" },
+        "annotations": { "type": "object", "additionalProperties": { "type": "string" } },
+        "dnsPort": { "type": "integer", "minimum": 1, "maximum": 65535 },
+        "httpPort": { "type": "integer", "minimum": 1, "maximum": 65535 }
+      }
+    }
+  }
+}

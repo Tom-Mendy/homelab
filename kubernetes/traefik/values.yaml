@@ -1,1 +1,5 @@
-{}
+namespace: traefik
+
+secret:
+  name: traefik-cloudflare-dns
+  apiToken: "REMOVED_API_KEY"
