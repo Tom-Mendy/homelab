@@ -12,12 +12,36 @@
         icon: grafana.svg
         href: https://grafana.home.tom-mendy.com
         description: Dashboards
+    - NAS Synology:
+        icon: synology.svg
+        href: https://192.168.1.1:5001/
+        description: NAS
 
 - Professional Tools:
     - Stirling PDF:
         icon: stirling-pdf.svg
         href: https://stirling-pdf.home.tom-mendy.com/
         description: Web Application to Edit PDF
+    - Vaultwarden:
+        icon: vaultwarden.svg
+        href: https://vaultwarden.home.tom-mendy.com/
+        description: Password manager
+    - qBittorrent:
+        icon: qbittorrent.svg
+        href: https://qbittorrent.home.tom-mendy.com/
+        description: Torrent downloader (VPN)
+    - NZBGet:
+        icon: nzbget.svg
+        href: https://nzbget.home.tom-mendy.com/
+        description: Usenet downloader (VPN)
+
+- Entertainment:
+    - Navidrome:
+        icon: navidrome.svg
+        href: https://navidrome.home.tom-mendy.com/
+        description: Music player
+
+- Developer:
     - Argo CD:
         icon: argo-cd.svg
         href: https://argocd.home.tom-mendy.com/
@@ -27,7 +51,7 @@
         href: https://forgejo.home.tom-mendy.com/
         description: Git forge
 
-- Entertainment:
+- Arr Apps:
     - Prowlarr:
         icon: prowlarr.svg
         href: https://prowlarr.home.tom-mendy.com/
@@ -44,27 +68,7 @@
         icon: bazarr.svg
         href: https://bazarr.home.tom-mendy.com/
         description: Subtitle manager
-    - qBittorrent:
-        icon: qbittorrent.svg
-        href: https://qbittorrent.home.tom-mendy.com/
-        description: Torrent downloader (VPN)
-    - NZBGet:
-        icon: nzbget.svg
-        href: https://nzbget.home.tom-mendy.com/
-        description: Usenet downloader (VPN)
     - Autobrr:
         icon: autobrr.svg
         href: https://autobrr.home.tom-mendy.com/
         description: Automation and racing
-    - NAS Synology:
-        icon: synology.svg
-        href: https://192.168.1.1:5001/
-        description: NAS
-    - Navidrome:
-        icon: navidrome.svg
-        href: https://navidrome.home.tom-mendy.com/
-        description: Music player
-    - Vaultwarden:
-        icon: vaultwarden.svg
-        href: https://vaultwarden.home.tom-mendy.com/
-        description: Password manager
