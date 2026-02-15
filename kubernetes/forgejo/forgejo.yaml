@@ -63,7 +63,7 @@ spec:
         - name: USER_GID
           value: "100"
         - name: FORGEJO__server__ROOT_URL
-          value: http://forgejo.home.tom-mendy.com/
+          value: https://forgejo.home.tom-mendy.com/
         volumeMounts:
         - name: data
           mountPath: /data

@@ -4,10 +4,6 @@
 # icons found here https://github.com/homarr-labs/dashboard-icons
 
 - Homelab:
-    - Home Assistant:
-        icon: home-assistant.svg
-        href: http://192.168.1.11:8123/
-        description: Home Automation
     - Prometheus:
         icon: prometheus.svg
         href: https://prometheus.home.tom-mendy.com
@@ -24,44 +20,44 @@
         description: Web Application to Edit PDF
     - Argo CD:
         icon: argo-cd.svg
-        href: http://argocd.home.tom-mendy.com/
+        href: https://argocd.home.tom-mendy.com/
         description: GitOps continuous delivery
     - Forgejo:
         icon: forgejo.svg
-        href: http://forgejo.home.tom-mendy.com/
+        href: https://forgejo.home.tom-mendy.com/
         description: Git forge
 
 - Entertainment:
     - Prowlarr:
         icon: prowlarr.svg
-        href: http://prowlarr.home.tom-mendy.com/
+        href: https://prowlarr.home.tom-mendy.com/
         description: Indexer manager
     - Sonarr:
         icon: sonarr.svg
-        href: http://sonarr.home.tom-mendy.com/
+        href: https://sonarr.home.tom-mendy.com/
         description: TV series manager
     - Radarr:
         icon: radarr.svg
-        href: http://radarr.home.tom-mendy.com/
+        href: https://radarr.home.tom-mendy.com/
         description: Movies manager
     - Bazarr:
         icon: bazarr.svg
-        href: http://bazarr.home.tom-mendy.com/
+        href: https://bazarr.home.tom-mendy.com/
         description: Subtitle manager
     - qBittorrent:
         icon: qbittorrent.svg
-        href: http://qbittorrent.home.tom-mendy.com/
+        href: https://qbittorrent.home.tom-mendy.com/
         description: Torrent downloader (VPN)
     - NZBGet:
         icon: nzbget.svg
-        href: http://nzbget.home.tom-mendy.com/
+        href: https://nzbget.home.tom-mendy.com/
         description: Usenet downloader (VPN)
     - Autobrr:
         icon: autobrr.svg
-        href: http://autobrr.home.tom-mendy.com/
+        href: https://autobrr.home.tom-mendy.com/
         description: Automation and racing
     - NAS Synology:
-        icon: https://simpleicons.org/icons/synology.svg
+        icon: synology.svg
         href: https://192.168.1.1:5001/
         description: NAS
     - Navidrome:
