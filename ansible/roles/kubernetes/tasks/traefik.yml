@@ -3,19 +3,12 @@
     name: traefik
     repo_url: https://traefik.github.io/charts
 
-- name: Ensure Traefik namespace exists
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: traefik
-
-- name: Apply Traefik Cloudflare DNS secret
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/traefik/traefik-cloudflare-secret.example.yaml') | from_yaml }}"
+- name: Deploy Traefik local Helm chart (Cloudflare secret)
+  kubernetes.core.helm:
+    name: traefik-local-extras
+    chart_ref: "{{ playbook_dir + '/../../kubernetes/traefik' }}"
+    release_namespace: traefik
+    create_namespace: true
 
 - name: Deploy Traefik Ingress Controller
   kubernetes.core.helm:

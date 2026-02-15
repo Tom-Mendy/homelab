@@ -1,0 +1,8 @@
+kubernetes_deploy_mode: gitops
+
+argocd_gitops_repo_url: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
+argocd_gitops_repo_revision: main
+argocd_gitops_apps_path: kubernetes/argocd/apps
+
+argocd_gitops_repo_ssh_private_key: ""
+argocd_gitops_repo_insecure_ignore_host_key: true

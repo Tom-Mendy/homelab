@@ -4,32 +4,49 @@
 - name: Deploy MetalLB
   ansible.builtin.include_tasks: metallb.yml
 
-- name: Deploy Traefik
-  ansible.builtin.include_tasks: traefik.yml
-
-- name: Deploy Blocky
-  ansible.builtin.include_tasks: blocky.yml
-
-- name: Deploy Homepage
-  ansible.builtin.include_tasks: homepage.yml
-
-- name: Deploy Keel
-  ansible.builtin.include_tasks: keel.yml
-
-- name: Deploy Prometheus
-  ansible.builtin.include_tasks: prometheus.yml
-
-- name: Deploy Grafana
-  ansible.builtin.include_tasks: grafana.yml
-
-- name: Deploy Navidrome
-  ansible.builtin.include_tasks: navidrome.yml
-
-- name: Deploy Vaultwarden
-  ansible.builtin.include_tasks: vaultwarden.yml
-
-- name: Deploy Forgejo
-  ansible.builtin.include_tasks: forgejo.yml
-
 - name: Deploy Argo CD
   ansible.builtin.include_tasks: argocd.yml
+
+- name: Configure Argo CD repository credentials
+  ansible.builtin.include_tasks: argocd-repository.yml
+  when: kubernetes_deploy_mode == 'gitops'
+
+- name: Bootstrap Argo CD applications (GitOps)
+  ansible.builtin.include_tasks: argocd-bootstrap.yml
+  when: kubernetes_deploy_mode == 'gitops'
+
+- name: Deploy Traefik (legacy mode)
+  ansible.builtin.include_tasks: traefik.yml
+  when: kubernetes_deploy_mode == 'legacy'
+
+- name: Deploy Blocky (legacy mode)
+  ansible.builtin.include_tasks: blocky.yml
+  when: kubernetes_deploy_mode == 'legacy'
+
+- name: Deploy Homepage (legacy mode)
+  ansible.builtin.include_tasks: homepage.yml
+  when: kubernetes_deploy_mode == 'legacy'
+
+- name: Deploy Keel (legacy mode)
+  ansible.builtin.include_tasks: keel.yml
+  when: kubernetes_deploy_mode == 'legacy'
+
+- name: Deploy Prometheus (legacy mode)
+  ansible.builtin.include_tasks: prometheus.yml
+  when: kubernetes_deploy_mode == 'legacy'
+
+- name: Deploy Grafana (legacy mode)
+  ansible.builtin.include_tasks: grafana.yml
+  when: kubernetes_deploy_mode == 'legacy'
+
+- name: Deploy Navidrome (legacy mode)
+  ansible.builtin.include_tasks: navidrome.yml
+  when: kubernetes_deploy_mode == 'legacy'
+
+- name: Deploy Vaultwarden (legacy mode)
+  ansible.builtin.include_tasks: vaultwarden.yml
+  when: kubernetes_deploy_mode == 'legacy'
+
+- name: Deploy Forgejo (legacy mode)
+  ansible.builtin.include_tasks: forgejo.yml
+  when: kubernetes_deploy_mode == 'legacy'

@@ -1,0 +1,1 @@
+{{ .Files.Get "keel-ingress.yaml" }}

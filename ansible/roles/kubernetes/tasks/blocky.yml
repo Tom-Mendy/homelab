@@ -1,49 +1,6 @@
-- name: Ensure Blocky namespace exists
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: blocky
-
-- name: Ensure Blocky config directory exists on control plane
-  become: true
-  ansible.builtin.file:
-    path: /etc/blocky
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-
-- name: Copy Blocky config on control plane
-  become: true
-  ansible.builtin.copy:
-    src: "{{ playbook_dir + '/../../kubernetes/blocky/config.yml' }}"
-    dest: /etc/blocky/config.yml
-    owner: root
-    group: root
-    mode: '0644'
-
-- name: Read copied Blocky config
-  become: true
-  ansible.builtin.slurp:
-    src: /etc/blocky/config.yml
-  register: blocky_config_file
-
-- name: Ensure Blocky ConfigMap exists
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: blocky-config
-        namespace: blocky
-      data:
-        config.yml: "{{ blocky_config_file.content | b64decode }}"
-
-- name: Deploy Blocky
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/blocky/blocky.yaml') | from_yaml_all }}"
+- name: Deploy Blocky local Helm chart
+  kubernetes.core.helm:
+    name: blocky-local
+    chart_ref: "{{ playbook_dir + '/../../kubernetes/blocky' }}"
+    release_namespace: blocky
+    create_namespace: true

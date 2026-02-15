@@ -13,7 +13,9 @@
     create_namespace: true
     values: "{{ lookup('file', playbook_dir + '/../../kubernetes/keel/keel-values.yaml') | from_yaml }}"
 
-- name: Apply Keel Ingress
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/keel/keel-ingress.yaml') | from_yaml }}"
+- name: Deploy Keel local Helm chart (ingress)
+  kubernetes.core.helm:
+    name: keel-local-extras
+    chart_ref: "{{ playbook_dir + '/../../kubernetes/keel' }}"
+    release_namespace: keel
+    create_namespace: true

@@ -51,9 +51,9 @@ This repository contains configuration files, documentation, and automation scri
 
 ### Prerequisites
 
-- Linux server with Docker installed
-- Domain name (optional, for external access)
-- Basic understanding of Docker and networking
+- Linux nodes reachable via SSH (inventory configured)
+- Ansible dependencies managed via `ansible/run.sh`
+- Basic understanding of Kubernetes and networking
 
 ### Installation
 
@@ -64,19 +64,40 @@ git clone https://github.com/Tom-Mendy/homelab.git
 cd homelab
 ```
 
-1. Copy and customize environment files:
+1. Configure SSH key and inventory:
 
 ```bash
 cd ansible
-cp /path/to/ssh-key ./ansible/private_key
+cp /path/to/ssh-key ./private_key
 # Edit inventory.ini with your specific configuration
 ```
 
-1. Start core services:
+1. Deploy applications:
 
 ```bash
-docker-compose up -d
+./run.sh playbooks/deploy-apps.yml
 ```
+
+### Deployment modes
+
+- `gitops` (default): Ansible bootstraps Argo CD, then Argo CD keeps apps in sync from Git.
+- `legacy`: Ansible deploys apps directly.
+
+```bash
+cd ansible
+./run.sh playbooks/deploy-apps.yml -e kubernetes_deploy_mode=legacy
+```
+
+### Local Helm charts
+
+Local Helm charts are used for app manifests and addon resources in:
+
+- `kubernetes/blocky`
+- `kubernetes/homepage`
+- `kubernetes/prometheus`
+- `kubernetes/grafana`
+- `kubernetes/keel`
+- `kubernetes/traefik`
 
 ### Configuration
 
@@ -240,6 +261,7 @@ sudo ufw status
 - [Network diagram](docs/network-diagram.md)
 - [Backup procedures](docs/backup-procedures.md)
 - [Disaster recovery](docs/disaster-recovery.md)
+- [Argo CD GitOps migration](docs/argocd-gitops.md)
 
 ## Contributing
 

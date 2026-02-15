@@ -3,10 +3,12 @@
     name: grafana-community
     repo_url: https://grafana-community.github.io/helm-charts
 
-- name: Apply Grafana admin secret
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('file', playbook_dir + '/../../kubernetes/grafana/grafana-admin-secret.yaml') | from_yaml }}"
+- name: Deploy Grafana local Helm chart (admin secret)
+  kubernetes.core.helm:
+    name: grafana-local-extras
+    chart_ref: "{{ playbook_dir + '/../../kubernetes/grafana' }}"
+    release_namespace: grafana
+    create_namespace: true
 
 - name: Deploy Grafana via Helm
   kubernetes.core.helm:
