@@ -12,6 +12,10 @@
         icon: prometheus.svg
         href: https://prometheus.home.tom-mendy.com
         description: Metrics and monitoring
+    - Grafana:
+        icon: grafana.svg
+        href: https://grafana.home.tom-mendy.com
+        description: Dashboards
 
 - Professional Tools:
     - Stirling PDF:

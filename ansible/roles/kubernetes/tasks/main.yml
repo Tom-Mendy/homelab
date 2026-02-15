@@ -19,6 +19,9 @@
 - name: Deploy Prometheus
   ansible.builtin.include_tasks: prometheus.yml
 
+- name: Deploy Grafana
+  ansible.builtin.include_tasks: grafana.yml
+
 - name: Deploy Navidrome
   ansible.builtin.include_tasks: navidrome.yml
 
