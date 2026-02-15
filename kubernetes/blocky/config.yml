@@ -18,6 +18,7 @@ customDNS:
     prometheus.home.tom-mendy.com: 192.168.1.20
     forgejo.home.tom-mendy.com: 192.168.1.20
     grafana.home.tom-mendy.com: 192.168.1.20
+    argocd.home.tom-mendy.com: 192.168.1.20
 prometheus:
   enable: true
   path: /metrics

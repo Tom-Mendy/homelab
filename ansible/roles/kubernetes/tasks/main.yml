@@ -30,3 +30,6 @@
 
 - name: Deploy Forgejo
   ansible.builtin.include_tasks: forgejo.yml
+
+- name: Deploy Argo CD
+  ansible.builtin.include_tasks: argocd.yml
