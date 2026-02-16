@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: newt-creds
+  namespace: newt-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+type: Opaque
+stringData:
+  PANGOLIN_ENDPOINT: "https://pangolin.tom-mendy.com"
+  NEWT_ID: "wythld3ajvimpsh"
+  NEWT_SECRET: "REMOVED_API_KEY"

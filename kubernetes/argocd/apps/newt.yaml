@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: newt
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+spec:
+  project: default
+  sources:
+    - repoURL: https://charts.fossorial.io
+      chart: newt
+      targetRevision: 1.1.0
+      helm:
+        releaseName: newt
+        valueFiles:
+          - $values/kubernetes/newt/newt-values.yaml
+    - repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
+      targetRevision: main
+      ref: values
+    - repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
+      targetRevision: main
+      path: kubernetes/newt
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: newt-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

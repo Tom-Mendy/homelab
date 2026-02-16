@@ -1,0 +1,15 @@
+global:
+  deploymentAnnotations:
+    keel.sh/policy: all
+  image:
+    tag: latest
+
+newtInstances:
+  - name: main-tunnel
+    enabled: true
+    auth:
+      existingSecretName: newt-creds
+      keys:
+        endpointKey: PANGOLIN_ENDPOINT
+        idKey: NEWT_ID
+        secretKey: NEWT_SECRET
