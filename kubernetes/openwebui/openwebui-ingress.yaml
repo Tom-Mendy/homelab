@@ -5,7 +5,12 @@ metadata:
   namespace: openwebui
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
 spec:
+  tls:
+  - hosts:
+    - openwebui.home.tom-mendy.com
   rules:
   - host: openwebui.home.tom-mendy.com
     http:
