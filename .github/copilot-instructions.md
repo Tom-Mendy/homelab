@@ -20,6 +20,9 @@
   - Update nodes: [ansible/playbooks/update.yml](../ansible/playbooks/update.yml)
   - Reboot nodes: [ansible/playbooks/reboot.yml](../ansible/playbooks/reboot.yml)
   - Reset cluster: [ansible/playbooks/reset.yml](../ansible/playbooks/reset.yml)
+- **Local kubectl access to the Cluster**:
+  - Reference workflow: [kubernetes/kube-config-documentation.md](../kubernetes/kube-config-documentation.md).
+  - use `--kubeconfig "$HOME/.kube/config-homelab"`.
 - **Application deployment model**:
   - App definitions live under [kubernetes/](../kubernetes/).
   - GitOps applications are declared in [kubernetes/argocd/apps/](../kubernetes/argocd/apps/).

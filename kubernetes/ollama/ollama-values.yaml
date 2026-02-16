@@ -16,7 +16,7 @@ ollama:
 
 deployment:
   annotations:
-    keel.sh/policy: minor
+    keel.sh/policy: all
 
 tolerations: []
 nodeSelector:
