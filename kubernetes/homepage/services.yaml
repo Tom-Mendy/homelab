@@ -21,6 +21,9 @@
     - Kasm:
         href: https://kasm.home.tom-mendy.com/
         description: Browser-based remote workspaces
+    - OpenWebUI:
+        href: https://openwebui.home.tom-mendy.com/
+        description: Chat UI for local LLMs
     - Stirling PDF:
         icon: stirling-pdf.svg
         href: https://stirling-pdf.home.tom-mendy.com/
