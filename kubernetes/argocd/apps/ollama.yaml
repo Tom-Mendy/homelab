@@ -23,7 +23,7 @@ spec:
       path: kubernetes/ollama
       directory:
         recurse: true
-        include: '{ollama-ingress.yaml,runtimeclass-nvidia.yaml}'
+        include: '{ollama-ingress.yaml,runtimeclass-nvidia.yaml,nvidia-device-plugin.yaml}'
   destination:
     server: https://kubernetes.default.svc
     namespace: ollama
