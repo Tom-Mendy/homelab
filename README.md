@@ -33,13 +33,12 @@ Kubernetes homelab managed with Ansible + Kubespray, with Argo CD GitOps for app
 - `vaultwarden`
 - `forgejo`
 - `trilium`
-
-### Additional manifests in repository
-
-- `kubernetes/ollama/`
-- `kubernetes/openwebui/`
-
-These are present in the repo but are not part of `kubernetes/argocd/apps`.
+- `media`
+- `kasm`
+- `newt`
+- `stirling-pdf`
+- `ollama`
+- `openwebui`
 
 ## Quick start
 
