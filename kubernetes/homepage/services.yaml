@@ -24,6 +24,10 @@
     - OpenWebUI:
         href: https://openwebui.home.tom-mendy.com/
         description: Chat UI for local LLMs
+    - SearXNG:
+        icon: searxng.svg
+        href: https://searxng.home.tom-mendy.com/
+        description: Privacy-respecting metasearch engine
     - Stirling PDF:
         icon: stirling-pdf.svg
         href: https://stirling-pdf.home.tom-mendy.com/
