@@ -1,6 +1,6 @@
 # openwebui-values.yaml
 ollama:
-  enabled: true
+  enabled: false
   host: ollama.ollama.svc.cluster.local
   port: 11434
 
