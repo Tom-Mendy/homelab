@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
-    targetRevision: main
+    targetRevision: HEAD
     path: kubernetes/searxng
   destination:
     server: https://kubernetes.default.svc
