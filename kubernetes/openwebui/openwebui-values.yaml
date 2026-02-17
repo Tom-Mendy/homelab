@@ -21,3 +21,13 @@ pipelines:
   persistence:
     storageClass: local-path
     size: 50Gi
+
+extraEnvVars:
+  - name: ENABLE_WEB_SEARCH
+    value: "true"
+  - name: WEB_SEARCH_ENGINE
+    value: "searxng"
+  - name: SEARXNG_QUERY_URL
+    value: "http://searxng.searxng.svc.cluster.local:8080/search"
+  - name: SEARXNG_LANGUAGE
+    value: "all"
