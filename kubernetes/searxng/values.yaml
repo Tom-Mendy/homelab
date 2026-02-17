@@ -32,3 +32,14 @@ env:
 secret:
   name: searxng-secret
   serverSecretKey: "FdfgPLztckqMFZleMTjJL6THzgpRIIpzRWTgvkNQ+Vak4GYjClRm/5nNkU4fWsYp"
+
+vpn:
+  enabled: true
+  createSecret: true
+  secretName: searxng-vpn-secret
+  serviceProvider: protonvpn
+  type: wireguard
+  firewall: "on"
+  serverCountries: "France"
+  credentials:
+    wireguardPrivateKey: "4CRPmvGD799Plg87IfW1gFNe6+3FVzpULVJ/EqodX0g="

@@ -18,6 +18,46 @@ spec:
         app: searxng
     spec:
       containers:
+        {{- if .Values.vpn.enabled }}
+        - name: gluetun
+          image: qmcgaw/gluetun:latest
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          env:
+            - name: VPN_SERVICE_PROVIDER
+              value: {{ .Values.vpn.serviceProvider | quote }}
+            - name: VPN_TYPE
+              value: {{ .Values.vpn.type | quote }}
+            {{- if eq (lower .Values.vpn.type) "wireguard" }}
+            - name: WIREGUARD_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.vpn.secretName }}
+                  key: WIREGUARD_PRIVATE_KEY
+            {{- else }}
+            - name: OPENVPN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.vpn.secretName }}
+                  key: OPENVPN_USER
+            - name: OPENVPN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.vpn.secretName }}
+                  key: OPENVPN_PASSWORD
+            {{- end }}
+            - name: FIREWALL
+              value: {{ .Values.vpn.firewall | quote }}
+            - name: FIREWALL_INPUT_PORTS
+              value: {{ .Values.service.port | quote }}
+            - name: SERVER_COUNTRIES
+              value: {{ .Values.vpn.serverCountries | quote }}
+          volumeMounts:
+            - name: tun
+              mountPath: /dev/net/tun
+        {{- end }}
         - name: searxng
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -50,3 +90,10 @@ spec:
               port: http
             failureThreshold: 30
             periodSeconds: 10
+      {{- if .Values.vpn.enabled }}
+      volumes:
+        - name: tun
+          hostPath:
+            path: /dev/net/tun
+            type: CharDevice
+      {{- end }}
