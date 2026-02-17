@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["namespace", "createNamespace", "replicaCount", "image", "service", "ingress", "env", "secret"],
+  "properties": {
+    "namespace": { "type": "string", "minLength": 1 },
+    "createNamespace": { "type": "boolean" },
+    "replicaCount": { "type": "integer", "minimum": 1 },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "tag", "pullPolicy"],
+      "properties": {
+        "repository": { "type": "string", "minLength": 1 },
+        "tag": { "type": "string", "minLength": 1 },
+        "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] }
+      }
+    },
+    "deploymentAnnotations": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "service": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "port"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "port": { "type": "integer", "minimum": 1, "maximum": 65535 }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "host", "className", "annotations"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "host": { "type": "string", "minLength": 1 },
+        "className": { "type": "string" },
+        "annotations": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
+    "env": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["instanceName", "baseUrl", "autocomplete"],
+      "properties": {
+        "instanceName": { "type": "string", "minLength": 1 },
+        "baseUrl": { "type": "string", "minLength": 1 },
+        "autocomplete": { "type": "string", "minLength": 1 }
+      }
+    },
+    "secret": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "serverSecretKey"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "serverSecretKey": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

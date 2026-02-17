@@ -1,0 +1,34 @@
+namespace: searxng
+createNamespace: true
+
+replicaCount: 1
+
+image:
+  repository: searxng/searxng
+  tag: latest
+  pullPolicy: IfNotPresent
+
+deploymentAnnotations:
+  keel.sh/policy: all
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  host: searxng.home.tom-mendy.com
+  className: ""
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+
+env:
+  instanceName: SearXNG
+  baseUrl: https://searxng.home.tom-mendy.com/
+  autocomplete: duckduckgo
+
+secret:
+  name: searxng-secret
+  serverSecretKey: "***REMOVED***"

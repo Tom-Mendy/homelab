@@ -39,6 +39,7 @@ Kubernetes homelab managed with Ansible + Kubespray, with Argo CD GitOps for app
 - `stirling-pdf`
 - `ollama`
 - `openwebui`
+- `searxng`
 
 ## Quick start
 
