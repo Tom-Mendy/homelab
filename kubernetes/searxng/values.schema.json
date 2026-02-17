@@ -59,6 +59,39 @@
         "name": { "type": "string", "minLength": 1 },
         "serverSecretKey": { "type": "string", "minLength": 1 }
       }
+    },
+    "vpn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "createSecret",
+        "secretName",
+        "serviceProvider",
+        "type",
+        "firewall",
+        "serverCountries",
+        "credentials"
+      ],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "createSecret": { "type": "boolean" },
+        "secretName": { "type": "string", "minLength": 1 },
+        "serviceProvider": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "minLength": 1 },
+        "firewall": { "type": "string", "minLength": 1 },
+        "serverCountries": { "type": "string" },
+        "credentials": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["wireguardPrivateKey", "openvpnUser", "openvpnPassword"],
+          "properties": {
+            "wireguardPrivateKey": { "type": "string" },
+            "openvpnUser": { "type": "string" },
+            "openvpnPassword": { "type": "string" }
+          }
+        }
+      }
     }
   }
 }
