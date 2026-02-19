@@ -30,10 +30,10 @@ metadata:
   namespace: sparkyfitness
 type: Opaque
 stringData:
-  SPARKY_FITNESS_DB_PASSWORD: change_me_db_password
-  SPARKY_FITNESS_APP_DB_PASSWORD: change_me_app_db_password
-  SPARKY_FITNESS_API_ENCRYPTION_KEY: change_me_64_char_hex_key
-  BETTER_AUTH_SECRET: change_me_better_auth_secret
+  SPARKY_FITNESS_DB_PASSWORD: REMOVED_API_KEY
+  SPARKY_FITNESS_APP_DB_PASSWORD: REMOVED_API_KEY
+  SPARKY_FITNESS_API_ENCRYPTION_KEY: REMOVED_API_KEY
+  BETTER_AUTH_SECRET: REMOVED_API_KEY
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
