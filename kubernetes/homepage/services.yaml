@@ -28,6 +28,9 @@
         icon: searxng.svg
         href: https://searxng.home.tom-mendy.com/
         description: Privacy-respecting metasearch engine
+    - SparkyFitness:
+        href: https://sparkyfitness.home.tom-mendy.com/
+        description: Self-hosted fitness tracking
     - Stirling PDF:
         icon: stirling-pdf.svg
         href: https://stirling-pdf.home.tom-mendy.com/

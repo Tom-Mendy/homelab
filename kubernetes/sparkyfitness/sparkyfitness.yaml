@@ -1,0 +1,341 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sparkyfitness
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sparkyfitness-config
+  namespace: sparkyfitness
+data:
+  SPARKY_FITNESS_DB_NAME: sparkyfitness_db
+  SPARKY_FITNESS_DB_USER: sparky
+  SPARKY_FITNESS_APP_DB_USER: sparky_app
+  SPARKY_FITNESS_DB_HOST: sparkyfitness-db
+  SPARKY_FITNESS_DB_PORT: "5432"
+  SPARKY_FITNESS_SERVER_HOST: sparkyfitness-server
+  SPARKY_FITNESS_SERVER_PORT: "3010"
+  SPARKY_FITNESS_FRONTEND_URL: https://sparkyfitness.home.tom-mendy.com
+  SPARKY_FITNESS_DISABLE_SIGNUP: "false"
+  SPARKY_FITNESS_FORCE_EMAIL_LOGIN: "true"
+  SPARKY_FITNESS_LOG_LEVEL: ERROR
+  ALLOW_PRIVATE_NETWORK_CORS: "true"
+  TZ: Etc/UTC
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sparkyfitness-secrets
+  namespace: sparkyfitness
+type: Opaque
+stringData:
+  SPARKY_FITNESS_DB_PASSWORD: change_me_db_password
+  SPARKY_FITNESS_APP_DB_PASSWORD: change_me_app_db_password
+  SPARKY_FITNESS_API_ENCRYPTION_KEY: change_me_64_char_hex_key
+  BETTER_AUTH_SECRET: change_me_better_auth_secret
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sparkyfitness-db-pvc
+  namespace: sparkyfitness
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: local-path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sparkyfitness-backup-pvc
+  namespace: sparkyfitness
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: local-path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sparkyfitness-uploads-pvc
+  namespace: sparkyfitness
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: local-path
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sparkyfitness-db
+  namespace: sparkyfitness
+  annotations:
+    keel.sh/policy: all
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sparkyfitness-db
+  template:
+    metadata:
+      labels:
+        app: sparkyfitness-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: SPARKY_FITNESS_DB_NAME
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: SPARKY_FITNESS_DB_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sparkyfitness-secrets
+              key: SPARKY_FITNESS_DB_PASSWORD
+        ports:
+        - name: postgres
+          containerPort: 5432
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: db-data
+        persistentVolumeClaim:
+          claimName: sparkyfitness-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sparkyfitness-db
+  namespace: sparkyfitness
+spec:
+  type: ClusterIP
+  selector:
+    app: sparkyfitness-db
+  ports:
+  - name: postgres
+    port: 5432
+    targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sparkyfitness-server
+  namespace: sparkyfitness
+  annotations:
+    keel.sh/policy: all
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sparkyfitness-server
+  template:
+    metadata:
+      labels:
+        app: sparkyfitness-server
+    spec:
+      containers:
+      - name: server
+        image: codewithcj/sparkyfitness_server:latest
+        env:
+        - name: SPARKY_FITNESS_LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: SPARKY_FITNESS_LOG_LEVEL
+        - name: ALLOW_PRIVATE_NETWORK_CORS
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: ALLOW_PRIVATE_NETWORK_CORS
+        - name: SPARKY_FITNESS_DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: SPARKY_FITNESS_DB_USER
+        - name: SPARKY_FITNESS_DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: SPARKY_FITNESS_DB_HOST
+        - name: SPARKY_FITNESS_DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: SPARKY_FITNESS_DB_NAME
+        - name: SPARKY_FITNESS_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sparkyfitness-secrets
+              key: SPARKY_FITNESS_DB_PASSWORD
+        - name: SPARKY_FITNESS_APP_DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: SPARKY_FITNESS_APP_DB_USER
+        - name: SPARKY_FITNESS_APP_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sparkyfitness-secrets
+              key: SPARKY_FITNESS_APP_DB_PASSWORD
+        - name: SPARKY_FITNESS_DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: SPARKY_FITNESS_DB_PORT
+        - name: SPARKY_FITNESS_API_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: sparkyfitness-secrets
+              key: SPARKY_FITNESS_API_ENCRYPTION_KEY
+        - name: BETTER_AUTH_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: sparkyfitness-secrets
+              key: BETTER_AUTH_SECRET
+        - name: SPARKY_FITNESS_FRONTEND_URL
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: SPARKY_FITNESS_FRONTEND_URL
+        - name: SPARKY_FITNESS_DISABLE_SIGNUP
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: SPARKY_FITNESS_DISABLE_SIGNUP
+        - name: SPARKY_FITNESS_FORCE_EMAIL_LOGIN
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: SPARKY_FITNESS_FORCE_EMAIL_LOGIN
+        - name: TZ
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: TZ
+        ports:
+        - name: http
+          containerPort: 3010
+        volumeMounts:
+        - name: backup
+          mountPath: /app/SparkyFitnessServer/backup
+        - name: uploads
+          mountPath: /app/SparkyFitnessServer/uploads
+      volumes:
+      - name: backup
+        persistentVolumeClaim:
+          claimName: sparkyfitness-backup-pvc
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: sparkyfitness-uploads-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sparkyfitness-server
+  namespace: sparkyfitness
+spec:
+  type: ClusterIP
+  selector:
+    app: sparkyfitness-server
+  ports:
+  - name: http
+    port: 3010
+    targetPort: 3010
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sparkyfitness-frontend
+  namespace: sparkyfitness
+  annotations:
+    keel.sh/policy: all
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sparkyfitness-frontend
+  template:
+    metadata:
+      labels:
+        app: sparkyfitness-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: codewithcj/sparkyfitness:latest
+        env:
+        - name: SPARKY_FITNESS_FRONTEND_URL
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: SPARKY_FITNESS_FRONTEND_URL
+        - name: SPARKY_FITNESS_SERVER_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: SPARKY_FITNESS_SERVER_HOST
+        - name: SPARKY_FITNESS_SERVER_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: sparkyfitness-config
+              key: SPARKY_FITNESS_SERVER_PORT
+        ports:
+        - name: http
+          containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sparkyfitness
+  namespace: sparkyfitness
+spec:
+  type: ClusterIP
+  selector:
+    app: sparkyfitness-frontend
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sparkyfitness-ingress
+  namespace: sparkyfitness
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+spec:
+  tls:
+  - hosts:
+    - sparkyfitness.home.tom-mendy.com
+  rules:
+  - host: sparkyfitness.home.tom-mendy.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sparkyfitness
+            port:
+              number: 80
