@@ -20,6 +20,7 @@ customDNS:
     ollama.home.tom-mendy.com: 192.168.1.20
     openwebui.home.tom-mendy.com: 192.168.1.20
     searxng.home.tom-mendy.com: 192.168.1.20
+    sparkyfitness.home.tom-mendy.com: 192.168.1.20
     stirling-pdf.home.tom-mendy.com: 192.168.1.20
     navidrome.home.tom-mendy.com: 192.168.1.20
     vaultwarden.home.tom-mendy.com: 192.168.1.20

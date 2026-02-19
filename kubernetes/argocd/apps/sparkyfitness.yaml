@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: searxng
+  name: sparkyfitness
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "5"
@@ -10,10 +10,10 @@ spec:
   source:
     repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
     targetRevision: main
-    path: kubernetes/searxng
+    path: kubernetes/sparkyfitness
   destination:
     server: https://kubernetes.default.svc
-    namespace: searxng
+    namespace: sparkyfitness
   syncPolicy:
     automated:
       prune: true
