@@ -9,4 +9,3 @@ metadata:
 binaryData:
   node-exporter.json: {{ .Files.Get "dashboards/node-exporter.json" | b64enc | quote }}
   argocd.json: {{ .Files.Get "dashboards/argocd.json" | b64enc | quote }}
-  k8s.json: {{ .Files.Get "dashboards/k8s.json" | b64enc | quote }}
