@@ -31,6 +31,10 @@ ingress:
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
 
+sshIngress:
+  enabled: true
+  entryPoint: forgejo-ssh
+
 storage:
   pvName: forgejo-data-pv
   pvcName: forgejo-data-pvc
