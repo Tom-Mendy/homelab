@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: {{ .Values.namespace }}
+binaryData:
+  node-exporter.json: {{ .Files.Get "dashboards/node-exporter.json" | b64enc | quote }}
+  blocky.json: {{ .Files.Get "dashboards/blocky.json" | b64enc | quote }}
+  traefik.json: {{ .Files.Get "dashboards/traefik.json" | b64enc | quote }}
+  argocd.json: {{ .Files.Get "dashboards/argocd.json" | b64enc | quote }}
+  k8S.json: {{ .Files.Get "dashboards/k8S.json" | b64enc | quote }}
