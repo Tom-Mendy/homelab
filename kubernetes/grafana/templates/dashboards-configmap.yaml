@@ -4,6 +4,7 @@ metadata:
   name: grafana-dashboards
   namespace: {{ .Values.namespace }}
   annotations:
+    argocd.argoproj.io/sync-wave: "-1"
     argocd.argoproj.io/sync-options: Replace=true
 binaryData:
   node-exporter.json: {{ .Files.Get "dashboards/node-exporter.json" | b64enc | quote }}
