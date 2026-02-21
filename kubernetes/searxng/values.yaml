@@ -43,3 +43,5 @@ vpn:
   serverCountries: "France"
   credentials:
     wireguardPrivateKey: "***REMOVED***"
+    openvpnUser: "your_openvpn_username"
+    openvpnPassword: "your_openvpn_password"
