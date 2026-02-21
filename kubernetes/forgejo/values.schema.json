@@ -49,6 +49,15 @@
         "annotations": { "type": "object", "additionalProperties": { "type": "string" } }
       }
     },
+    "sshIngress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "entryPoint"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "entryPoint": { "type": "string", "minLength": 1 }
+      }
+    },
     "storage": {
       "type": "object",
       "additionalProperties": false,
