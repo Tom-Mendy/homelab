@@ -1,1 +1,13 @@
-ARCH=$(uname -m); if [[ "$ARCH" == "x86_64" ]]; then ARCH=amd64; elif [[ "$ARCH" == "aarch64" ]]; then ARCH=arm64; fi; HELM_BIN="$PWD/.tmp/helm/linux-${ARCH}/helm"; charts=(kubernetes/blocky kubernetes/homepage kubernetes/traefik kubernetes/keel kubernetes/prometheus kubernetes/grafana kubernetes/navidrome kubernetes/vaultwarden kubernetes/forgejo); for c in "${charts[@]}"; do echo "=== $c ==="; "$HELM_BIN" template test "$c" >/tmp/helm_render.out 2>/tmp/helm_render.err; code=$?; if [[ $code -eq 0 ]]; then echo "OK"; else echo "FAIL ($code)"; cat /tmp/helm_render.err; fi; done
+#!/usr/bin/env bash
+
+charts=(blocky homepage traefik keel prometheus grafana navidrome vaultwarden forgejo searxng)
+for c in "${charts[@]}"
+do echo "=== $c ==="
+helm template test "$c" >/tmp/helm_render.out 2>/tmp/helm_render.err
+code=$?
+if [[ $code -eq 0 ]]
+then echo "OK"
+else echo "FAIL ($code)"
+cat /tmp/helm_render.err
+fi
+done
