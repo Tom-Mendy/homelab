@@ -1,0 +1,65 @@
+namespace: endfield
+
+image:
+  repository: forgejo.home.tom-mendy.com/tom-mendy/endfield-checkin
+  tag: latest
+  pullPolicy: IfNotPresent
+  pullSecrets:
+    - name: forgejo-registry-creds
+
+registryAuth:
+  createSecret: true
+  secretName: forgejo-registry-creds
+  server: forgejo.home.tom-mendy.com
+  username: Tom-Mendy
+  password: "haY&*$3hd9o!XL&B6a@&A^3h!C5^o6"
+
+cronJob:
+  enabled: true
+  schedule: "0 5 * * *"
+  timeZone: "Europe/Paris"
+  suspend: false
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 3600
+
+# Optional one-shot job, useful for manual run by flipping enabled=true.
+runOnceJob:
+  enabled: false
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 3600
+
+env:
+  createSecret: true
+  secretName: endfield-env
+  values:
+    ENDFIELD_CRED: "REMOVED_ENDFIELD_SECRET"
+    ENDFIELD_SK_GAME_ROLE: "REMOVED_ENDFIELD_SECRET"
+    ENDFIELD_PLATFORM: "3"
+    ENDFIELD_VNAME: "1.0.0"
+    ENDFIELD_ACCOUNT_NAME: "REMOVED_ENDFIELD_SECRET"
+    ENABLE_DISCORD_NOTIFY: "true"
+    DISCORD_WEBHOOK_URL: "REMOVED_ENDFIELD_SECRET"
+    DISCORD_USER_ID: "REMOVED_DISCORD_ID"
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+
+podSecurityContext: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

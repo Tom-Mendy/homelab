@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["namespace", "image", "registryAuth", "cronJob", "runOnceJob", "env", "resources", "securityContext", "podSecurityContext", "nodeSelector", "tolerations", "affinity"],
+  "properties": {
+    "namespace": { "type": "string", "minLength": 1 },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "tag", "pullPolicy", "pullSecrets"],
+      "properties": {
+        "repository": { "type": "string", "minLength": 1 },
+        "tag": { "type": "string", "minLength": 1 },
+        "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] },
+        "pullSecrets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "registryAuth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["createSecret", "secretName", "server", "username", "password"],
+      "properties": {
+        "createSecret": { "type": "boolean" },
+        "secretName": { "type": "string", "minLength": 1 },
+        "server": { "type": "string", "minLength": 1 },
+        "username": { "type": "string", "minLength": 1 },
+        "password": { "type": "string", "minLength": 1 }
+      }
+    },
+    "cronJob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "schedule", "timeZone", "suspend", "concurrencyPolicy", "successfulJobsHistoryLimit", "failedJobsHistoryLimit", "backoffLimit", "ttlSecondsAfterFinished"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "schedule": { "type": "string", "minLength": 1 },
+        "timeZone": { "type": "string", "minLength": 1 },
+        "suspend": { "type": "boolean" },
+        "concurrencyPolicy": { "type": "string", "enum": ["Allow", "Forbid", "Replace"] },
+        "successfulJobsHistoryLimit": { "type": "integer", "minimum": 0 },
+        "failedJobsHistoryLimit": { "type": "integer", "minimum": 0 },
+        "backoffLimit": { "type": "integer", "minimum": 0 },
+        "ttlSecondsAfterFinished": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "runOnceJob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "backoffLimit", "ttlSecondsAfterFinished"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "backoffLimit": { "type": "integer", "minimum": 0 },
+        "ttlSecondsAfterFinished": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "env": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["createSecret", "secretName", "values"],
+      "properties": {
+        "createSecret": { "type": "boolean" },
+        "secretName": { "type": "string", "minLength": 1 },
+        "values": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ENDFIELD_CRED", "ENDFIELD_SK_GAME_ROLE", "ENDFIELD_PLATFORM", "ENDFIELD_VNAME", "ENDFIELD_ACCOUNT_NAME", "ENABLE_DISCORD_NOTIFY", "DISCORD_WEBHOOK_URL", "DISCORD_USER_ID"],
+          "properties": {
+            "ENDFIELD_CRED": { "type": "string" },
+            "ENDFIELD_SK_GAME_ROLE": { "type": "string" },
+            "ENDFIELD_PLATFORM": { "type": "string" },
+            "ENDFIELD_VNAME": { "type": "string" },
+            "ENDFIELD_ACCOUNT_NAME": { "type": "string" },
+            "ENABLE_DISCORD_NOTIFY": { "type": "string" },
+            "DISCORD_WEBHOOK_URL": { "type": "string" },
+            "DISCORD_USER_ID": { "type": "string" }
+          }
+        }
+      }
+    },
+    "resources": {
+      "type": "object"
+    },
+    "securityContext": {
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "type": "object"
+    },
+    "nodeSelector": {
+      "type": "object"
+    },
+    "tolerations": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "affinity": {
+      "type": "object"
+    }
+  }
+}
