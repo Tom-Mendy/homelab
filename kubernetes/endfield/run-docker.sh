@@ -13,9 +13,24 @@ docker build -t "$IMAGE_NAME" .
 
 echo "[2/2] Run container"
 if [[ -f "$ENV_FILE" ]]; then
-  docker run --rm --env-file "$ENV_FILE" "$IMAGE_NAME"
+  # Source shell-style env file so quoted values are interpreted correctly.
+  set -a
+  # shellcheck disable=SC1090
+  source "$ENV_FILE"
+  set +a
+
+  docker run --rm \
+    -e ENDFIELD_CRED \
+    -e ENDFIELD_SK_GAME_ROLE \
+    -e ENDFIELD_PLATFORM \
+    -e ENDFIELD_VNAME \
+    -e ENDFIELD_ACCOUNT_NAME \
+    -e ENABLE_DISCORD_NOTIFY \
+    -e DISCORD_WEBHOOK_URL \
+    -e DISCORD_USER_ID \
+    "$IMAGE_NAME"
 else
   echo "Env file '$ENV_FILE' not found."
-  echo "Copy .env.example to .env and fill your values, or pass an env file path as first arg."
+  echo "Create .env with shell syntax (quoted values allowed), or pass an env file path as first arg."
   exit 1
 fi
