@@ -57,6 +57,21 @@ kubectl --kubeconfig "$HOME/.kube/config-homelab" get pods -n arc-systems
 kubectl --kubeconfig "$HOME/.kube/config-homelab" get pods -n arc-runners
 ```
 
+If controller logs show `no matches for kind "EphemeralRunnerSet" in version "actions.github.com/v1alpha1"`, verify CRDs exist:
+
+```bash
+kubectl --kubeconfig "$HOME/.kube/config-homelab" get crd | grep actions.github.com
+```
+
+Expected CRDs include:
+
+- `autoscalinglisteners.actions.github.com`
+- `autoscalingrunnersets.actions.github.com`
+- `ephemeralrunners.actions.github.com`
+- `ephemeralrunnersets.actions.github.com`
+
+If missing, force re-sync `actions-runner-controller` in Argo CD and restart the controller pod.
+
 Use these labels in workflows:
 
 - `runs-on: arc-runner-set` for `Tom-Mendy/homelab`
