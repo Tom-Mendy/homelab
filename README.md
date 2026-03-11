@@ -40,6 +40,9 @@ Kubernetes homelab managed with Ansible + Kubespray, with Argo CD GitOps for app
 - `ollama`
 - `openwebui`
 - `searxng`
+- `actions-runner-controller`
+- `github-runners`
+- `github-runners-capstone2`
 
 ## Quick start
 

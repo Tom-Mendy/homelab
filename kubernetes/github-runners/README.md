@@ -1,0 +1,63 @@
+# GitHub Actions Runners (ARC)
+
+This directory configures GitHub Actions Runner Controller (ARC) with two Argo CD apps:
+
+- `actions-runner-controller` (namespace: `arc-systems`)
+- `github-runners` (namespace: `arc-runners`)
+- `github-runners-capstone2` (namespace: `arc-runners`)
+
+## 1. Create GitHub auth secret
+
+Create the secret referenced by `githubConfigSecret` in:
+
+- `runner-scale-set-values.yaml`
+- `runner-scale-set-capstone2-values.yaml`
+
+### Option A: Personal access token (classic)
+
+```bash
+cp arc-github-auth-secret.yaml arc-github-auth-secret.local.yaml
+# edit arc-github-auth-secret.local.yaml and replace <YOUR_PAT>
+kubectl apply -f arc-github-auth-secret.local.yaml
+```
+
+### Option B: GitHub App
+
+```bash
+kubectl create secret generic arc-github-auth \
+  --namespace arc-runners \
+  --from-literal=github_app_id='<APP_ID>' \
+  --from-literal=github_app_installation_id='<INSTALLATION_ID>' \
+  --from-file=github_app_private_key='<PATH_TO_PRIVATE_KEY_PEM>'
+```
+
+## 2. Confirm target URL
+
+Update `githubConfigUrl` in each values file for your desired scope:
+
+- `runner-scale-set-values.yaml`
+- `runner-scale-set-capstone2-values.yaml`
+
+- Repository: `https://github.com/<owner>/<repo>`
+- Organization: `https://github.com/<org>`
+- Enterprise: `https://github.com/enterprises/<enterprise>`
+
+## 3. Deploy via existing GitOps flow
+
+```bash
+cd ansible
+./run.sh playbooks/deploy-apps.yml
+```
+
+## 4. Validate
+
+```bash
+kubectl --kubeconfig "$HOME/.kube/config-homelab" get applications -n argocd
+kubectl --kubeconfig "$HOME/.kube/config-homelab" get pods -n arc-systems
+kubectl --kubeconfig "$HOME/.kube/config-homelab" get pods -n arc-runners
+```
+
+Use these labels in workflows:
+
+- `runs-on: arc-runner-set` for `Tom-Mendy/homelab`
+- `runs-on: arc-runner-set-capstone2` for `Tom-Mendy/Capstone2`
