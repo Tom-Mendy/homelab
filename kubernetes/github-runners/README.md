@@ -72,6 +72,13 @@ Expected CRDs include:
 
 If missing, force re-sync `actions-runner-controller` in Argo CD and restart the controller pod.
 
+Recommended recovery order:
+
+1. Sync `actions-runner-controller-crds`
+2. Sync `actions-runner-controller`
+3. Restart controller pod in `arc-systems`
+4. Sync `github-runners` and `github-runners-capstone2`
+
 Use these labels in workflows:
 
 - `runs-on: arc-runner-set` for `Tom-Mendy/homelab`

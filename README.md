@@ -41,6 +41,7 @@ Kubernetes homelab managed with Ansible + Kubespray, with Argo CD GitOps for app
 - `openwebui`
 - `searxng`
 - `actions-runner-controller`
+- `actions-runner-controller-crds`
 - `github-runners`
 - `github-runners-capstone2`
 
