@@ -10,9 +10,10 @@ spec:
   sources:
     - repoURL: ghcr.io/actions/actions-runner-controller-charts
       chart: gha-runner-scale-set-controller
-      targetRevision: "*"
+      targetRevision: "0.13.1"
       helm:
         releaseName: arc
+        skipCrds: false
         valueFiles:
           - $values/kubernetes/github-runners/controller-values.yaml
     - repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
@@ -27,3 +28,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
