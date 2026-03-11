@@ -1,0 +1,25 @@
+githubConfigUrl: "https://github.com/Tom-Mendy/Capstone2"
+githubConfigSecret: arc-github-auth
+
+runnerScaleSetName: "arc-runner-set-capstone2"
+
+maxRunners: 5
+minRunners: 0
+
+controllerServiceAccount:
+  namespace: arc-systems
+  name: arc-gha-rs-controller
+
+template:
+  spec:
+    containers:
+      - name: runner
+        image: ghcr.io/actions/actions-runner:latest
+        command: ["/home/runner/run.sh"]
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "2"
+            memory: "2Gi"
