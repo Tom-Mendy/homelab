@@ -6,6 +6,9 @@ runnerScaleSetName: "arc-runner-set-capstone2"
 maxRunners: 5
 minRunners: 0
 
+containerMode:
+  type: "dind"
+
 controllerServiceAccount:
   namespace: arc-systems
   name: arc-gha-rs-controller
