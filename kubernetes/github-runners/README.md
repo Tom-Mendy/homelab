@@ -1,10 +1,11 @@
 # GitHub Actions Runners (ARC)
 
-This directory configures GitHub Actions Runner Controller (ARC) with two Argo CD apps:
+This directory configures GitHub Actions Runner Controller (ARC) with Argo CD apps:
 
 - `actions-runner-controller` (namespace: `arc-systems`)
 - `github-runners` (namespace: `arc-runners`)
 - `github-runners-capstone2` (namespace: `arc-runners`)
+- `github-runners-portfolio` (namespace: `arc-runners`)
 
 ## 1. Create GitHub auth secret
 
@@ -12,6 +13,7 @@ Create the secret referenced by `githubConfigSecret` in:
 
 - `runner-scale-set-values.yaml`
 - `runner-scale-set-capstone2-values.yaml`
+- `runner-scale-set-portfolio-values.yaml`
 
 ### Option A: Personal access token (classic)
 
@@ -37,6 +39,7 @@ Update `githubConfigUrl` in each values file for your desired scope:
 
 - `runner-scale-set-values.yaml`
 - `runner-scale-set-capstone2-values.yaml`
+- `runner-scale-set-portfolio-values.yaml`
 
 - Repository: `https://github.com/<owner>/<repo>`
 - Organization: `https://github.com/<org>`
@@ -77,9 +80,10 @@ Recommended recovery order:
 1. Sync `actions-runner-controller-crds`
 2. Sync `actions-runner-controller`
 3. Restart controller pod in `arc-systems`
-4. Sync `github-runners` and `github-runners-capstone2`
+4. Sync `github-runners`, `github-runners-capstone2`, and `github-runners-portfolio`
 
 Use these labels in workflows:
 
 - `runs-on: arc-runner-set` for `Tom-Mendy/homelab`
 - `runs-on: arc-runner-set-capstone2` for `Tom-Mendy/Capstone2`
+- `runs-on: arc-runner-set-portfolio` for `Tom-Mendy/Portfolio`
