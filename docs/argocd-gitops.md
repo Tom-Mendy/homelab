@@ -27,7 +27,7 @@ Then behavior depends on `kubernetes_deploy_mode`:
 Defined Argo CD Applications:
 
 - `traefik`, `blocky`, `homepage`, `keel`, `prometheus`, `grafana`, `navidrome`, `vaultwarden`, `trilium`, `forgejo`, `media`, `kasm`, `newt`, `stirling-pdf`, `ollama`, `openwebui`
-- `actions-runner-controller-crds`, `actions-runner-controller`, `github-runners`, `github-runners-capstone2`
+- `actions-runner-controller-crds`, `actions-runner-controller`, `github-runners`, `github-runners-capstone2`, `github-runners-portfolio`
 
 ## Sync-wave order
 
@@ -43,6 +43,7 @@ From `kubernetes/argocd/apps/*.yaml`:
 - wave `5`: `actions-runner-controller`
 - wave `6`: `github-runners`
 - wave `7`: `github-runners-capstone2`
+- wave `8`: `github-runners-portfolio`
 
 ## Important Ansible variables
 
