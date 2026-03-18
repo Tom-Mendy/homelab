@@ -9,6 +9,14 @@
       "type": "integer",
       "minimum": 1
     },
+    "nfsPermissions": {
+      "type": "object",
+      "properties": {
+        "userUid": { "type": "string" },
+        "userGid": { "type": "string" }
+      },
+      "required": ["userUid", "userGid"]
+    },
     "atuin": {
       "type": "object",
       "properties": {
@@ -40,10 +48,15 @@
         "storage": {
           "type": "object",
           "properties": {
+            "pvName": { "type": "string" },
             "size": { "type": "string" },
-            "storageClassName": { "type": "string" }
+            "accessMode": { "type": "string" },
+            "reclaimPolicy": { "type": "string" },
+            "storageClassName": { "type": "string" },
+            "nfsServer": { "type": "string" },
+            "nfsPath": { "type": "string" }
           },
-          "required": ["size", "storageClassName"]
+          "required": ["pvName", "size", "accessMode", "reclaimPolicy", "storageClassName", "nfsServer", "nfsPath"]
         }
       },
       "required": ["image", "host", "port", "openRegistration", "db", "storage"]
@@ -68,10 +81,15 @@
         "storage": {
           "type": "object",
           "properties": {
+            "pvName": { "type": "string" },
             "size": { "type": "string" },
-            "storageClassName": { "type": "string" }
+            "accessMode": { "type": "string" },
+            "reclaimPolicy": { "type": "string" },
+            "storageClassName": { "type": "string" },
+            "nfsServer": { "type": "string" },
+            "nfsPath": { "type": "string" }
           },
-          "required": ["size", "storageClassName"]
+          "required": ["pvName", "size", "accessMode", "reclaimPolicy", "storageClassName", "nfsServer", "nfsPath"]
         }
       },
       "required": ["image", "port", "storage"]
@@ -96,5 +114,5 @@
       "required": ["enabled", "className", "annotations"]
     }
   },
-  "required": ["namespace", "replicaCount", "atuin", "postgres", "service", "ingress"]
+  "required": ["namespace", "replicaCount", "nfsPermissions", "atuin", "postgres", "service", "ingress"]
 }
