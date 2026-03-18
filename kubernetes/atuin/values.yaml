@@ -2,10 +2,14 @@ namespace: atuin
 
 replicaCount: 1
 
+nfsPermissions:
+  userUid: "1023"
+  userGid: "100"
+
 atuin:
   image:
     repository: ghcr.io/atuinsh/atuin
-    tag: v18.13.3
+    tag: latest
     pullPolicy: IfNotPresent
   host: atuin.home.tom-mendy.com
   port: 8888
@@ -15,8 +19,13 @@ atuin:
     user: atuin
     password: atuinpassword
   storage:
-    size: 1Gi
-    storageClassName: local-path
+    pvName: atuin-data-pv
+    size: 20Gi
+    accessMode: ReadWriteMany
+    reclaimPolicy: Retain
+    storageClassName: ""
+    nfsServer: 192.168.1.1
+    nfsPath: /volume1/atuin/db
 
 postgres:
   image:
@@ -25,8 +34,13 @@ postgres:
     pullPolicy: IfNotPresent
   port: 5432
   storage:
+    pvName: atuin-postgres-data-pv
     size: 10Gi
-    storageClassName: local-path
+    accessMode: ReadWriteOnce
+    reclaimPolicy: Retain
+    storageClassName: ""
+    nfsServer: 192.168.1.1
+    nfsPath: /volume1/atuin/postgres
 
 deploymentAnnotations:
   keel.sh/policy: all
