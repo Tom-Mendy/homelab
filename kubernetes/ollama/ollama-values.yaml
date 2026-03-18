@@ -12,7 +12,7 @@ ollama:
   # -- List of models to pull at container startup
   models:
     pull:
-      - qwen3:8b
+      - deepseek-r1:8b
 
 deployment:
   annotations:

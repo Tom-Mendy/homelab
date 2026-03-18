@@ -26,7 +26,7 @@ Then behavior depends on `kubernetes_deploy_mode`:
 
 Defined Argo CD Applications:
 
-- `traefik`, `blocky`, `homepage`, `keel`, `prometheus`, `grafana`, `navidrome`, `vaultwarden`, `trilium`, `forgejo`, `media`, `kasm`, `newt`, `stirling-pdf`, `ollama`, `openwebui`
+- `traefik`, `blocky`, `homepage`, `keel`, `prometheus`, `grafana`, `navidrome`, `vaultwarden`, `trilium`, `forgejo`, `media`, `newt`, `stirling-pdf`, `ollama`, `openwebui`
 - `actions-runner-controller-crds`, `actions-runner-controller`, `github-runners`, `github-runners-capstone2`, `github-runners-portfolio`
 
 ## Sync-wave order
@@ -37,7 +37,7 @@ From `kubernetes/argocd/apps/*.yaml`:
 - wave `1`: `blocky`
 - wave `2`: `homepage`, `keel`, `prometheus`
 - wave `3`: `grafana`, `navidrome`, `vaultwarden`, `trilium`
-- wave `4`: `forgejo`, `media`, `kasm`, `newt`, `stirling-pdf`, `ollama`
+- wave `4`: `forgejo`, `media`, `newt`, `stirling-pdf`, `ollama`
 - wave `4`: `actions-runner-controller-crds`
 - wave `5`: `openwebui`
 - wave `5`: `actions-runner-controller`

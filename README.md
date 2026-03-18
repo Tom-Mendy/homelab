@@ -34,7 +34,6 @@ Kubernetes homelab managed with Ansible + Kubespray, with Argo CD GitOps for app
 - `forgejo`
 - `trilium`
 - `media`
-- `kasm`
 - `newt`
 - `stirling-pdf`
 - `ollama`
