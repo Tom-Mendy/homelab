@@ -25,7 +25,7 @@ atuin:
     reclaimPolicy: Retain
     storageClassName: ""
     nfsServer: 192.168.1.1
-    nfsPath: /volume1/atuin/db
+    nfsPath: /volume1/atuin
 
 postgres:
   image:
