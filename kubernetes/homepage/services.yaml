@@ -18,9 +18,6 @@
         description: NAS
 
 - Professional Tools:
-    - Kasm:
-        href: https://kasm.home.tom-mendy.com/
-        description: Browser-based remote workspaces
     - OpenWebUI:
         href: https://openwebui.home.tom-mendy.com/
         description: Chat UI for local LLMs
