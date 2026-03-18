@@ -31,6 +31,10 @@ spec:
                 secretKeyRef:
                   name: atuin-secrets
                   key: ATUIN_DB_URI
+            - name: USER_UID
+              value: {{ .Values.nfsPermissions.userUid | quote }}
+            - name: USER_GID
+              value: {{ .Values.nfsPermissions.userGid | quote }}
             - name: ATUIN_HOST
               value: 0.0.0.0
             - name: ATUIN_PORT

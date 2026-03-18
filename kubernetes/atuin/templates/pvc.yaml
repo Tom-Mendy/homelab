@@ -5,11 +5,42 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   accessModes:
-    - ReadWriteOnce
+    - {{ .Values.postgres.storage.accessMode }}
   resources:
     requests:
       storage: {{ .Values.postgres.storage.size }}
-  storageClassName: {{ .Values.postgres.storage.storageClassName }}
+  storageClassName: {{ .Values.postgres.storage.storageClassName | quote }}
+  volumeName: {{ .Values.postgres.storage.pvName }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.postgres.storage.pvName }}
+spec:
+  capacity:
+    storage: {{ .Values.postgres.storage.size }}
+  accessModes:
+    - {{ .Values.postgres.storage.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.postgres.storage.reclaimPolicy }}
+  storageClassName: {{ .Values.postgres.storage.storageClassName | quote }}
+  nfs:
+    server: {{ .Values.postgres.storage.nfsServer }}
+    path: {{ .Values.postgres.storage.nfsPath }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.atuin.storage.pvName }}
+spec:
+  capacity:
+    storage: {{ .Values.atuin.storage.size }}
+  accessModes:
+    - {{ .Values.atuin.storage.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.atuin.storage.reclaimPolicy }}
+  storageClassName: {{ .Values.atuin.storage.storageClassName | quote }}
+  nfs:
+    server: {{ .Values.atuin.storage.nfsServer }}
+    path: {{ .Values.atuin.storage.nfsPath }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -18,8 +49,9 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   accessModes:
-    - ReadWriteOnce
+    - {{ .Values.atuin.storage.accessMode }}
   resources:
     requests:
       storage: {{ .Values.atuin.storage.size }}
-  storageClassName: {{ .Values.atuin.storage.storageClassName }}
+  storageClassName: {{ .Values.atuin.storage.storageClassName | quote }}
+  volumeName: {{ .Values.atuin.storage.pvName }}
