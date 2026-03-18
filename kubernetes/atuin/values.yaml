@@ -35,7 +35,8 @@ postgres:
     pullPolicy: IfNotPresent
   port: 5432
   storage:
-    pvName: atuin-postgres-data-pv
+    pvName: atuin-postgres-data-pv-v2
+    pvcName: postgres-data-v2
     size: 10Gi
     accessMode: ReadWriteOnce
     reclaimPolicy: Retain

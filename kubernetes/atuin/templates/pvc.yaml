@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-data
+  name: {{ .Values.postgres.storage.pvcName | default "postgres-data" }}
   namespace: {{ .Values.namespace }}
 spec:
   accessModes:
