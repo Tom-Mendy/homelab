@@ -19,7 +19,8 @@ atuin:
     user: atuin
     password: atuinpassword
   storage:
-    pvName: atuin-data-pv
+    pvName: atuin-data-pv-v2
+    pvcName: atuin-config-v2
     size: 20Gi
     accessMode: ReadWriteMany
     reclaimPolicy: Retain
