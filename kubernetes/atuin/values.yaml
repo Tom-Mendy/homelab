@@ -40,7 +40,7 @@ postgres:
     reclaimPolicy: Retain
     storageClassName: ""
     nfsServer: 192.168.1.1
-    nfsPath: /volume1/atuin/postgres
+    nfsPath: /volume1/atuin-postgres
 
 deploymentAnnotations:
   keel.sh/policy: all
