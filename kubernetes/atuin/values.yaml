@@ -1,0 +1,43 @@
+namespace: atuin
+
+replicaCount: 1
+
+atuin:
+  image:
+    repository: ghcr.io/atuinsh/atuin
+    tag: v18.13.3
+    pullPolicy: IfNotPresent
+  host: atuin.home.tom-mendy.com
+  port: 8888
+  openRegistration: false
+  db:
+    name: atuin
+    user: atuin
+    password: atuinpassword
+  storage:
+    size: 1Gi
+    storageClassName: local-path
+
+postgres:
+  image:
+    repository: postgres
+    tag: "16"
+    pullPolicy: IfNotPresent
+  port: 5432
+  storage:
+    size: 10Gi
+    storageClassName: local-path
+
+deploymentAnnotations:
+  keel.sh/policy: all
+
+service:
+  type: ClusterIP
+
+ingress:
+  enabled: true
+  className: ""
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt

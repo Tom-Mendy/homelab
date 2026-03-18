@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atuin
+  namespace: {{ .Values.namespace }}
+  annotations:
+{{ toYaml .Values.deploymentAnnotations | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: atuin
+  template:
+    metadata:
+      labels:
+        app: atuin
+    spec:
+      containers:
+        - name: atuin
+          image: "{{ .Values.atuin.image.repository }}:{{ .Values.atuin.image.tag }}"
+          imagePullPolicy: {{ .Values.atuin.image.pullPolicy }}
+          args:
+            - server
+            - start
+          ports:
+            - containerPort: {{ .Values.atuin.port }}
+              name: http
+          env:
+            - name: ATUIN_DB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: atuin-secrets
+                  key: ATUIN_DB_URI
+            - name: ATUIN_HOST
+              value: 0.0.0.0
+            - name: ATUIN_PORT
+              value: {{ .Values.atuin.port | quote }}
+            - name: ATUIN_OPEN_REGISTRATION
+              value: {{ ternary "true" "false" .Values.atuin.openRegistration | quote }}
+          volumeMounts:
+            - name: atuin-config
+              mountPath: /config
+      volumes:
+        - name: atuin-config
+          persistentVolumeClaim:
+            claimName: atuin-config
