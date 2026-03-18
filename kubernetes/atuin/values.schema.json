@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "namespace": {
+      "type": "string"
+    },
+    "replicaCount": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "atuin": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "type": "object",
+          "properties": {
+            "repository": { "type": "string" },
+            "tag": { "type": "string" },
+            "pullPolicy": { "type": "string" }
+          },
+          "required": ["repository", "tag", "pullPolicy"]
+        },
+        "host": { "type": "string" },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "openRegistration": { "type": "boolean" },
+        "db": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "user": { "type": "string" },
+            "password": { "type": "string" }
+          },
+          "required": ["name", "user", "password"]
+        },
+        "storage": {
+          "type": "object",
+          "properties": {
+            "size": { "type": "string" },
+            "storageClassName": { "type": "string" }
+          },
+          "required": ["size", "storageClassName"]
+        }
+      },
+      "required": ["image", "host", "port", "openRegistration", "db", "storage"]
+    },
+    "postgres": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "type": "object",
+          "properties": {
+            "repository": { "type": "string" },
+            "tag": { "type": "string" },
+            "pullPolicy": { "type": "string" }
+          },
+          "required": ["repository", "tag", "pullPolicy"]
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "storage": {
+          "type": "object",
+          "properties": {
+            "size": { "type": "string" },
+            "storageClassName": { "type": "string" }
+          },
+          "required": ["size", "storageClassName"]
+        }
+      },
+      "required": ["image", "port", "storage"]
+    },
+    "service": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" }
+      },
+      "required": ["type"]
+    },
+    "ingress": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "className": { "type": "string" },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      },
+      "required": ["enabled", "className", "annotations"]
+    }
+  },
+  "required": ["namespace", "replicaCount", "atuin", "postgres", "service", "ingress"]
+}
