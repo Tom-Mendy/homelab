@@ -49,6 +49,7 @@
           "type": "object",
           "properties": {
             "pvName": { "type": "string" },
+            "pvcName": { "type": "string" },
             "size": { "type": "string" },
             "accessMode": { "type": "string" },
             "reclaimPolicy": { "type": "string" },
