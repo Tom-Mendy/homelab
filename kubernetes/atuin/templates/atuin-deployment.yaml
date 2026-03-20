@@ -20,7 +20,6 @@ spec:
           image: "{{ .Values.atuin.image.repository }}:{{ .Values.atuin.image.tag }}"
           imagePullPolicy: {{ .Values.atuin.image.pullPolicy }}
           args:
-            - atuin-server
             - start
           ports:
             - containerPort: {{ .Values.atuin.port }}
