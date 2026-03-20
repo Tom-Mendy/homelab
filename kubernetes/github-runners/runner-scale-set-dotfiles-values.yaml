@@ -1,0 +1,28 @@
+githubConfigUrl: "https://github.com/Tom-Mendy/dotfiles"
+githubConfigSecret: arc-github-auth
+
+runnerScaleSetName: "arc-runner-set-dotfiles"
+
+maxRunners: 5
+minRunners: 0
+
+containerMode:
+  type: "dind"
+
+controllerServiceAccount:
+  namespace: arc-systems
+  name: arc-gha-rs-controller
+
+template:
+  spec:
+    containers:
+      - name: runner
+        image: ghcr.io/actions/actions-runner:latest
+        command: ["/home/runner/run.sh"]
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "2"
+            memory: "2Gi"
