@@ -3,7 +3,7 @@ namespace: atuin
 replicaCount: 1
 
 nfsPermissions:
-  userUid: "1027"
+  userUid: "1025"
   userGid: "100"
 
 atuin:
