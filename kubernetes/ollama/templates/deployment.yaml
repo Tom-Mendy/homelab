@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: {{ .Values.namespace }}
+  labels:
+{{ include "ollama-local.labels" . | nindent 4 }}
+{{- with .Values.deployment.annotations }}
+  annotations:
+{{ toYaml . | nindent 4 }}
+{{- end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+{{ include "ollama-local.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+{{ include "ollama-local.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- if .Values.gpu.runtimeClass.enabled }}
+      runtimeClassName: {{ .Values.gpu.runtimeClass.name }}
+      {{- end }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | nindent 8 }}
+      {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if gt (len .Values.models.pull) 0 }}
+      initContainers:
+        - name: pull-models
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              {{- range .Values.models.pull }}
+              ollama pull {{ . | quote }}
+              {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /root/.ollama
+      {{- end }}
+      containers:
+        - name: ollama
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/sh
+            - -c
+            - ollama serve
+          ports:
+            - name: http
+              containerPort: 11434
+          env:
+            - name: OLLAMA_HOST
+              value: 0.0.0.0:11434
+          volumeMounts:
+            - name: data
+              mountPath: /root/.ollama
+          readinessProbe:
+            httpGet:
+              path: /api/version
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/version
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+{{ toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: ollama-data

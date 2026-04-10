@@ -1,0 +1,70 @@
+{{- if .Values.gpu.devicePlugin.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nvidia-device-plugin
+  namespace: {{ .Values.gpu.devicePlugin.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nvidia-device-plugin
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: nvidia-device-plugin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: nvidia-device-plugin
+subjects:
+  - kind: ServiceAccount
+    name: nvidia-device-plugin
+    namespace: {{ .Values.gpu.devicePlugin.namespace }}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nvidia-device-plugin-daemonset
+  namespace: {{ .Values.gpu.devicePlugin.namespace }}
+spec:
+  selector:
+    matchLabels:
+      name: nvidia-device-plugin-ds
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: nvidia-device-plugin-ds
+    spec:
+      priorityClassName: system-node-critical
+      serviceAccountName: nvidia-device-plugin
+      runtimeClassName: {{ .Values.gpu.runtimeClass.name }}
+      tolerations:
+{{ toYaml .Values.gpu.devicePlugin.tolerations | nindent 8 }}
+      nodeSelector:
+{{ toYaml .Values.gpu.devicePlugin.nodeSelector | nindent 8 }}
+      containers:
+        - image: {{ .Values.gpu.devicePlugin.image }}
+          name: nvidia-device-plugin-ctr
+          args:
+            - --fail-on-init-error=false
+            - --device-discovery-strategy=nvml
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: device-plugin
+              mountPath: /var/lib/kubelet/device-plugins
+      volumes:
+        - name: device-plugin
+          hostPath:
+            path: /var/lib/kubelet/device-plugins
+{{- end }}
