@@ -38,9 +38,28 @@ spec:
             - -c
             - |
               set -eu
+              export OLLAMA_HOST=127.0.0.1:11434
+              ollama serve >/tmp/ollama-init.log 2>&1 &
+              OLLAMA_PID=$!
+
+              # Wait for the local Ollama API to become available.
+              for i in $(seq 1 60); do
+                if ollama list >/dev/null 2>&1; then
+                  break
+                fi
+                if [ "$i" -eq 60 ]; then
+                  echo "Ollama server did not become ready in time"
+                  kill "$OLLAMA_PID" || true
+                  exit 1
+                fi
+                sleep 1
+              done
+
               {{- range .Values.models.pull }}
               ollama pull {{ . | quote }}
               {{- end }}
+
+              kill "$OLLAMA_PID" || true
           volumeMounts:
             - name: data
               mountPath: /root/.ollama
