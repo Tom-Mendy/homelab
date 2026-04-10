@@ -11,6 +11,8 @@ metadata:
 {{- end }}
 spec:
   replicas: 1
+  strategy:
+    type: {{ .Values.deployment.strategy | default "Recreate" }}
   selector:
     matchLabels:
 {{ include "ollama-local.selectorLabels" . | nindent 6 }}
