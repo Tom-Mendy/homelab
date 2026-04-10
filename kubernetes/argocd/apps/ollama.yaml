@@ -14,7 +14,7 @@ spec:
     helm:
       releaseName: ollama
       valueFiles:
-        - ollama-values.yaml
+        - values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: ollama
