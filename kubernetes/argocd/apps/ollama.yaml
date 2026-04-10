@@ -7,23 +7,14 @@ metadata:
     argocd.argoproj.io/sync-wave: "4"
 spec:
   project: default
-  sources:
-    - repoURL: https://otwld.github.io/ollama-helm/
-      chart: ollama
-      targetRevision: ">=0.0.0-0"
-      helm:
-        releaseName: ollama
-        valueFiles:
-          - $values/kubernetes/ollama/ollama-values.yaml
-    - repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
-      targetRevision: main
-      ref: values
-    - repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
-      targetRevision: main
-      path: kubernetes/ollama
-      directory:
-        recurse: true
-        include: '{ollama-ingress.yaml,runtimeclass-nvidia.yaml,nvidia-device-plugin.yaml}'
+  source:
+    repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
+    targetRevision: main
+    path: kubernetes/ollama
+    helm:
+      releaseName: ollama
+      valueFiles:
+        - ollama-values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: ollama
