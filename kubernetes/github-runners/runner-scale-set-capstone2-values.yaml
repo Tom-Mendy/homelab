@@ -1,4 +1,4 @@
-githubConfigUrl: "https://github.com/Tom-Mendy/Capstone2"
+githubConfigUrl: "https://github.com/Tom-Mendy/Echo"
 githubConfigSecret: arc-github-auth
 
 runnerScaleSetName: "arc-runner-set-capstone2"
