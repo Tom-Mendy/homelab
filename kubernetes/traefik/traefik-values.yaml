@@ -27,7 +27,7 @@ persistence:
   enabled: true
   name: traefik-data
   accessMode: ReadWriteOnce
-  storageClass: local-path
+  storageClass: nfs-k8s
   size: 128Mi
   path: /data
 
