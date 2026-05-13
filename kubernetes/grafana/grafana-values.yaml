@@ -14,7 +14,7 @@ initChownData:
 
 persistence:
   enabled: true
-  storageClassName: local-path
+  storageClassName: nfs-k8s
   accessModes:
     - ReadWriteOnce
   size: 5Gi
