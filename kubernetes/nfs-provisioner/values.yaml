@@ -1,0 +1,23 @@
+replicaCount: 1
+
+nfs:
+  server: 192.168.1.1
+  path: /volume1/k8s
+  mountOptions:
+    - nfsvers=4.1
+
+storageClass:
+  create: true
+  name: nfs-k8s
+  defaultClass: false
+  archiveOnDelete: true
+  reclaimPolicy: Retain
+  accessModes: ReadWriteMany
+  volumeBindingMode: Immediate
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 64Mi
+  limits:
+    memory: 128Mi

@@ -16,7 +16,11 @@ This document defines practical backup steps for this homelab repository and clu
 
 ## Important storage rule
 
-Only content data should be stored on NAS shares. Application runtime data should stay on local cluster storage unless explicitly required.
+Kubernetes persistent data must not use worker-local storage. Standard PVCs
+should use the shared Synology NFS-backed `nfs-k8s` StorageClass so workloads can
+survive the loss or shutdown of a worker node. S3-compatible storage is reserved
+for backups, artifacts, and object data; it is not a general POSIX PVC
+replacement.
 
 ## 1) Repository backup
 
