@@ -30,7 +30,7 @@ storage:
     size: 4Ti
 
 configStorage:
-  className: local-path
+  className: nfs-k8s
   defaultSize: 5Gi
 
 ingress:
