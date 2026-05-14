@@ -1,6 +1,7 @@
 # Homelab Infrastructure
 
-Kubernetes homelab managed with Ansible + Kubespray, with Argo CD GitOps for app reconciliation.
+Kubernetes homelab managed with Ansible + Kubespray,
+with Argo CD GitOps for app reconciliation.
 
 ## What is in this repo
 
@@ -51,10 +52,10 @@ Kubernetes homelab managed with Ansible + Kubespray, with Argo CD GitOps for app
 
 1. Clone repository:
 
- ```bash
- git clone https://github.com/Tom-Mendy/homelab.git
- cd homelab
- ```
+   ```bash
+   git clone https://github.com/Tom-Mendy/homelab.git
+   cd homelab
+   ```
 
 2. Place SSH key for Ansible at `ansible/private_key`.
 3. Review `ansible/inventory.ini`.

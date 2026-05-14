@@ -1,6 +1,7 @@
 # Backup Procedures
 
-This document defines practical backup steps for this homelab repository and cluster workloads.
+This document defines practical backup steps for this homelabrepository
+and cluster workloads.
 
 ## Scope
 

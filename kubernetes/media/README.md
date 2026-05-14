@@ -1,6 +1,7 @@
 # Media Stack Helm Chart
 
-This directory is now a Helm chart, aligned with the pattern used by the other charts in `kubernetes/`.
+This directory is now a Helm chart, aligned with the pattern used
+by the other charts in `kubernetes/`.
 
 ## Included apps
 
@@ -40,7 +41,8 @@ If you use OpenVPN instead, configure:
 - `vpn.credentials.openvpnUser`
 - `vpn.credentials.openvpnPassword`
 
-For safer handling, set `vpn.createSecret=false` and provide a pre-created secret named by `vpn.secretName`.
+For safer handling, set `vpn.createSecret=false` and
+provide a pre-created secret named by `vpn.secretName`.
 
 ## Local Helm test (optional)
 
@@ -48,4 +50,5 @@ For safer handling, set `vpn.createSecret=false` and provide a pre-created secre
 helm template media ./kubernetes/media
 ```
 
-Argo CD app `kubernetes/argocd/apps/media.yaml` points to this chart path and will sync it automatically.
+Argo CD app `kubernetes/argocd/apps/media.yaml` points to this
+chart path and will sync it automatically.

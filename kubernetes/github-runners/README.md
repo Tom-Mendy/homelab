@@ -40,7 +40,6 @@ Update `githubConfigUrl` in each values file for your desired scope:
 - `runner-scale-set-values.yaml`
 - `runner-scale-set-capstone2-values.yaml`
 - `runner-scale-set-portfolio-values.yaml`
-
 - Repository: `https://github.com/<owner>/<repo>`
 - Organization: `https://github.com/<org>`
 - Enterprise: `https://github.com/enterprises/<enterprise>`
@@ -73,7 +72,8 @@ Expected CRDs include:
 - `ephemeralrunners.actions.github.com`
 - `ephemeralrunnersets.actions.github.com`
 
-If missing, force re-sync `actions-runner-controller` in Argo CD and restart the controller pod.
+If missing, force re-sync `actions-runner-controller` in Argo CD and
+restart the controller pod.
 
 Recommended recovery order:
 

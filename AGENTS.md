@@ -53,6 +53,12 @@ The repository owner is currently learning Kubernetes and homelab operations.
 For every significant activity performed through Kubernetes, write an activity
 report under `docs/activity_report/`.
 
+to check markdown quality use:
+
+```sh
+rumdl check --fix .
+```
+
 Use one Markdown file per activity, with a dated and descriptive name such as
 `2026-05-14-migrate-grafana-pvc.md`.
 

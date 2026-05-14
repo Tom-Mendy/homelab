@@ -1,6 +1,7 @@
 # Disaster Recovery
 
-This runbook describes how to recover the homelab after partial or total cluster failure.
+This runbook describes how to recover the homelab after partial
+or total cluster failure.
 
 ## Recovery objectives
 
@@ -21,34 +22,34 @@ This runbook describes how to recover the homelab after partial or total cluster
 
 1. Inspect Argo CD and pod status:
 
- ```bash
- kubectl get applications -n argocd
- kubectl get pods -A
- ```
+   ```bash
+   kubectl get applications -n argocd
+   kubectl get pods -A
+   ```
 
 2. If GitOps-managed, sync/fix via Argo CD by reconciling desired state in Git.
 3. If needed, redeploy platform/apps:
 
- ```bash
- cd ansible
- ./run.sh playbooks/deploy-apps.yml
- ```
+   ```bash
+   cd ansible
+   ./run.sh playbooks/deploy-apps.yml
+   ```
 
 ## Level 2: Node failure
 
 1. Recover node OS/network access.
 2. Validate inventory reachability:
 
- ```bash
- cd ansible
- ./run.sh playbooks/update.yml --check
- ```
+   ```bash
+   cd ansible
+   ./run.sh playbooks/update.yml --check
+   ```
 
 3. Re-run app deployment to reconcile workloads:
 
- ```bash
- ./run.sh playbooks/deploy-apps.yml
- ```
+   ```bash
+   ./run.sh playbooks/deploy-apps.yml
+   ```
 
 4. Restore app data for impacted PVCs if needed.
 
@@ -59,22 +60,22 @@ Use when control plane/etcd is unrecoverable.
 1. Recreate/repair nodes (OS + SSH + networking).
 2. (Optional) reset old cluster state:
 
- ```bash
- cd ansible
- ./run.sh playbooks/reset.yml
- ```
+   ```bash
+   cd ansible
+   ./run.sh playbooks/reset.yml
+   ```
 
 3. Install Kubernetes with Kubespray:
 
- ```bash
- ./run.sh playbooks/install.yml
- ```
+   ```bash
+   ./run.sh playbooks/install.yml
+   ```
 
 4. Deploy platform and applications:
 
- ```bash
- ./run.sh playbooks/deploy-apps.yml
- ```
+   ```bash
+   ./run.sh playbooks/deploy-apps.yml
+   ```
 
 5. Restore persistent data backups to required PVCs/services.
 
