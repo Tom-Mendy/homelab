@@ -26,8 +26,10 @@ Then behavior depends on `kubernetes_deploy_mode`:
 
 Defined Argo CD Applications:
 
-- `traefik`, `blocky`, `homepage`, `keel`, `prometheus`, `grafana`, `navidrome`, `vaultwarden`, `trilium`, `forgejo`, `media`, `newt`, `stirling-pdf`, `ollama`, `openwebui`
-- `actions-runner-controller-crds`, `actions-runner-controller`, `github-runners`, `github-runners-capstone2`, `github-runners-portfolio`
+- `traefik`, `blocky`, `homepage`, `keel`, `prometheus`, `grafana`,
+  `navidrome`, `vaultwarden`, `trilium`, `forgejo`, `media`, `newt`, `stirling-pdf`, `ollama`, `openwebui`
+- `actions-runner-controller-crds`, `actions-runner-controller`,
+  `github-runners`, `github-runners-capstone2`, `github-runners-portfolio`
 
 ## Sync-wave order
 
@@ -58,7 +60,8 @@ Defaults are in `ansible/roles/kubernetes/defaults/main.yml`:
 
 ## SSH repository access
 
-If Argo CD tracks a private SSH repository (default URL points to internal Forgejo), set `argocd_gitops_repo_ssh_private_key`.
+If Argo CD tracks a private SSH repository (default URL points
+to internal Forgejo), set `argocd_gitops_repo_ssh_private_key`.
 
 When provided, Ansible creates the Argo CD repository Secret automatically.
 

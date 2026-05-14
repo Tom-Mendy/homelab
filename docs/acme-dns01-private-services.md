@@ -1,6 +1,7 @@
 # ACME DNS-01 for private homelab services
 
-This setup gives browser-trusted HTTPS certificates **without** installing a private CA on clients and **without** exposing apps publicly.
+This setup gives browser-trusted HTTPS certificates **without** installing
+a private CA on clients and **without** exposing apps publicly.
 
 ## Domain pattern
 
@@ -24,15 +25,19 @@ Examples currently present in DNS mapping (`kubernetes/blocky/config.yml`):
 
 ## Why DNS-01
 
-Let's Encrypt validates domain ownership via DNS TXT records. No inbound public access to your cluster is required.
+Let's Encrypt validates domain ownership via DNS TXT records.
+No inbound public access to your cluster is required.
 
 ## DNS provider note (Hostinger)
 
-Traefik's ACME DNS challenge uses LEGO DNS providers. If your DNS provider is not supported directly, use a supported DNS provider for your authoritative zone (Cloudflare is commonly used).
+Traefik's ACME DNS challenge uses LEGO DNS providers.
+If your DNS provider is not supported directly, use a supported DNS provider
+for your authoritative zone (Cloudflare is commonly used).
 
 ## Required DNS records
 
-For DNS-01 certificate issuance, the authoritative public zone must be manageable by your DNS API token.
+For DNS-01 certificate issuance, the authoritative public zone must be
+manageable by your DNS API token.
 
 Practical options:
 
@@ -82,4 +87,5 @@ curl -Ik https://vaultwarden.home.tom-mendy.com
 
 ## Result
 
-Browsers trust certificates for these domains using public CA trust roots, with no client CA installation.
+Browsers trust certificates for these domains using public CA trust roots,
+with no client CA installation.

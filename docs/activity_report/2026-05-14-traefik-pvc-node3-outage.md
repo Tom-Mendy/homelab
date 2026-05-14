@@ -187,6 +187,7 @@ The final fix was to migrate Traefik from `local-path` to `nfs-k8s`.
 Steps performed:
 
 1. Temporarily paused Argo CD auto-sync for `homelab` and `traefik`.
+
 2. Created a temporary NFS PVC:
 
    ```yaml
@@ -238,7 +239,7 @@ Starting provider *acme.Provider
 Testing certificate renew...
 ```
 
-8. Updated GitOps:
+1. Updated GitOps:
 
 ```yaml
 persistence:
