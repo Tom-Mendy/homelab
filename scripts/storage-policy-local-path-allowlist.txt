@@ -1,2 +1,1 @@
-kubernetes/media/values.yaml
 kubernetes/ollama/values.yaml
