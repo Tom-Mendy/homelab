@@ -46,3 +46,23 @@ Before finishing Kubernetes changes:
   from `node3` to `node2`.
 - Prefer S3-compatible storage only for object data, artifacts, and backups. Do
   not use S3 as a general POSIX PVC replacement.
+
+## Learning and Kubernetes activity reports
+
+The repository owner is currently learning Kubernetes and homelab operations.
+For every significant activity performed through Kubernetes, write an activity
+report under `docs/activity_report/`.
+
+Use one Markdown file per activity, with a dated and descriptive name such as
+`2026-05-14-migrate-grafana-pvc.md`.
+
+Each report must include:
+
+1. The problem that had to be solved.
+2. The reasoning path used to solve it, including the commands to run.
+3. The command results, including commands that failed but helped move the
+   investigation forward.
+4. The final outcome and what had to be changed.
+
+Prefer concrete command transcripts and observed outputs over summaries when the
+details are useful for learning later.
