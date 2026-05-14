@@ -1,4 +1,2 @@
 kubernetes/media/values.yaml
-kubernetes/navidrome/navidrome.yaml
-kubernetes/navidrome/values.yaml
 kubernetes/ollama/values.yaml

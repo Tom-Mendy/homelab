@@ -43,7 +43,7 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  storageClassName: local-path
+  storageClassName: nfs-k8s
 ---
 apiVersion: apps/v1
 kind: Deployment
