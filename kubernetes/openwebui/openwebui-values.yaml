@@ -14,12 +14,12 @@ service:
 
 persistence:
   enabled: true
-  storageClass: "local-path"
+  storageClass: nfs-k8s
   size: 50Gi
 pipelines:
   enabled: false
   persistence:
-    storageClass: local-path
+    storageClass: nfs-k8s
     size: 50Gi
 
 extraEnvVars:
