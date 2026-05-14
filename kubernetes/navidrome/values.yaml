@@ -34,4 +34,4 @@ musicStorage:
 dataStorage:
   pvcName: navidrome-data-pvc
   size: 5Gi
-  storageClassName: local-path
+  storageClassName: nfs-k8s
