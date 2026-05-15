@@ -5,7 +5,7 @@
 Navidrome utilisait encore un PVC `local-path` pour ses donnees applicatives:
 
 ```text
-navidrome/navidrome-data-pvc   Bound   local-path   pvc-cec06eea-febe-44ff-a287-708d814b4584   5Gi
+navidrome/navidrome-data-pvc   Bound   local-path   5Gi
 ```
 
 Le PV etait attache a `node3`:
@@ -30,7 +30,10 @@ Verifier que Forgejo/Argo CD voyait bien le dernier commit avant de continuer:
 ```bash
 kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
   -n argocd get app homelab openwebui navidrome \
-  -o custom-columns=NAME:.metadata.name,SYNC:.status.sync.status,HEALTH:.status.health.status,AUTO:.spec.syncPolicy.automated,REV:.status.sync.revision --no-headers
+  -o custom-columns=NAME:.metadata.name,SYNC:.status.sync.status,\
+HEALTH:.status.health.status,AUTO:.spec.syncPolicy.automated,\
+REV:.status.sync.revision \
+  --no-headers
 ```
 
 Resultat apres refresh:
@@ -188,7 +191,12 @@ Verifier la copie:
 ```bash
 kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
   -n navidrome exec navidrome-pvc-copy -- \
-  sh -c 'find /old -type f | wc -l; find /new -type f | wc -l; find /old -type d | wc -l; find /new -type d | wc -l'
+  sh -c '
+    find /old -type f | wc -l
+    find /new -type f | wc -l
+    find /old -type d | wc -l
+    find /new -type d | wc -l
+  '
 
 kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
   -n navidrome exec navidrome-pvc-copy -- \
@@ -235,7 +243,14 @@ Copier du PVC temporaire NFS vers le PVC final NFS:
 ```bash
 kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
   -n navidrome exec navidrome-final-copy -- \
-  sh -c 'cd /src && tar cf - . | tar xf - -C /dst && du -sh /src /dst && find /src -type f | wc -l && find /dst -type f | wc -l && sha256sum /src/navidrome.db /dst/navidrome.db'
+  sh -c '
+    cd /src &&
+    tar cf - . | tar xf - -C /dst &&
+    du -sh /src /dst &&
+    find /src -type f | wc -l &&
+    find /dst -type f | wc -l &&
+    sha256sum /src/navidrome.db /dst/navidrome.db
+  '
 ```
 
 Resultat:
@@ -320,8 +335,8 @@ Cause: `zsh` interprete les crochets de `[0]`. Il faut citer l'argument
 Le PVC final Navidrome est maintenant en NFS:
 
 ```text
-navidrome-data-pvc   nfs-k8s   Bound   pvc-1f866e9a-7c31-4550-8080-37fda981fe6e   5Gi
-navidrome-music-pvc            Bound   navidrome-music-pv                         200Gi
+navidrome-data-pvc   nfs-k8s   Bound   5Gi
+navidrome-music-pvc            Bound   200Gi
 ```
 
 Les PVC `local-path` restants dans le cluster sont maintenant:

@@ -70,13 +70,20 @@ pvc-849f8a14-6f38-4124-b84a-0339c50297cc   sonarr-config-pvc        node3
 Mesurer les volumes avant migration:
 
 ```bash
-kubectl --kubeconfig /home/tmendy/.kube/config-homelab -n media exec deploy/autobrr -- du -sh /config
-kubectl --kubeconfig /home/tmendy/.kube/config-homelab -n media exec deploy/bazarr -- du -sh /config
-kubectl --kubeconfig /home/tmendy/.kube/config-homelab -n media exec deploy/nzbget -c nzbget -- du -sh /config
-kubectl --kubeconfig /home/tmendy/.kube/config-homelab -n media exec deploy/prowlarr -- du -sh /config
-kubectl --kubeconfig /home/tmendy/.kube/config-homelab -n media exec deploy/qbittorrent -c qbittorrent -- du -sh /config
-kubectl --kubeconfig /home/tmendy/.kube/config-homelab -n media exec deploy/radarr -- du -sh /config
-kubectl --kubeconfig /home/tmendy/.kube/config-homelab -n media exec deploy/sonarr -- du -sh /config
+kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
+  -n media exec deploy/autobrr -- du -sh /config
+kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
+  -n media exec deploy/bazarr -- du -sh /config
+kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
+  -n media exec deploy/nzbget -c nzbget -- du -sh /config
+kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
+  -n media exec deploy/prowlarr -- du -sh /config
+kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
+  -n media exec deploy/qbittorrent -c qbittorrent -- du -sh /config
+kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
+  -n media exec deploy/radarr -- du -sh /config
+kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
+  -n media exec deploy/sonarr -- du -sh /config
 ```
 
 Resultat:
@@ -109,7 +116,10 @@ root Argo. Il a fallu verifier explicitement:
 ```bash
 kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
   -n argocd get app homelab media \
-  -o custom-columns=NAME:.metadata.name,SYNC:.status.sync.status,HEALTH:.status.health.status,AUTO:.spec.syncPolicy.automated,REV:.status.sync.revision --no-headers
+  -o custom-columns=NAME:.metadata.name,SYNC:.status.sync.status,\
+HEALTH:.status.health.status,AUTO:.spec.syncPolicy.automated,\
+REV:.status.sync.revision \
+  --no-headers
 ```
 
 Resultat attendu avant de continuer:
@@ -138,7 +148,8 @@ Arreter les services:
 
 ```bash
 kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
-  -n media scale deploy autobrr bazarr nzbget prowlarr qbittorrent radarr sonarr --replicas=0
+  -n media scale deploy autobrr bazarr nzbget prowlarr qbittorrent \
+  radarr sonarr --replicas=0
 ```
 
 Creer sept PVC temporaires `nfs-k8s`:
@@ -165,11 +176,15 @@ Copier les donnees vers les PVC temporaires:
 ```bash
 kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
   -n media exec media-pvc-copy-node2 -- \
-  sh -c 'for app in bazarr radarr; do cd /old/$app && tar cf - . | tar xf - -C /new/$app; done'
+  sh -c 'for app in bazarr radarr; do
+    cd /old/$app && tar cf - . | tar xf - -C /new/$app
+  done'
 
 kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
   -n media exec media-pvc-copy-node3 -- \
-  sh -c 'for app in autobrr nzbget prowlarr qbittorrent sonarr; do cd /old/$app && tar cf - . | tar xf - -C /new/$app; done'
+  sh -c 'for app in autobrr nzbget prowlarr qbittorrent sonarr; do
+    cd /old/$app && tar cf - . | tar xf - -C /new/$app
+  done'
 ```
 
 Verifier les copies temporaires:
@@ -204,7 +219,9 @@ Copier des PVC temporaires vers les PVC finaux:
 ```bash
 kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
   -n media exec media-final-copy -- \
-  sh -c 'for app in autobrr bazarr nzbget prowlarr qbittorrent radarr sonarr; do cd /src/$app && tar cf - . | tar xf - -C /dst/$app; done'
+  sh -c 'for app in autobrr bazarr nzbget prowlarr qbittorrent radarr sonarr; do
+    cd /src/$app && tar cf - . | tar xf - -C /dst/$app
+  done'
 ```
 
 Verification finale de copie:
@@ -223,7 +240,8 @@ Redemarrer les services:
 
 ```bash
 kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
-  -n media scale deploy autobrr bazarr nzbget prowlarr qbittorrent radarr sonarr --replicas=1
+  -n media scale deploy autobrr bazarr nzbget prowlarr qbittorrent \
+  radarr sonarr --replicas=1
 ```
 
 Resultat:

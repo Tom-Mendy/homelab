@@ -27,7 +27,8 @@ Then behavior depends on `kubernetes_deploy_mode`:
 Defined Argo CD Applications:
 
 - `traefik`, `blocky`, `homepage`, `keel`, `prometheus`, `grafana`,
-  `navidrome`, `vaultwarden`, `trilium`, `forgejo`, `media`, `newt`, `stirling-pdf`, `ollama`, `openwebui`
+  `navidrome`, `vaultwarden`, `trilium`, `forgejo`, `media`, `newt`,
+  `stirling-pdf`, `ollama`, `openwebui`
 - `actions-runner-controller-crds`, `actions-runner-controller`,
   `github-runners`, `github-runners-capstone2`, `github-runners-portfolio`
 

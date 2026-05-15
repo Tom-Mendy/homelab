@@ -5,7 +5,7 @@
 Ollama utilisait encore un PVC `local-path` pour ses modeles:
 
 ```text
-ollama/ollama-data   Bound   local-path   pvc-c69d66cc-7e76-43e9-80b4-df6a9ff48ae5   50Gi
+ollama/ollama-data   Bound   local-path   50Gi
 ```
 
 Le PV etait attache a `node3`:
@@ -164,7 +164,15 @@ Faire un checksum complet des 13 fichiers:
 ```bash
 kubectl --kubeconfig /home/tmendy/.kube/config-homelab \
   -n ollama exec ollama-pvc-copy -- \
-  sh -c 'cd /old && find . -type f | sort | while read f; do sha256sum "$f"; done > /tmp/ollama.old; cd /new && find . -type f | sort | while read f; do sha256sum "$f"; done > /tmp/ollama.new; diff -u /tmp/ollama.old /tmp/ollama.new'
+  sh -c '
+    cd /old &&
+    find . -type f | sort | while read f; do sha256sum "$f"; done \
+      > /tmp/ollama.old
+    cd /new &&
+    find . -type f | sort | while read f; do sha256sum "$f"; done \
+      > /tmp/ollama.new
+    diff -u /tmp/ollama.old /tmp/ollama.new
+  '
 ```
 
 Resultat:
