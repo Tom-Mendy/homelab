@@ -37,6 +37,8 @@ spec:
                 secretKeyRef:
                   name: atuin-secrets
                   key: ATUIN_DB_PASSWORD
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
             - name: USER_UID
               value: {{ .Values.nfsPermissions.userUid | quote }}
             - name: USER_GID
