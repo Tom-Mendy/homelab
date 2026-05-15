@@ -52,7 +52,8 @@ Use this to capture current cluster object state (useful before upgrades).
 mkdir -p backups/k8s-$(date +%F)
 kubectl get ns -o yaml > backups/k8s-$(date +%F)/namespaces.yaml
 
-for ns in argocd traefik blocky homepage keel prometheus grafana navidrome vaultwarden forgejo default; do
+for ns in argocd traefik blocky homepage keel prometheus grafana \
+  navidrome vaultwarden forgejo default; do
  kubectl get all,cm,secret,ing,pvc -n "$ns" -o yaml \
   > backups/k8s-$(date +%F)/${ns}.yaml || true
 done

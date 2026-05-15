@@ -41,7 +41,7 @@ Useful result:
 pod/traefik-69c7647584-sdwlw   1/1   Terminating   node3
 pod/traefik-69c7647584-zw8h8   0/1   Pending       <none>
 
-persistentvolumeclaim/traefik  Bound  pvc-4f16151f-a4c0-4b9d-a4d4-1cfdc0a17101  local-path
+persistentvolumeclaim/traefik  Bound  local-path
 ```
 
 Then inspect why the new pod could not schedule:

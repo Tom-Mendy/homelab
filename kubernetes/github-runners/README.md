@@ -59,7 +59,8 @@ kubectl --kubeconfig "$HOME/.kube/config-homelab" get pods -n arc-systems
 kubectl --kubeconfig "$HOME/.kube/config-homelab" get pods -n arc-runners
 ```
 
-If controller logs show `no matches for kind "EphemeralRunnerSet" in version "actions.github.com/v1alpha1"`, verify CRDs exist:
+If controller logs show `no matches for kind "EphemeralRunnerSet" in version
+"actions.github.com/v1alpha1"`, verify CRDs exist:
 
 ```bash
 kubectl --kubeconfig "$HOME/.kube/config-homelab" get crd | grep actions.github.com
