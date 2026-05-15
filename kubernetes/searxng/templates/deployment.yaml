@@ -17,6 +17,7 @@ spec:
       labels:
         app: searxng
     spec:
+      enableServiceLinks: false
       containers:
         {{- if .Values.vpn.enabled }}
         - name: gluetun

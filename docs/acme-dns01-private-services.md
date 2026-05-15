@@ -41,13 +41,16 @@ manageable by your DNS API token.
 
 Practical options:
 
-1. **Private-only resolution in LAN**: keep service A records in Blocky (`customDNS.mapping`) and use DNS-01 only for certificate issuance.
-2. **Public DNS records**: publish A records to your ingress IP if that matches your security model.
+1. **Private-only resolution in LAN**: keep service A records in Blocky
+   (`customDNS.mapping`) and use DNS-01 only for certificate issuance.
+2. **Public DNS records**: publish A records to your ingress IP if that matches
+   your security model.
 
 ## Apply steps
 
 1. Create a Cloudflare API token with Zone DNS edit permission for `tom-mendy.com`.
-2. Create the Kubernetes secret from `kubernetes/traefik/traefik-cloudflare-secret.example.yaml` (replace token first).
+2. Create the Kubernetes secret from
+   `kubernetes/traefik/traefik-cloudflare-secret.example.yaml` after replacing the token.
 
 ```bash
 kubectl apply -f kubernetes/traefik/traefik-cloudflare-secret.example.yaml
@@ -65,7 +68,9 @@ or with kubectl only:
 ```bash
 helm repo add traefik https://traefik.github.io/charts
 helm repo update
-helm upgrade --install traefik traefik/traefik -n traefik --create-namespace -f kubernetes/traefik/traefik-values.yaml
+helm upgrade --install traefik traefik/traefik \
+  -n traefik --create-namespace \
+  -f kubernetes/traefik/traefik-values.yaml
 kubectl apply -f kubernetes/blocky/blocky.yaml
 kubectl apply -f kubernetes/keel/keel-ingress.yaml
 kubectl apply -f kubernetes/navidrome/navidrome.yaml
