@@ -57,7 +57,7 @@
             "nfsServer": { "type": "string" },
             "nfsPath": { "type": "string" }
           },
-          "required": ["pvName", "size", "accessMode", "reclaimPolicy", "storageClassName", "nfsServer", "nfsPath"]
+          "required": ["pvcName", "size", "accessMode", "storageClassName"]
         }
       },
       "required": ["image", "host", "port", "openRegistration", "db", "storage"]
@@ -91,7 +91,7 @@
             "nfsServer": { "type": "string" },
             "nfsPath": { "type": "string" }
           },
-          "required": ["pvName", "size", "accessMode", "reclaimPolicy", "storageClassName", "nfsServer", "nfsPath"]
+          "required": ["pvcName", "size", "accessMode", "storageClassName"]
         }
       },
       "required": ["image", "port", "storage"]

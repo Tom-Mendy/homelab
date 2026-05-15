@@ -10,7 +10,10 @@ spec:
     requests:
       storage: {{ .Values.postgres.storage.size }}
   storageClassName: {{ .Values.postgres.storage.storageClassName | quote }}
+{{- if .Values.postgres.storage.pvName }}
   volumeName: {{ .Values.postgres.storage.pvName }}
+{{- end }}
+{{- if and .Values.postgres.storage.pvName .Values.postgres.storage.nfsServer .Values.postgres.storage.nfsPath }}
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -26,6 +29,8 @@ spec:
   nfs:
     server: {{ .Values.postgres.storage.nfsServer }}
     path: {{ .Values.postgres.storage.nfsPath }}
+{{- end }}
+{{- if and .Values.atuin.storage.pvName .Values.atuin.storage.nfsServer .Values.atuin.storage.nfsPath }}
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -41,6 +46,7 @@ spec:
   nfs:
     server: {{ .Values.atuin.storage.nfsServer }}
     path: {{ .Values.atuin.storage.nfsPath }}
+{{- end }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -54,4 +60,6 @@ spec:
     requests:
       storage: {{ .Values.atuin.storage.size }}
   storageClassName: {{ .Values.atuin.storage.storageClassName | quote }}
+{{- if .Values.atuin.storage.pvName }}
   volumeName: {{ .Values.atuin.storage.pvName }}
+{{- end }}

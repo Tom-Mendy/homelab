@@ -19,14 +19,14 @@ atuin:
     user: atuin
     password: atuinpassword
   storage:
-    pvName: atuin-data-pv-v2
+    pvName: ""
     pvcName: atuin-config-v2
     size: 20Gi
     accessMode: ReadWriteMany
     reclaimPolicy: Retain
-    storageClassName: ""
-    nfsServer: 192.168.1.1
-    nfsPath: /volume1/atuin
+    storageClassName: nfs-k8s
+    nfsServer: ""
+    nfsPath: ""
 
 postgres:
   image:
@@ -35,14 +35,14 @@ postgres:
     pullPolicy: IfNotPresent
   port: 5432
   storage:
-    pvName: atuin-postgres-data-pv-v2
+    pvName: ""
     pvcName: postgres-data-v2
     size: 10Gi
     accessMode: ReadWriteOnce
     reclaimPolicy: Retain
-    storageClassName: ""
-    nfsServer: 192.168.1.1
-    nfsPath: /volume1/atuin-postgres
+    storageClassName: nfs-k8s
+    nfsServer: ""
+    nfsPath: ""
 
 deploymentAnnotations:
   keel.sh/policy: all
