@@ -1,0 +1,44 @@
+infisical:
+  replicaCount: 2
+  kubeSecretRef: infisical-secrets
+  image:
+    repository: infisical/infisical
+    tag: v0.158.0
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+
+ingress:
+  enabled: true
+  hostName: infisical.home.tom-mendy.com
+  ingressClassName: traefik
+  nginx:
+    enabled: false
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+  tls:
+    - hosts:
+        - infisical.home.tom-mendy.com
+
+postgresql:
+  enabled: false
+  useExistingPostgresSecret:
+    enabled: true
+    existingConnectionStringSecret:
+      name: infisical-secrets
+      key: DB_CONNECTION_URI
+
+redis:
+  enabled: true
+  architecture: standalone
+  usePassword: false
+  auth:
+    enabled: false
+    password: ""
+  master:
+    persistence:
+      enabled: true
+      storageClass: nfs-k8s
+      size: 5Gi

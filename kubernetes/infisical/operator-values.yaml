@@ -1,0 +1,9 @@
+hostAPI: https://infisical.home.tom-mendy.com/api
+
+controllerManager:
+  replicas: 1
+
+telemetry:
+  serviceMonitor:
+    enabled: false
+

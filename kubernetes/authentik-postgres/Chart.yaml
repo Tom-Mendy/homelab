@@ -1,0 +1,7 @@
+apiVersion: v2
+name: authentik-postgres-local
+description: Local Helm chart for authentik CloudNativePG resources
+type: application
+version: 0.1.0
+appVersion: "17"
+
