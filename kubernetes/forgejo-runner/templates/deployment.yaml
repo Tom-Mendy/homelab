@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forgejo-runner-homelab
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: forgejo-runner-homelab
+  template:
+    metadata:
+      labels:
+        app: forgejo-runner-homelab
+    spec:
+      securityContext:
+        fsGroup: {{ .Values.securityContext.fsGroup }}
+      containers:
+        - name: docker
+          image: "{{ .Values.docker.image.repository }}:{{ .Values.docker.image.tag }}"
+          imagePullPolicy: {{ .Values.docker.image.pullPolicy }}
+          securityContext:
+            privileged: true
+          env:
+            - name: DOCKER_TLS_CERTDIR
+              value: ""
+          command:
+            - dockerd
+          args:
+            - -H
+            - tcp://0.0.0.0:2375
+            - --tls=false
+          ports:
+            - containerPort: 2375
+              name: docker
+          resources:
+{{ toYaml .Values.docker.resources | nindent 12 }}
+          volumeMounts:
+            - name: docker-data
+              mountPath: /var/lib/docker
+        - name: runner
+          image: "{{ .Values.runner.image.repository }}:{{ .Values.runner.image.tag }}"
+          imagePullPolicy: {{ .Values.runner.image.pullPolicy }}
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: {{ .Values.securityContext.runAsUser }}
+            runAsGroup: {{ .Values.securityContext.runAsGroup }}
+          env:
+            - name: DOCKER_HOST
+              value: {{ .Values.docker.host | quote }}
+            - name: RUNNER_UUID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.runner.secretName }}
+                  key: uuid
+            - name: RUNNER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.runner.secretName }}
+                  key: token
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              cp /etc/forgejo-runner/config.yaml /data/config.yaml
+              cat >> /data/config.yaml <<EOF
+
+              server:
+                connections:
+                  forgejo:
+                    url: {{ .Values.forgejo.url | quote }}
+                    uuid: ${RUNNER_UUID}
+                    token: ${RUNNER_TOKEN}
+              EOF
+              forgejo-runner daemon --config /data/config.yaml
+          resources:
+{{ toYaml .Values.runner.resources | nindent 12 }}
+          volumeMounts:
+            - name: runner-config
+              mountPath: /etc/forgejo-runner
+              readOnly: true
+            - name: runner-data
+              mountPath: /data
+      volumes:
+        - name: runner-config
+          configMap:
+            name: forgejo-runner-config
+        - name: runner-data
+          emptyDir: {}
+        - name: docker-data
+          emptyDir: {}

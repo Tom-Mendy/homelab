@@ -49,8 +49,8 @@ Practical options:
 ## Apply steps
 
 1. Create a Cloudflare API token with Zone DNS edit permission for `tom-mendy.com`.
-2. Create the Kubernetes secret from
-   `kubernetes/traefik/traefik-cloudflare-secret.example.yaml` after replacing the token.
+2. Create the Kubernetes secret from the Traefik Cloudflare example after
+   replacing the token.
 
 ```bash
 kubectl apply -f kubernetes/traefik/traefik-cloudflare-secret.example.yaml

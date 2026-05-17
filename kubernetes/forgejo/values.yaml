@@ -17,6 +17,10 @@ user:
 
 rootUrl: http://forgejo.home.tom-mendy.com/
 
+actions:
+  enabled: "true"
+  defaultActionsUrl: https://data.forgejo.org
+
 service:
   type: ClusterIP
   httpPort: 3000

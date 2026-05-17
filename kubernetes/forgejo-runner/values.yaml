@@ -1,0 +1,47 @@
+namespace: forgejo-runner
+createNamespace: true
+
+replicaCount: 1
+
+forgejo:
+  url: https://forgejo.home.tom-mendy.com/
+
+runner:
+  image:
+    repository: data.forgejo.org/forgejo/runner
+    tag: "12"
+    pullPolicy: IfNotPresent
+  secretName: forgejo-runner-homelab
+  logLevel: info
+  capacity: 1
+  timeout: 3h
+  labels:
+    - ubuntu-latest:docker://node:20-bookworm
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+
+docker:
+  host: tcp://127.0.0.1:2375
+  jobHost: tcp://dind.docker.internal:2375
+  containerOptions: --add-host=dind.docker.internal:host-gateway
+  image:
+    repository: docker
+    tag: dind
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "2"
+      memory: "2Gi"
+
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
