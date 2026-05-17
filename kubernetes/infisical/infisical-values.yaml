@@ -27,8 +27,8 @@ postgresql:
   useExistingPostgresSecret:
     enabled: true
     existingConnectionStringSecret:
-      name: infisical-secrets
-      key: DB_CONNECTION_URI
+      name: infisical-postgres-app
+      key: uri
 
 redis:
   enabled: true
