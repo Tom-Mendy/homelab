@@ -31,47 +31,30 @@ https://cloudnative-pg.io/docs/1.29/bootstrap
 
 The Infisical Helm chart supports using an existing Kubernetes secret for root
 configuration and an existing secret key containing a PostgreSQL connection
-string. That lets one bootstrap secret serve both CloudNativePG database owner
-credentials and Infisical application configuration.
+string. CloudNativePG generates the application database secret as
+`infisical-postgres-app`, including a `uri` key that Infisical can consume.
 
 ## Commands to run
 
-Create the Infisical bootstrap secret before syncing the `infisical-postgres`
-and `infisical` Argo CD apps. Replace the generated values only by running the
-command locally; do not commit them to Git.
+Create the Infisical bootstrap secret before syncing the `infisical` Argo CD
+app. CloudNativePG generates `infisical-postgres-app` for database credentials;
+do not put the database password in Git or in the Infisical bootstrap secret.
 
 ```sh
 kubectl create namespace infisical
 
-INFISICAL_DB_PASSWORD="$(openssl rand -base64 36)"
-INFISICAL_DB_URI="postgresql://infisical:${INFISICAL_DB_PASSWORD}@infisical-postgres-rw.infisical.svc.cluster.local:5432/infisicalDB"
-
 kubectl create secret generic infisical-secrets \
   --namespace infisical \
-  --from-literal=username=infisical \
-  --from-literal=password="${INFISICAL_DB_PASSWORD}" \
   --from-literal=AUTH_SECRET="$(openssl rand -base64 32)" \
   --from-literal=ENCRYPTION_KEY="$(openssl rand -hex 16)" \
   --from-literal=SITE_URL="https://infisical.home.tom-mendy.com" \
-  --from-literal=DB_CONNECTION_URI="${INFISICAL_DB_URI}" \
   --dry-run=client -o yaml | kubectl apply -f -
 ```
 
-Create the authentik database owner secret before syncing
-`authentik-postgres`. Store the same password in Infisical at the
-`/authentik` path as `AUTHENTIK_POSTGRESQL__PASSWORD`.
-
-```sh
-kubectl create namespace authentik
-
-AUTHENTIK_DB_PASSWORD="$(openssl rand -base64 36)"
-
-kubectl create secret generic authentik-postgres-app \
-  --namespace authentik \
-  --from-literal=username=authentik \
-  --from-literal=password="${AUTHENTIK_DB_PASSWORD}" \
-  --dry-run=client -o yaml | kubectl apply -f -
-```
+CloudNativePG generates `authentik-postgres-app` for the authentik database.
+The authentik chart reads `AUTHENTIK_POSTGRESQL__PASSWORD` directly from that
+secret and sets the other PostgreSQL connection fields as explicit environment
+variables.
 
 After Infisical is reachable, finish its first-user setup in the browser:
 
@@ -85,11 +68,6 @@ identity for the cluster, and store these authentik keys under `/authentik`:
 ```text
 AUTHENTIK_ENABLED=true
 AUTHENTIK_SECRET_KEY=<openssl rand -base64 60>
-AUTHENTIK_POSTGRESQL__HOST=authentik-postgres-rw.authentik.svc.cluster.local
-AUTHENTIK_POSTGRESQL__NAME=authentik
-AUTHENTIK_POSTGRESQL__USER=authentik
-AUTHENTIK_POSTGRESQL__PASSWORD=<same value used in authentik-postgres-app>
-AUTHENTIK_POSTGRESQL__PORT=5432
 AUTHENTIK_LOG_LEVEL=info
 AUTHENTIK_ERROR_REPORTING__ENABLED=false
 AUTHENTIK_WEB__PATH=/
@@ -118,9 +96,13 @@ argocd app sync authentik
 Verify CloudNativePG, Infisical, and authentik:
 
 ```sh
+kubectl get crd clusters.postgresql.cnpg.io poolers.postgresql.cnpg.io
+kubectl get deploy,pods -n cnpg-system
 kubectl get clusters.postgresql.cnpg.io -A
+kubectl get secret -n infisical infisical-postgres-app
 kubectl get pods -n infisical
 kubectl get ingress -n infisical
+kubectl get secret -n authentik authentik-postgres-app
 kubectl get infisicalsecret -n authentik
 kubectl get secret authentik-secrets -n authentik
 kubectl get pods -n authentik
@@ -180,6 +162,28 @@ Markdown validation succeeded after fixing line length:
 
 ```text
 Success: No issues found in 24 files
+```
+
+The first Argo CD deployment attempt exposed two ordering/apply issues:
+
+```text
+CustomResourceDefinition.apiextensions.k8s.io "clusters.postgresql.cnpg.io"
+is invalid: metadata.annotations: Too long: may not be more than 262144 bytes
+
+Cluster.postgresql.cnpg.io "" not found
+```
+
+The fix is to use server-side apply for the CloudNativePG chart and skip dry-run
+for CNPG `Cluster` resources while the CRD is being installed:
+
+```yaml
+syncOptions:
+  - ServerSideApply=true
+```
+
+```yaml
+syncOptions:
+  - SkipDryRunOnMissingResource=true
 ```
 
 The implementation adds these GitOps entry points:

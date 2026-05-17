@@ -9,5 +9,3 @@ cluster:
     storageClass: nfs-k8s
   database: authentik
   owner: authentik
-  ownerSecret: authentik-postgres-app
-
