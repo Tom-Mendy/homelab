@@ -1,0 +1,30 @@
+namespace: wakapi
+createNamespace: true
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/muety/wakapi
+  tag: latest
+  pullPolicy: IfNotPresent
+
+deploymentAnnotations:
+  keel.sh/policy: all
+
+service:
+  type: ClusterIP
+  port: 3000
+
+ingress:
+  enabled: true
+  host: wakapi.home.tom-mendy.com
+  className: ""
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+
+dataStorage:
+  pvcName: wakapi-data-pvc
+  size: 5Gi
+  storageClassName: nfs-k8s
