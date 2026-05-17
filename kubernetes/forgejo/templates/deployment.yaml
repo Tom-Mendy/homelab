@@ -33,6 +33,10 @@ spec:
               value: {{ .Values.user.gid | quote }}
             - name: FORGEJO__server__ROOT_URL
               value: {{ .Values.rootUrl | quote }}
+            - name: FORGEJO__actions__ENABLED
+              value: {{ .Values.actions.enabled | quote }}
+            - name: FORGEJO__actions__DEFAULT_ACTIONS_URL
+              value: {{ .Values.actions.defaultActionsUrl | quote }}
           volumeMounts:
             - name: data
               mountPath: /data

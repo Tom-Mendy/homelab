@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-charts=(blocky homepage traefik keel prometheus grafana navidrome vaultwarden forgejo searxng endfield)
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+charts=(blocky homepage traefik keel prometheus grafana navidrome vaultwarden forgejo forgejo-runner searxng endfield)
 for c in "${charts[@]}"
 do echo "=== $c ==="
-helm template test "$c" >/tmp/helm_render.out 2>/tmp/helm_render.err
+helm template test "$script_dir/$c" >/tmp/helm_render.out 2>/tmp/helm_render.err
 code=$?
 if [[ $code -eq 0 ]]
 then echo "OK"

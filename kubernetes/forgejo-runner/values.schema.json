@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["namespace", "createNamespace", "replicaCount", "forgejo", "runner", "docker", "securityContext"],
+  "properties": {
+    "namespace": { "type": "string", "minLength": 1 },
+    "createNamespace": { "type": "boolean" },
+    "replicaCount": { "type": "integer", "minimum": 1 },
+    "forgejo": {
+      "type": "object",
+      "required": ["url"],
+      "properties": {
+        "url": { "type": "string", "minLength": 1 }
+      }
+    },
+    "runner": {
+      "type": "object",
+      "required": ["image", "secretName", "logLevel", "capacity", "timeout", "labels", "resources"],
+      "properties": {
+        "image": {
+          "type": "object",
+          "required": ["repository", "tag", "pullPolicy"],
+          "properties": {
+            "repository": { "type": "string", "minLength": 1 },
+            "tag": { "type": "string", "minLength": 1 },
+            "pullPolicy": { "type": "string", "minLength": 1 }
+          }
+        },
+        "secretName": { "type": "string", "minLength": 1 },
+        "logLevel": { "type": "string", "minLength": 1 },
+        "capacity": { "type": "integer", "minimum": 1 },
+        "timeout": { "type": "string", "minLength": 1 },
+        "labels": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "resources": { "type": "object" }
+      }
+    },
+    "docker": {
+      "type": "object",
+      "required": ["host", "jobHost", "containerOptions", "image", "resources"],
+      "properties": {
+        "host": { "type": "string", "minLength": 1 },
+        "jobHost": { "type": "string", "minLength": 1 },
+        "containerOptions": { "type": "string", "minLength": 1 },
+        "image": {
+          "type": "object",
+          "required": ["repository", "tag", "pullPolicy"],
+          "properties": {
+            "repository": { "type": "string", "minLength": 1 },
+            "tag": { "type": "string", "minLength": 1 },
+            "pullPolicy": { "type": "string", "minLength": 1 }
+          }
+        },
+        "resources": { "type": "object" }
+      }
+    },
+    "securityContext": {
+      "type": "object",
+      "required": ["runAsUser", "runAsGroup", "fsGroup"],
+      "properties": {
+        "runAsUser": { "type": "integer", "minimum": 1 },
+        "runAsGroup": { "type": "integer", "minimum": 1 },
+        "fsGroup": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}
