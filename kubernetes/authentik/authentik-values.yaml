@@ -1,0 +1,31 @@
+authentik:
+  existingSecret:
+    secretName: authentik-secrets
+  error_reporting:
+    enabled: false
+  postgresql:
+    host: authentik-postgres-rw.authentik.svc.cluster.local
+    name: authentik
+    user: authentik
+    port: 5432
+
+postgresql:
+  enabled: false
+
+server:
+  replicas: 1
+  ingress:
+    enabled: true
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    hosts:
+      - authentik.home.tom-mendy.com
+    tls:
+      - hosts:
+          - authentik.home.tom-mendy.com
+
+worker:
+  replicas: 1
+
