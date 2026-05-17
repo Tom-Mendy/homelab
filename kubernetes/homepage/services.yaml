@@ -12,6 +12,14 @@
         icon: grafana.svg
         href: https://grafana.home.tom-mendy.com
         description: Dashboards
+    - Infisical:
+        icon: infisical.svg
+        href: https://infisical.home.tom-mendy.com
+        description: Secrets management
+    - Authentik:
+        icon: authentik.svg
+        href: https://authentik.home.tom-mendy.com
+        description: Identity provider
     - NAS Synology:
         icon: synology.svg
         href: https://192.168.1.1:5001/

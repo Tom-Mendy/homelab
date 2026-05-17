@@ -1,0 +1,11 @@
+namespace: authentik
+
+infisicalSecret:
+  enabled: false
+  name: authentik-secrets
+  hostAPI: https://infisical.home.tom-mendy.com/api
+  identityID: ""
+  projectSlug: homelab
+  envSlug: prod
+  secretsPath: /authentik
+

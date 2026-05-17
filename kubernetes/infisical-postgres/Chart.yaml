@@ -1,0 +1,7 @@
+apiVersion: v2
+name: infisical-postgres-local
+description: Local Helm chart for Infisical CloudNativePG resources
+type: application
+version: 0.1.0
+appVersion: "17"
+
