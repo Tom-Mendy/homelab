@@ -4,7 +4,7 @@ createNamespace: true
 replicaCount: 1
 
 forgejo:
-  url: https://forgejo.home.tom-mendy.com/
+  url: http://forgejo.forgejo.svc.cluster.local:3000/
 
 runner:
   image:
