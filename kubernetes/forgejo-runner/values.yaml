@@ -16,7 +16,8 @@ runner:
   capacity: 1
   timeout: 3h
   labels:
-    - ubuntu-latest:docker://node:20-bookworm
+    - debian:docker://docker.io/library/node:lts
+    - ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-latest
   resources:
     requests:
       cpu: "250m"
