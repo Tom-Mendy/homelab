@@ -17,6 +17,10 @@ user:
 
 rootUrl: https://forgejo.tom-mendy.com/
 
+oauth2Client:
+  enableAutoRegistration: true
+  username: nickname
+
 actions:
   enabled: "true"
   defaultActionsUrl: https://data.forgejo.org
