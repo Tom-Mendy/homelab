@@ -5,7 +5,7 @@ replicaCount: 1
 
 image:
   repository: codeberg.org/forgejo/forgejo
-  tag: "13"
+  tag: "15"
   pullPolicy: IfNotPresent
 
 deploymentAnnotations:
@@ -15,7 +15,7 @@ user:
   uid: "1023"
   gid: "100"
 
-rootUrl: http://forgejo.home.tom-mendy.com/
+rootUrl: https://forgejo.tom-mendy.com/
 
 actions:
   enabled: "true"
