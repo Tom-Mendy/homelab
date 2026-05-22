@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft-07/schema#",
   "type": "object",
   "additionalProperties": false,
-  "required": ["namespace", "createNamespace", "replicaCount", "image", "user", "rootUrl", "actions", "service", "ingress", "storage"],
+  "required": ["namespace", "createNamespace", "replicaCount", "image", "user", "rootUrl", "oauth2Client", "actions", "service", "ingress", "storage"],
   "properties": {
     "namespace": { "type": "string", "minLength": 1 },
     "createNamespace": { "type": "boolean" },
@@ -28,6 +28,15 @@
       }
     },
     "rootUrl": { "type": "string", "minLength": 1 },
+    "oauth2Client": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enableAutoRegistration", "username"],
+      "properties": {
+        "enableAutoRegistration": { "type": "boolean" },
+        "username": { "type": "string", "enum": ["userid", "nickname", "email"] }
+      }
+    },
     "actions": {
       "type": "object",
       "required": ["enabled", "defaultActionsUrl"],
