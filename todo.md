@@ -13,10 +13,10 @@
 
 ## Phase P1 - GitOps Reproducibility
 
-- [x] Pin floating Helm chart `targetRevision: "*"` values to live deployed
+- [ ] Pin floating Helm chart `targetRevision: "*"` values to live deployed
   chart versions.
 - [ ] Pin `latest` image tags to exact tags or digests.
-  - [x] Pin running app images with known pod digests.
+  - [ ] Pin running app images with known pod digests.
   - [ ] Pin Endfield image after CI publishes immutable tags or digest is known.
   - [ ] Pin GitHub ARC runner image after digest is known.
   - [ ] Decide whether unused Wakapi chart should be pinned or removed.
