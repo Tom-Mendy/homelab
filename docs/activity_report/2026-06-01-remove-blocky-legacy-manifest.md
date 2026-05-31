@@ -41,3 +41,14 @@ The rendered chart contains:
 
 Blocky now has one declarative source in the repository: the local Helm chart
 under `kubernetes/blocky`.
+
+Validation:
+
+```text
+helm template blocky kubernetes/blocky
+kubectl apply --dry-run=server -f /tmp/blocky-render.yaml
+namespace/blocky configured (server dry run)
+configmap/blocky-config configured (server dry run)
+service/blocky configured (server dry run)
+deployment.apps/blocky configured (server dry run)
+```
