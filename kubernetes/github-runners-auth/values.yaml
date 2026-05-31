@@ -1,0 +1,17 @@
+namespace: arc-runners
+
+secret:
+  name: arc-github-auth
+
+infisicalSecret:
+  enabled: true
+  name: arc-github-auth
+  serviceAccountName: github-runners-infisical-sync
+  connectionName: github-runners-infisical
+  authName: github-runners-infisical
+  identitySecretName: github-runners-infisical-identity
+  address: https://infisical.home.tom-mendy.com
+  identityID: "c676eb83-e1d9-4b95-b164-11a71421c84f"
+  projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+  envSlug: prod
+  secretsPath: github-runners
