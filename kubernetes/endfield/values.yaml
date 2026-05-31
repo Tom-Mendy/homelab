@@ -8,11 +8,11 @@ image:
     - name: forgejo-registry-creds
 
 registryAuth:
-  createSecret: true
+  createSecret: false
   secretName: forgejo-registry-creds
   server: forgejo.home.tom-mendy.com
-  username: Tom-Mendy
-  password: "haY&*$3hd9o!XL&B6a@&A^3h!C5^o6"
+  username: ""
+  password: ""
 
 cronJob:
   enabled: true
@@ -32,17 +32,30 @@ runOnceJob:
   ttlSecondsAfterFinished: 3600
 
 env:
-  createSecret: true
+  createSecret: false
   secretName: endfield-env
   values:
-    ENDFIELD_CRED: "REMOVED_ENDFIELD_SECRET"
-    ENDFIELD_SK_GAME_ROLE: "REMOVED_ENDFIELD_SECRET"
+    ENDFIELD_CRED: ""
+    ENDFIELD_SK_GAME_ROLE: ""
     ENDFIELD_PLATFORM: "3"
     ENDFIELD_VNAME: "1.0.0"
-    ENDFIELD_ACCOUNT_NAME: "REMOVED_ENDFIELD_SECRET"
+    ENDFIELD_ACCOUNT_NAME: ""
     ENABLE_DISCORD_NOTIFY: "true"
-    DISCORD_WEBHOOK_URL: "REMOVED_ENDFIELD_SECRET"
-    DISCORD_USER_ID: "REMOVED_DISCORD_ID"
+    DISCORD_WEBHOOK_URL: ""
+    DISCORD_USER_ID: ""
+
+infisicalSecret:
+  enabled: true
+  name: endfield-secrets
+  serviceAccountName: endfield-infisical-sync
+  connectionName: endfield-infisical
+  authName: endfield-infisical
+  identitySecretName: endfield-infisical-identity
+  address: https://infisical.home.tom-mendy.com
+  identityID: "b8b289b4-f869-4547-94e1-ce89928ce5a9"
+  projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+  envSlug: prod
+  secretsPath: /endfield
 
 resources:
   requests:
