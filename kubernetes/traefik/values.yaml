@@ -11,6 +11,6 @@ infisicalSecret:
   serviceAccountName: traefik-infisical-sync
   hostAPI: https://infisical.home.tom-mendy.com/api
   identityID: "c676eb83-e1d9-4b95-b164-11a71421c84f"
-  projectSlug: homelab
+  projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
   envSlug: prod
   secretsPath: /traefik

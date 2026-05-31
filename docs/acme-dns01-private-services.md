@@ -49,8 +49,7 @@ Practical options:
 ## Apply steps
 
 1. Create a Cloudflare API token with Zone DNS edit permission for `tom-mendy.com`.
-2. Store the token in Infisical project `homelab`, env `prod`, path
-   `/traefik`:
+2. Store the token in Infisical project `homelab`, env `prod`, path `/traefik`:
 
 ```text
 CF_DNS_API_TOKEN=<rotated-cloudflare-dns-token>

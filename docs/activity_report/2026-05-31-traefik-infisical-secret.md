@@ -33,7 +33,7 @@ infisicalSecret:
   serviceAccountName: traefik-infisical-sync
   hostAPI: https://infisical.home.tom-mendy.com/api
   identityID: ""
-  projectSlug: homelab
+  projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
   envSlug: prod
   secretsPath: /traefik
 ```
@@ -100,7 +100,7 @@ spec:
         name: traefik-infisical-sync
         namespace: traefik
       secretsScope:
-        projectSlug: "homelab"
+        projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
         envSlug: "prod"
         secretsPath: "/traefik"
         recursive: false
@@ -185,3 +185,20 @@ manifest. The chart can now render an InfisicalSecret that creates the same
 Kubernetes Secret Traefik already consumes. Live cutover still requires a
 rotated Cloudflare token in Infisical and the real Infisical Kubernetes-auth
 machine identity ID in `kubernetes/traefik/values.yaml`.
+
+## Live verification update
+
+The first live check showed Kubernetes Auth loaded the machine identity token,
+but secret sync failed because the project slug lookup returned 404:
+
+```text
+Project with slug 'homelab' not found
+```
+
+The URL segment after `/projects/` is the Infisical product area, not the
+project slug. To avoid slug ambiguity, the Traefik values now use project ID
+from the Infisical project URL:
+
+```yaml
+projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+```
