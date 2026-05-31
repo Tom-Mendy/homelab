@@ -20,6 +20,10 @@
         icon: authentik.svg
         href: https://authentik.home.tom-mendy.com
         description: Identity provider
+    - Keel:
+         icon: keel.svg
+         href: https://keel.home.tom-mendy.com
+         description: Kubernetes deployment automation
     - NAS Synology:
         icon: synology.svg
         href: https://192.168.1.1:5001/
