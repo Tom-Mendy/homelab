@@ -8,12 +8,12 @@
 - [x] Remove Grafana committed admin secret and rely on Helm-generated admin
   credentials.
 - [ ] Optional: move Forgejo runner live-only Secret to Infisical.
-- [ ] Optional: purge/rotate old Git history secrets if this repository was
+- [X] Optional: purge/rotate old Git history secrets if this repository was
   pushed/shared while secrets were committed.
 
 ## Phase P1 - GitOps Reproducibility
 
-- [ ] Pin floating Helm chart `targetRevision: "*"` values to live deployed
+- [x] Pin floating Helm chart `targetRevision: "*"` values to live deployed
   chart versions.
 - [ ] Pin `latest` image tags to exact tags or digests.
   - [ ] Pin running app images with known pod digests.
