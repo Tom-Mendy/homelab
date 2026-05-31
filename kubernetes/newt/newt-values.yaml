@@ -2,7 +2,7 @@ global:
   deploymentAnnotations:
     keel.sh/policy: all
   image:
-    tag: latest
+    tag: latest@sha256:3c009663332145cae39b940b07857469038d5e9d71aacb1497e78795ba4e3b9b
 
 newtInstances:
   - name: main-tunnel

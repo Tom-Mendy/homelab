@@ -9,7 +9,7 @@ nfsPermissions:
 atuin:
   image:
     repository: ghcr.io/atuinsh/atuin
-    tag: latest
+    tag: latest@sha256:9a3bf220acd36873004fe18a9abb2bcd2d74a8c3522e52d309ba7c53d971c01f
     pullPolicy: IfNotPresent
   host: atuin.home.tom-mendy.com
   port: 8888
