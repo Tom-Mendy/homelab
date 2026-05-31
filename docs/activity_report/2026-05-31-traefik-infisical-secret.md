@@ -23,15 +23,19 @@ env:
 
 The safest local chart change is to keep that Secret name and key stable, but
 change the producer from a committed Kubernetes Secret to the Infisical
-operator. The Infisical operator pattern already exists in the repository for
-authentik, so Traefik now follows the same shape:
+operator. The Infisical Kubernetes Operator overview recommends v1beta1 CRDs
+for new resources, so Traefik uses `InfisicalConnection`, `InfisicalAuth`, and
+`InfisicalStaticSecret`.
 
 ```yaml
 infisicalSecret:
   enabled: false
   name: traefik-cloudflare-dns
   serviceAccountName: traefik-infisical-sync
-  hostAPI: https://infisical.home.tom-mendy.com/api
+  connectionName: traefik-infisical
+  authName: traefik-infisical
+  identitySecretName: traefik-infisical-identity
+  address: https://infisical.home.tom-mendy.com
   identityID: ""
   projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
   envSlug: prod
@@ -63,7 +67,7 @@ Result:
 ```
 
 Render the Infisical-enabled path with a dummy identity ID to verify the
-ServiceAccount and InfisicalSecret shape.
+ServiceAccount and v1beta1 Infisical resources.
 
 ```sh
 helm template test kubernetes/traefik \
@@ -82,34 +86,65 @@ metadata:
   namespace: traefik
 ---
 # Source: traefik-local-extras/templates/infisical-secret.yaml
-apiVersion: secrets.infisical.com/v1alpha1
-kind: InfisicalSecret
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalConnection
+metadata:
+  name: traefik-infisical
+  namespace: traefik
+spec:
+  address: "https://infisical.home.tom-mendy.com"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: traefik-infisical-identity
+  namespace: traefik
+type: Opaque
+stringData:
+  identityId: "dummy-identity"
+---
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalAuth
+metadata:
+  name: traefik-infisical
+  namespace: traefik
+spec:
+  method: kubernetes
+  infisicalConnectionRef:
+    name: traefik-infisical
+    namespace: traefik
+  kubernetes:
+    identityIdRef:
+      name: traefik-infisical-identity
+      namespace: traefik
+      key: identityId
+    serviceAccountRef:
+      name: traefik-infisical-sync
+      namespace: traefik
+---
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalStaticSecret
 metadata:
   name: traefik-cloudflare-dns
   namespace: traefik
 spec:
-  hostAPI: "https://infisical.home.tom-mendy.com/api"
-  syncConfig:
-    resyncInterval: 1m
-    instantUpdates: false
-  authentication:
-    kubernetesAuth:
-      identityId: "dummy-identity"
-      autoCreateServiceAccountToken: true
-      serviceAccountRef:
-        name: traefik-infisical-sync
-        namespace: traefik
-      secretsScope:
-        projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
-        envSlug: "prod"
-        secretsPath: "/traefik"
-        recursive: false
-  managedKubeSecretReferences:
-    - secretName: traefik-cloudflare-dns
-      secretNamespace: traefik
+  infisicalAuthRef:
+    name: traefik-infisical
+    namespace: traefik
+  sources:
+    - projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+      environmentSlug: "prod"
+      secretPath: "/traefik"
+      recursive: false
+  targets:
+    - name: traefik-cloudflare-dns
+      namespace: traefik
+      kind: Secret
       creationPolicy: Orphan
-      template:
-        includeAllSecrets: true
+      secretType: Opaque
+  syncOptions:
+    refreshInterval: 1m
+    instantUpdates: false
 ```
 
 Render all local charts covered by the existing script.
@@ -181,10 +216,10 @@ Result:
 ## Final outcome
 
 The committed Cloudflare token was removed from the Traefik chart and example
-manifest. The chart can now render an InfisicalSecret that creates the same
-Kubernetes Secret Traefik already consumes. Live cutover still requires a
-rotated Cloudflare token in Infisical and the real Infisical Kubernetes-auth
-machine identity ID in `kubernetes/traefik/values.yaml`.
+manifest. The chart can now render v1beta1 Infisical operator resources that
+create the same Kubernetes Secret Traefik already consumes. Live cutover still
+requires a rotated Cloudflare token in Infisical and the real Infisical
+Kubernetes-auth machine identity ID in `kubernetes/traefik/values.yaml`.
 
 ## Live verification update
 

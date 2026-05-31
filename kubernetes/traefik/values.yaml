@@ -9,7 +9,10 @@ infisicalSecret:
   enabled: true
   name: traefik-cloudflare-dns
   serviceAccountName: traefik-infisical-sync
-  hostAPI: https://infisical.home.tom-mendy.com/api
+  connectionName: traefik-infisical
+  authName: traefik-infisical
+  identitySecretName: traefik-infisical-identity
+  address: https://infisical.home.tom-mendy.com
   identityID: "c676eb83-e1d9-4b95-b164-11a71421c84f"
   projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
   envSlug: prod
