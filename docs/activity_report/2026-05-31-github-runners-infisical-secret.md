@@ -29,7 +29,7 @@ service account: github-runners-infisical-sync
 ```
 
 Before enabling the chart, store the rotated GitHub token in Infisical project
-`homelab`, env `prod`, path `github-runners`:
+`homelab`, env `prod`, path `/github-runners`:
 
 ```text
 github_token=<rotated-github-token>
@@ -135,3 +135,25 @@ application, `github-runners-auth`, can create `arc-github-auth` from Infisical
 before the runner scale sets sync. Live cutover still requires a rotated GitHub
 token in Infisical and the real Kubernetes Auth machine identity ID in
 `kubernetes/github-runners-auth/values.yaml`.
+
+## Live verification update
+
+Kubernetes Auth succeeded with the dedicated `github-runners-k8s-auth` identity:
+
+```text
+InfisicalAuth is ready to be used.
+```
+
+The chart uses the dedicated GitHub runners path:
+
+```yaml
+identityID: "7b887000-ae48-4603-8ed2-89a5bd6f1f5e"
+secretsPath: /github-runners
+```
+
+Live verification then succeeded:
+
+```text
+InfisicalStaticSecret LastReconcileStatus=True
+github_token key exists
+```
