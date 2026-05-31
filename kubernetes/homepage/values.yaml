@@ -4,7 +4,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/gethomepage/homepage
-  tag: latest@sha256:0b596092c0b55fe4c65379a428a3fe90bd192f10d1b07d189a34fe5fabe7eedb
+  tag: latest
   pullPolicy: IfNotPresent
 
 allowedHosts: homepage.home.tom-mendy.com
