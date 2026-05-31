@@ -5,7 +5,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/muety/wakapi
-  tag: latest
+  tag: 2.17.4@sha256:6fce764acf8775e1166e8b03e59fb6b34744e4a9fba5e98d9ea15d341db31bf8
   pullPolicy: IfNotPresent
 
 deploymentAnnotations:
