@@ -2,4 +2,15 @@ namespace: traefik
 
 secret:
   name: traefik-cloudflare-dns
-  apiToken: "REMOVED_API_KEY"
+  create: false
+  apiToken: ""
+
+infisicalSecret:
+  enabled: true
+  name: traefik-cloudflare-dns
+  serviceAccountName: traefik-infisical-sync
+  hostAPI: https://infisical.home.tom-mendy.com/api
+  identityID: "c676eb83-e1d9-4b95-b164-11a71421c84f"
+  projectSlug: homelab
+  envSlug: prod
+  secretsPath: /traefik
