@@ -31,17 +31,31 @@ env:
 
 secret:
   name: searxng-secret
-  serverSecretKey: "***REMOVED***"
+  create: false
+  serverSecretKey: ""
 
 vpn:
   enabled: true
-  createSecret: true
+  createSecret: false
   secretName: searxng-vpn-secret
   serviceProvider: protonvpn
   type: wireguard
   firewall: "on"
   serverCountries: "France"
   credentials:
-    wireguardPrivateKey: "***REMOVED***"
+    wireguardPrivateKey: ""
     openvpnUser: "your_openvpn_username"
     openvpnPassword: "your_openvpn_password"
+
+infisicalSecret:
+  enabled: true
+  name: searxng-secrets
+  serviceAccountName: searxng-infisical-sync
+  connectionName: searxng-infisical
+  authName: searxng-infisical
+  identitySecretName: searxng-infisical-identity
+  address: https://infisical.home.tom-mendy.com
+  identityID: "c4027cca-f8d6-4d36-a73c-2dc61baf2016"
+  projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+  envSlug: prod
+  secretsPath: /searxng
