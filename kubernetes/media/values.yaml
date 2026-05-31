@@ -8,14 +8,27 @@ securityContext:
 
 vpn:
   enabled: true
-  createSecret: true
+  createSecret: false
   secretName: protonvpn-credentials
   serviceProvider: protonvpn
   type: wireguard
   firewall: "on"
   serverCountries: Switzerland
   credentials:
-    wireguardPrivateKey: "REMOVED_API_KEY"
+    wireguardPrivateKey: ""
+
+infisicalSecret:
+  enabled: true
+  name: protonvpn-credentials
+  serviceAccountName: media-infisical-sync
+  connectionName: media-infisical
+  authName: media-infisical
+  identitySecretName: media-infisical-identity
+  address: https://infisical.home.tom-mendy.com
+  identityID: "69201a96-2f66-46ef-a4a2-1e81c08a3dfb"
+  projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+  envSlug: prod
+  secretsPath: /media
 
 storage:
   nfsServer: 192.168.1.1
