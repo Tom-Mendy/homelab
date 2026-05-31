@@ -1,6 +1,1 @@
 namespace: grafana
-
-secret:
-  name: grafana-admin
-  adminUser: admin
-  adminPassword: admin
