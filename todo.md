@@ -20,16 +20,19 @@
   - [ ] Pin Endfield image after CI publishes immutable tags or digest is known.
   - [x] Pin GitHub ARC runner image after digest is known.
   - [x] Decide whether unused Wakapi chart should be pinned or removed.
-- [ ] Replace remaining legacy raw manifests with chart values/templates where
+- [x] Replace remaining legacy raw manifests with chart values/templates where
   this reduces drift.
   - [x] Remove Blocky raw manifest duplicate.
   - [x] Remove Navidrome raw manifest duplicate.
   - [x] Convert Trilium raw manifest to local Helm chart.
   - [x] Remove Prometheus raw ingress/storage duplicates.
   - [x] Remove Ollama raw GPU/ingress/runtimeclass duplicates.
-  - [ ] Review remaining raw support manifests and keep only intentional ones.
-- [ ] Add full Helm render/lint coverage in CI.
-- [ ] Add kubeconform or equivalent schema validation in CI.
+  - [x] Remove Keel raw ingress duplicate.
+  - [x] Convert OpenWebUI raw ingress include to a local extras chart.
+  - [x] Remove obsolete GitHub runner placeholder Secret.
+  - [x] Review remaining raw support manifests and keep only intentional ones.
+- [x] Add full Helm render/lint coverage in CI.
+- [x] Add kubeconform or equivalent schema validation in CI.
 
 ## Phase P1 - Reliability Proof
 

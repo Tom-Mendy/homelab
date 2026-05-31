@@ -21,9 +21,6 @@ spec:
     - repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
       targetRevision: main
       path: kubernetes/openwebui
-      directory:
-        recurse: true
-        include: openwebui-ingress.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: openwebui
