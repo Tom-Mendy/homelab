@@ -5,7 +5,7 @@ replicaCount: 1
 
 image:
   repository: spx01/blocky
-  tag: latest
+  tag: latest@sha256:5f84a54e4ee950c4ab21db905b7497476ece2f4e1a376d23ab8c4855cabddcba
   pullPolicy: IfNotPresent
 
 deploymentAnnotations:
