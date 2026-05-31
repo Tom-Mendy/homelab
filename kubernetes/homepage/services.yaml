@@ -31,6 +31,7 @@
 
 - Professional Tools:
     - OpenWebUI:
+        icon: ollama.svg
         href: https://openwebui.home.tom-mendy.com/
         description: Chat UI for local LLMs
     - SearXNG:
@@ -42,6 +43,7 @@
         href: https://stirling-pdf.home.tom-mendy.com/
         description: Web Application to Edit PDF
     - Atuin:
+        icon: atuin.svg
         href: https://atuin.home.tom-mendy.com/
         description: Shell history sync and search
     - Vaultwarden:
