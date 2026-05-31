@@ -41,8 +41,9 @@ If you use OpenVPN instead, configure:
 - `vpn.credentials.openvpnUser`
 - `vpn.credentials.openvpnPassword`
 
-For safer handling, set `vpn.createSecret=false` and
-provide a pre-created secret named by `vpn.secretName`.
+For safer handling, set `vpn.createSecret=false` and provide a pre-created
+secret named by `vpn.secretName`. In this repository, Infisical creates
+`protonvpn-credentials` from project `homelab`, env `prod`, path `/media`.
 
 ## Local Helm test (optional)
 
