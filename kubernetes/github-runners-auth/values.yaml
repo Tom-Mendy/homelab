@@ -14,4 +14,4 @@ infisicalSecret:
   identityID: "7b887000-ae48-4603-8ed2-89a5bd6f1f5e"
   projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
   envSlug: prod
-  secretsPath: github-runners
+  secretsPath: /github-runners
