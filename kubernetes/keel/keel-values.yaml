@@ -11,7 +11,11 @@ helmProvider:
 basicauth:
   enabled: true
   user: admin
-  password: admin
+  password: ""
+
+secret:
+  create: false
+  name: keel
 
 # Enable the Keel service so Traefik can route traffic
 service:

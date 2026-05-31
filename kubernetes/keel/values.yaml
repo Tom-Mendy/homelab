@@ -12,3 +12,16 @@ ingress:
     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+
+infisicalSecret:
+  enabled: true
+  name: keel
+  serviceAccountName: keel-infisical-sync
+  connectionName: keel-infisical
+  authName: keel-infisical
+  identitySecretName: keel-infisical-identity
+  address: https://infisical.home.tom-mendy.com
+  identityID: "71f263fc-48c4-4359-aaea-bbe8c66d3054"
+  projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+  envSlug: prod
+  secretsPath: /keel
