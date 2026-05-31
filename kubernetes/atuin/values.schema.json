@@ -114,7 +114,36 @@
         }
       },
       "required": ["enabled", "className", "annotations"]
+    },
+    "infisicalSecret": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "name": { "type": "string" },
+        "serviceAccountName": { "type": "string" },
+        "connectionName": { "type": "string" },
+        "authName": { "type": "string" },
+        "identitySecretName": { "type": "string" },
+        "address": { "type": "string" },
+        "identityID": { "type": "string" },
+        "projectId": { "type": "string" },
+        "envSlug": { "type": "string" },
+        "secretsPath": { "type": "string" }
+      },
+      "required": [
+        "enabled",
+        "name",
+        "serviceAccountName",
+        "connectionName",
+        "authName",
+        "identitySecretName",
+        "address",
+        "identityID",
+        "projectId",
+        "envSlug",
+        "secretsPath"
+      ]
     }
   },
-  "required": ["namespace", "replicaCount", "nfsPermissions", "atuin", "postgres", "service", "ingress"]
+  "required": ["namespace", "replicaCount", "nfsPermissions", "atuin", "postgres", "service", "ingress", "infisicalSecret"]
 }

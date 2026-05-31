@@ -16,8 +16,8 @@ atuin:
   openRegistration: false
   db:
     name: atuin
-    user: atuin
-    password: atuinpassword
+    user: ""
+    password: ""
   storage:
     pvName: ""
     pvcName: atuin-config-v2
@@ -57,3 +57,16 @@ ingress:
     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+
+infisicalSecret:
+  enabled: true
+  name: atuin-secrets
+  serviceAccountName: atuin-infisical-sync
+  connectionName: atuin-infisical
+  authName: atuin-infisical
+  identitySecretName: atuin-infisical-identity
+  address: https://infisical.home.tom-mendy.com
+  identityID: "7b4de8a4-b92f-4694-8183-4b026262442f"
+  projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+  envSlug: prod
+  secretsPath: /atuin
