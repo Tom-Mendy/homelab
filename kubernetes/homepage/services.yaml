@@ -21,7 +21,7 @@
         href: https://authentik.home.tom-mendy.com
         description: Identity provider
     - Keel:
-         icon: keel.svg
+         icon: kubernetes.svg
          href: https://keel.home.tom-mendy.com
          description: Kubernetes deployment automation
     - NAS Synology:
@@ -42,10 +42,6 @@
         icon: stirling-pdf.svg
         href: https://stirling-pdf.home.tom-mendy.com/
         description: Web Application to Edit PDF
-    - Atuin:
-        icon: atuin.svg
-        href: https://atuin.home.tom-mendy.com/
-        description: Shell history sync and search
     - Vaultwarden:
         icon: vaultwarden.svg
         href: https://vaultwarden.home.tom-mendy.com/
@@ -74,6 +70,10 @@
         icon: forgejo.svg
         href: https://forgejo.tom-mendy.com/
         description: Git forge
+    - Atuin:
+        icon: atuin.svg
+        href: https://atuin.home.tom-mendy.com/
+        description: Shell history sync and search
 
 - Arr Apps:
     - Prowlarr:
