@@ -16,10 +16,10 @@
 - [x] Pin floating Helm chart `targetRevision: "*"` values to live deployed
   chart versions.
 - [ ] Pin `latest` image tags to exact tags or digests.
-  - [ ] Pin running app images with known pod digests.
+  - [x] Pin running app images with researched exact tags and digests.
   - [ ] Pin Endfield image after CI publishes immutable tags or digest is known.
-  - [ ] Pin GitHub ARC runner image after digest is known.
-  - [ ] Decide whether unused Wakapi chart should be pinned or removed.
+  - [x] Pin GitHub ARC runner image after digest is known.
+  - [x] Decide whether unused Wakapi chart should be pinned or removed.
 - [ ] Replace remaining legacy raw manifests with chart values/templates where
   this reduces drift.
 - [ ] Add full Helm render/lint coverage in CI.
