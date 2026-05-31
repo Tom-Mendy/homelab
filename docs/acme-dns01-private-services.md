@@ -78,7 +78,7 @@ cd ansible
 ./run.sh playbooks/deploy-apps.yml
 ```
 
-or with kubectl only:
+or render/apply the local charts directly for a manual break-glass run:
 
 ```bash
 helm repo add traefik https://traefik.github.io/charts
@@ -86,10 +86,9 @@ helm repo update
 helm upgrade --install traefik traefik/traefik \
   -n traefik --create-namespace \
   -f kubernetes/traefik/traefik-values.yaml
-kubectl apply -f kubernetes/blocky/blocky.yaml
-kubectl apply -f kubernetes/keel/keel-ingress.yaml
-kubectl apply -f kubernetes/navidrome/navidrome.yaml
-kubectl apply -f kubernetes/vaultwarden/vaultwarden.yaml
+helm upgrade --install blocky kubernetes/blocky -n blocky --create-namespace
+helm upgrade --install navidrome kubernetes/navidrome -n navidrome --create-namespace
+helm upgrade --install vaultwarden kubernetes/vaultwarden -n vaultwarden --create-namespace
 ```
 
 1. Verify certificate issuance:
