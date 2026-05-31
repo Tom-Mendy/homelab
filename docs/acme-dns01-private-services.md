@@ -49,8 +49,24 @@ Practical options:
 ## Apply steps
 
 1. Create a Cloudflare API token with Zone DNS edit permission for `tom-mendy.com`.
-2. Create the Kubernetes secret from the Traefik Cloudflare example after
-   replacing the token.
+2. Store the token in Infisical project `homelab`, env `prod`, path
+   `/traefik`:
+
+```text
+CF_DNS_API_TOKEN=<rotated-cloudflare-dns-token>
+```
+
+1. Enable the Traefik Infisical sync after filling the real Infisical
+   `identityID` in `kubernetes/traefik/values.yaml`:
+
+```yaml
+infisicalSecret:
+  enabled: true
+  identityID: "<machine-identity-id>"
+```
+
+The fallback example below is only for manual break-glass use. Do not commit
+real token values.
 
 ```bash
 kubectl apply -f kubernetes/traefik/traefik-cloudflare-secret.example.yaml
