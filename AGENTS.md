@@ -51,7 +51,7 @@ Before finishing Kubernetes changes:
 
 The repository owner is currently learning Kubernetes and homelab operations.
 For every significant activity performed through Kubernetes, write an activity
-report under `docs/activity_report/`.
+english report under `docs/activity_report/`.
 
 to check markdown quality use:
 
