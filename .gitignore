@@ -5,3 +5,11 @@ __pycache__/
 
 .tmp
 .rumdl_cache
+
+# Local secrets
+.env
+.env.*
+*.key
+*.pem
+*.secret.yaml
+*-secret.local.yaml

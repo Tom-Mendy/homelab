@@ -30,8 +30,9 @@ Defined Argo CD Applications:
   `navidrome`, `vaultwarden`, `trilium`, `forgejo`, `media`, `newt`,
   `stirling-pdf`, `ollama`, `openwebui`
 - `actions-runner-controller-crds`, `actions-runner-controller`,
-  `github-runners-capstone2`, `github-runners-dotfiles`,
-  `github-runners-portfolio`, `forgejo-runner-homelab`
+  `github-runners-auth`, `github-runners-capstone2`,
+  `github-runners-dotfiles`, `github-runners-portfolio`,
+  `forgejo-runner-homelab`
 
 ## Sync-wave order
 
@@ -45,7 +46,7 @@ From `kubernetes/argocd/apps/*.yaml`:
 - wave `4`: `actions-runner-controller-crds`
 - wave `5`: `openwebui`
 - wave `5`: `actions-runner-controller`
-- wave `6`: `forgejo-runner-homelab`
+- wave `6`: `forgejo-runner-homelab`, `github-runners-auth`
 - wave `7`: `github-runners-capstone2`
 - wave `8`: `github-runners-portfolio`, `github-runners-dotfiles`
 

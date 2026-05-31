@@ -9,13 +9,37 @@ This directory configures GitHub Actions Runner Controller (ARC) with Argo CD ap
 
 ## 1. Create GitHub auth secret
 
-Create the secret referenced by `githubConfigSecret` in:
+The runner scale sets read the secret referenced by `githubConfigSecret` in:
 
 - `runner-scale-set-capstone2-values.yaml`
 - `runner-scale-set-portfolio-values.yaml`
 - `runner-scale-set-dotfiles-values.yaml`
 
+The preferred path is Infisical. Store the rotated GitHub token in project
+`homelab`, env `prod`, path `github-runners`:
+
+```text
+github_token=<rotated-github-token>
+```
+
+Create a Kubernetes Auth machine identity for:
+
+```text
+namespace: arc-runners
+service account: github-runners-infisical-sync
+```
+
+Then enable `kubernetes/github-runners-auth/values.yaml`:
+
+```yaml
+infisicalSecret:
+  enabled: true
+  identityID: "<machine-identity-id>"
+```
+
 ### Option A: Personal access token (classic)
+
+Manual fallback only. Do not commit real tokens.
 
 ```bash
 cp arc-github-auth-secret.yaml arc-github-auth-secret.local.yaml
