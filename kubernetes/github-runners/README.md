@@ -16,7 +16,7 @@ The runner scale sets read the secret referenced by `githubConfigSecret` in:
 - `runner-scale-set-dotfiles-values.yaml`
 
 The preferred path is Infisical. Store the rotated GitHub token in project
-`homelab`, env `prod`, path `github-runners`:
+`homelab`, env `prod`, path `/github-runners`:
 
 ```text
 github_token=<rotated-github-token>
