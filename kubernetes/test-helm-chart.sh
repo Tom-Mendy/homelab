@@ -1,14 +1,35 @@
 #!/usr/bin/env bash
 
+set -u
+
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-charts=(blocky homepage traefik keel prometheus grafana navidrome vaultwarden forgejo forgejo-runner searxng endfield infisical-postgres authentik-postgres authentik github-runners-auth newt trilium)
+mapfile -t charts < "$script_dir/active-local-charts.txt"
+failed=0
+tmp_dir="$(mktemp -d)"
+trap 'rm -rf "$tmp_dir"' EXIT
+
 for c in "${charts[@]}"
-do echo "=== $c ==="
-helm template test "$script_dir/$c" >/tmp/helm_render.out 2>/tmp/helm_render.err
-code=$?
-if [[ $code -eq 0 ]]
-then echo "OK"
-else echo "FAIL ($code)"
-cat /tmp/helm_render.err
-fi
+do
+  echo "=== $c ==="
+
+  if ! helm lint "$script_dir/$c" >"$tmp_dir/$c-lint.out" 2>"$tmp_dir/$c-lint.err"
+  then
+    echo "LINT FAIL"
+    cat "$tmp_dir/$c-lint.out"
+    cat "$tmp_dir/$c-lint.err"
+    failed=1
+    continue
+  fi
+
+  if ! helm template test "$script_dir/$c" >"$tmp_dir/$c-render.out" 2>"$tmp_dir/$c-render.err"
+  then
+    echo "TEMPLATE FAIL"
+    cat "$tmp_dir/$c-render.err"
+    failed=1
+    continue
+  fi
+
+  echo "OK"
 done
+
+exit "$failed"
