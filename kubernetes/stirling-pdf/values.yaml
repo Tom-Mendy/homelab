@@ -4,7 +4,7 @@ replicaCount: 1
 
 image:
   repository: stirlingtools/stirling-pdf
-  tag: latest
+  tag: 2.9.2@sha256:3fcfa4d6b6ff22fdbf96ff2aae98dc2fb6d8c1ba0afab1dd2fdfdcdc9ab543c4
   pullPolicy: IfNotPresent
 
 deploymentAnnotations:
