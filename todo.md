@@ -22,6 +22,12 @@
   - [x] Decide whether unused Wakapi chart should be pinned or removed.
 - [ ] Replace remaining legacy raw manifests with chart values/templates where
   this reduces drift.
+  - [x] Remove Blocky raw manifest duplicate.
+  - [x] Remove Navidrome raw manifest duplicate.
+  - [x] Convert Trilium raw manifest to local Helm chart.
+  - [x] Remove Prometheus raw ingress/storage duplicates.
+  - [x] Remove Ollama raw GPU/ingress/runtimeclass duplicates.
+  - [ ] Review remaining raw support manifests and keep only intentional ones.
 - [ ] Add full Helm render/lint coverage in CI.
 - [ ] Add kubeconform or equivalent schema validation in CI.
 
