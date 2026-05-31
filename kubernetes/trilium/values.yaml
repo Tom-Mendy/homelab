@@ -1,0 +1,25 @@
+namespace: default
+
+replicaCount: 1
+
+image:
+  repository: zadam/trilium
+  tag: 0.63.7@sha256:a0b5a6a5fd7a64391ae6039bbcd5493151a77a1d5470ef5911923c64d0c232c0
+  pullPolicy: Always
+
+deploymentAnnotations:
+  keel.sh/policy: all
+
+service:
+  type: ClusterIP
+  port: 8080
+
+env:
+  port: "8080"
+
+ingress:
+  enabled: true
+  host: trilium.home.tom-mendy.com
+  className: ""
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure

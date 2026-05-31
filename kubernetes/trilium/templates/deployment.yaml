@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trilium
+  namespace: {{ .Values.namespace }}
+  {{- with .Values.deploymentAnnotations }}
+  annotations:
+{{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: trilium
+  template:
+    metadata:
+      labels:
+        app: trilium
+    spec:
+      containers:
+        - name: trilium
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: TRILIUM_PORT
+              value: {{ .Values.env.port | quote }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
