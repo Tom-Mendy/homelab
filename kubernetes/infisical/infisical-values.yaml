@@ -1,5 +1,5 @@
 infisical:
-  replicaCount: 2
+  replicaCount: 1
   kubeSecretRef: infisical-secrets
   image:
     repository: infisical/infisical
