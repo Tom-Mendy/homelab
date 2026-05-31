@@ -1,0 +1,17 @@
+namespace: newt-system
+
+secret:
+  name: newt-creds
+
+infisicalSecret:
+  enabled: true
+  name: newt-creds
+  serviceAccountName: newt-infisical-sync
+  connectionName: newt-infisical
+  authName: newt-infisical
+  identitySecretName: newt-infisical-identity
+  address: https://infisical.home.tom-mendy.com
+  identityID: "78e81396-214b-4ae1-9b8e-438fc2c31dee"
+  projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+  envSlug: prod
+  secretsPath: /newt
