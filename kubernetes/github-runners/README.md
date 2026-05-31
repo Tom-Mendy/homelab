@@ -42,9 +42,9 @@ infisicalSecret:
 Manual fallback only. Do not commit real tokens.
 
 ```bash
-cp arc-github-auth-secret.yaml arc-github-auth-secret.local.yaml
-# edit arc-github-auth-secret.local.yaml and replace <YOUR_PAT>
-kubectl apply -f arc-github-auth-secret.local.yaml
+kubectl create secret generic arc-github-auth \
+  --namespace arc-runners \
+  --from-literal=github_token='<ROTATED_GITHUB_TOKEN>'
 ```
 
 ### Option B: GitHub App

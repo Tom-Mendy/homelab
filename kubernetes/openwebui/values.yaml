@@ -1,0 +1,12 @@
+namespace: openwebui
+
+ingress:
+  name: openwebui-ingress
+  host: openwebui.home.tom-mendy.com
+  className: ""
+  serviceName: openwebui-open-webui
+  servicePort: 8080
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
