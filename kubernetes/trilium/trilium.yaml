@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: trilium
-        image: zadam/trilium:latest@sha256:a0b5a6a5fd7a64391ae6039bbcd5493151a77a1d5470ef5911923c64d0c232c0
+        image: zadam/trilium:latest
         env:
         - name: TRILIUM_PORT
           value: "8080"
