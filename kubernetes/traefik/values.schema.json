@@ -24,7 +24,7 @@
         "serviceAccountName",
         "hostAPI",
         "identityID",
-        "projectSlug",
+        "projectId",
         "envSlug",
         "secretsPath"
       ],
@@ -34,7 +34,7 @@
         "serviceAccountName": { "type": "string", "minLength": 1 },
         "hostAPI": { "type": "string", "minLength": 1 },
         "identityID": { "type": "string" },
-        "projectSlug": { "type": "string", "minLength": 1 },
+        "projectId": { "type": "string", "minLength": 1 },
         "envSlug": { "type": "string", "minLength": 1 },
         "secretsPath": { "type": "string", "minLength": 1 }
       }
