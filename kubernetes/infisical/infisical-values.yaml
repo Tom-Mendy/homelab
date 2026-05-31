@@ -7,6 +7,9 @@ infisical:
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
+  extraEnv:
+    - name: ALLOW_INTERNAL_IP_CONNECTIONS
+      value: "true"
 
 ingress:
   enabled: true
