@@ -11,50 +11,50 @@ Axe aléatoire retenu: **GitOps security**. Objectif: transformer un peu de surp
 ### 1. Kubernetes
 
 - Dernières releases vues via GitHub API:
-  - `v1.36.1` — 2026-05-12 — https://github.com/kubernetes/kubernetes/releases/tag/v1.36.1
-  - `v1.35.5` — 2026-05-12 — https://github.com/kubernetes/kubernetes/releases/tag/v1.35.5
-  - `v1.34.8` — 2026-05-12 — https://github.com/kubernetes/kubernetes/releases/tag/v1.34.8
+  - `v1.36.1` — 2026-05-12 — <https://github.com/kubernetes/kubernetes/releases/tag/v1.36.1>
+  - `v1.35.5` — 2026-05-12 — <https://github.com/kubernetes/kubernetes/releases/tag/v1.35.5>
+  - `v1.34.8` — 2026-05-12 — <https://github.com/kubernetes/kubernetes/releases/tag/v1.34.8>
 - Point d’attention: consulter le changelog de la branche cible avant upgrade; le fichier `CHANGELOG-1.36.md` expose des sections `Urgent Upgrade Notes`.
-- Source changelog: https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-1.36.md
+- Source changelog: <https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-1.36.md>
 
 ### 2. Talos
 
 - Releases vues:
-  - `v1.14.0-alpha.1` — 2026-05-28 — https://github.com/siderolabs/talos/releases/tag/v1.14.0-alpha.1
-  - `v1.13.3` — 2026-05-26 — https://github.com/siderolabs/talos/releases/tag/v1.13.3
-  - `v1.12.8` — 2026-05-22 — https://github.com/siderolabs/talos/releases/tag/v1.12.8
+  - `v1.14.0-alpha.1` — 2026-05-28 — <https://github.com/siderolabs/talos/releases/tag/v1.14.0-alpha.1>
+  - `v1.13.3` — 2026-05-26 — <https://github.com/siderolabs/talos/releases/tag/v1.13.3>
+  - `v1.12.8` — 2026-05-22 — <https://github.com/siderolabs/talos/releases/tag/v1.12.8>
 - Pour un homelab stable, préférer une release stable (`v1.13.3` ou branche stable équivalente), pas l’alpha.
 - `v1.13.3` embarque notamment: Linux `6.18.33`, Kubernetes `1.36.1`, containerd `2.2.4`, Go `1.26.3`.
 - Signal sécurité intéressant dans les commits Talos `v1.13.3`: `feat: redact more machine config secrets and audit redactors`.
-- Source: https://github.com/siderolabs/talos/releases/tag/v1.13.3
+- Source: <https://github.com/siderolabs/talos/releases/tag/v1.13.3>
 
 ### 3. Flux
 
-- Dernière release vue: `v2.8.8` — 2026-05-20 — https://github.com/fluxcd/flux2/releases/tag/v2.8.8
+- Dernière release vue: `v2.8.8` — 2026-05-20 — <https://github.com/fluxcd/flux2/releases/tag/v2.8.8>
 - Points notables:
   - correction d’un risque de fetch d’artefact bloquant indéfiniment côté `helm-controller`;
   - correction d’une croissance mémoire non bornée liée au wrapper retry Kubernetes client;
   - mise à jour `go-git` vers `v5.19.1`, corrigeant `CVE-2026-45571` et `CVE-2026-45570`.
-- Source procédure upgrade Flux v2.7+: https://github.com/fluxcd/flux2/discussions/5572
+- Source procédure upgrade Flux v2.7+: <https://github.com/fluxcd/flux2/discussions/5572>
 
 ### 4. Argo CD
 
 - Dernières releases vues:
-  - `v3.4.3` — 2026-05-28 — https://github.com/argoproj/argo-cd/releases/tag/v3.4.3
-  - `v3.3.11` — 2026-05-28 — https://github.com/argoproj/argo-cd/releases/tag/v3.3.11
-  - `v3.2.12` — 2026-05-13 — https://github.com/argoproj/argo-cd/releases/tag/v3.2.12
+  - `v3.4.3` — 2026-05-28 — <https://github.com/argoproj/argo-cd/releases/tag/v3.4.3>
+  - `v3.3.11` — 2026-05-28 — <https://github.com/argoproj/argo-cd/releases/tag/v3.3.11>
+  - `v3.2.12` — 2026-05-13 — <https://github.com/argoproj/argo-cd/releases/tag/v3.2.12>
 - `v3.4.3` est surtout présenté comme bugfix; vérifier la page `Upgrading` avant tout saut majeur/minor.
-- Source: https://github.com/argoproj/argo-cd/releases/tag/v3.4.3
+- Source: <https://github.com/argoproj/argo-cd/releases/tag/v3.4.3>
 
 ### 5. Cilium
 
 - Releases vues:
-  - `v1.20.0-pre.3` — 2026-06-02 — https://github.com/cilium/cilium/releases/tag/v1.20.0-pre.3
-  - `v1.19.4` — 2026-05-13 — https://github.com/cilium/cilium/releases/tag/v1.19.4
-  - `v1.18.10` — 2026-05-13 — https://github.com/cilium/cilium/releases/tag/v1.18.10
+  - `v1.20.0-pre.3` — 2026-06-02 — <https://github.com/cilium/cilium/releases/tag/v1.20.0-pre.3>
+  - `v1.19.4` — 2026-05-13 — <https://github.com/cilium/cilium/releases/tag/v1.19.4>
+  - `v1.18.10` — 2026-05-13 — <https://github.com/cilium/cilium/releases/tag/v1.18.10>
 - Pour un homelab stable, rester sur stable (`1.19.x`/`1.18.x` selon compatibilité cluster), pas `pre`.
 - `v1.19.4` contient plusieurs bugfixes réseau utiles: masquerading iptables, egress gateway, IPsec trace, clustermesh EndpointSlice watch.
-- Source: https://github.com/cilium/cilium/releases/tag/v1.19.4
+- Source: <https://github.com/cilium/cilium/releases/tag/v1.19.4>
 
 ## Audit local rapide de l’environnement Hermes
 

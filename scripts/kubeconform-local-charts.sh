@@ -9,7 +9,8 @@ then
 fi
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-mapfile -t charts < "$script_dir/active-local-charts.txt"
+kubernetes_dir="$(cd "$script_dir/../kubernetes" && pwd)"
+mapfile -t charts < "$kubernetes_dir/active-local-charts.txt"
 tmp_dir="$(mktemp -d)"
 failed=0
 trap 'rm -rf "$tmp_dir"' EXIT
@@ -19,7 +20,7 @@ do
   echo "=== $c ==="
   render_file="$tmp_dir/$c.yaml"
 
-  helm template test "$script_dir/$c" >"$render_file"
+  helm template test "$kubernetes_dir/$c" >"$render_file"
 
   if ! kubeconform \
     -strict \
