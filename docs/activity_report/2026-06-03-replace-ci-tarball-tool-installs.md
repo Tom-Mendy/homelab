@@ -24,6 +24,17 @@ remote: Not found.
 fatal: repository 'https://data.forgejo.org/gitleaks/gitleaks-action/' not found
 ```
 
+After replacing Gitleaks with a Docker action, `Azure/setup-helm` still failed
+because that action downloads Helm from `get.helm.sh`:
+
+```text
+Installing v3.18.3
+Downloading 'v3.18.3' from 'https://get.helm.sh'
+Request timeout: /helm-v3.18.3-linux-amd64.tar.gz
+::error::Error: Failed to download Helm from location
+https://get.helm.sh/helm-v3.18.3-linux-amd64.tar.gz
+```
+
 ## Reasoning Path
 
 Inspect the active Forgejo workflow:
@@ -40,9 +51,10 @@ curl -sSL https://github.com/yannh/kubeconform/releases/download/...
 curl -sSL https://github.com/gitleaks/gitleaks/releases/download/...
 ```
 
-The replacement plan used maintained Actions where possible:
+The replacement plan used Docker actions for tools that previously required
+downloads inside the runner:
 
-- `azure/setup-helm@v5.0.0` for Helm.
+- `docker://alpine/helm:3.18.3` for Helm lint and rendering.
 - `docker://ghcr.io/gitleaks/gitleaks:v8.30.1` for secret scanning.
 - `docker://ghcr.io/yannh/kubeconform:master` for kubeconform.
 
@@ -53,13 +65,14 @@ directory.
 
 ## Command Results
 
-Workflow changes:
+Workflow changes removed both `apt` and Helm setup:
 
 ```yaml
-- name: Install helm
-  uses: azure/setup-helm@v5.0.0
+- name: Lint and render local Helm charts
+  uses: docker://alpine/helm:3.18.3
   with:
-      version: v3.18.3
+      entrypoint: /bin/sh
+      args: -ec './scripts/test-helm-chart.sh'
 ```
 
 ```yaml
@@ -90,6 +103,14 @@ The checkout step now uses full history for secret scanning:
       fetch-depth: 0
 ```
 
+The storage policy script now falls back to `find` and `grep` when `rg` is not
+available, so the workflow no longer installs `ripgrep`.
+
+The chart rendering loop was moved into
+`scripts/render-local-charts-for-kubeconform.sh` so the Helm Docker action can
+run a simple shell command instead of carrying complex inline shell in the
+workflow.
+
 ## Verification
 
 Render all local charts:
@@ -108,10 +129,34 @@ OK
 OK
 ```
 
+Render kubeconform inputs:
+
+```sh
+./scripts/render-local-charts-for-kubeconform.sh /tmp/homelab-rendered
+```
+
+Observed result:
+
+```text
+23 rendered files under /tmp/homelab-rendered
+```
+
 Storage policy check:
 
 ```sh
 ./scripts/check-storage-policy.sh
+```
+
+Observed output:
+
+```text
+storage policy ok
+```
+
+Storage policy fallback without `rg`:
+
+```sh
+PATH=/usr/bin:/bin ./scripts/check-storage-policy.sh
 ```
 
 Observed output:
@@ -157,15 +202,15 @@ gitleaks detect --source . --redact --no-banner --verbose
 Observed output:
 
 ```text
-164 commits scanned.
-scan completed in 279ms
+165 commits scanned.
+scan completed in 271ms
 no leaks found
 ```
 
 ## Final Outcome
 
-Forgejo CI no longer downloads Helm, kubeconform, or gitleaks with ad hoc
-tarball `curl` steps.
+Forgejo CI no longer installs tools with `apt`, direct tarball `curl`, or
+`Azure/setup-helm` downloads.
 
-The validation flow now uses maintained Actions and Docker actions for tooling,
-while keeping the existing Helm render/lint and storage policy checks.
+The validation flow now uses Docker actions for Helm, Gitleaks, and kubeconform,
+while keeping the existing chart render/lint and storage policy checks.
