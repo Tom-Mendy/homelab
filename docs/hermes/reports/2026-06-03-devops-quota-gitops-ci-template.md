@@ -35,14 +35,14 @@ Récupérées via GitHub API publique, sans token:
 
 | Outil | Version repérée | Source |
 |---|---:|---|
-| Kubernetes | `v1.36.1` | https://github.com/kubernetes/kubernetes/releases/tag/v1.36.1 |
-| gitleaks | `v8.30.1` | https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1 |
-| kubeconform | `v0.7.0` | https://github.com/yannh/kubeconform/releases/tag/v0.7.0 |
-| Helm | `v4.2.0` | https://github.com/helm/helm/releases/tag/v4.2.0 |
-| kustomize | `kustomize/v5.8.1` | https://github.com/kubernetes-sigs/kustomize/releases/tag/kustomize/v5.8.1 |
-| yamllint | `v1.38.0` | https://github.com/adrienverge/yamllint/releases/tag/v1.38.0 |
-| actionlint | `v1.7.12` | https://github.com/rhysd/actionlint/releases/tag/v1.7.12 |
-| Trivy | `v0.71.0` | https://github.com/aquasecurity/trivy/releases/tag/v0.71.0 |
+| Kubernetes | `v1.36.1` | <https://github.com/kubernetes/kubernetes/releases/tag/v1.36.1> |
+| gitleaks | `v8.30.1` | <https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1> |
+| kubeconform | `v0.7.0` | <https://github.com/yannh/kubeconform/releases/tag/v0.7.0> |
+| Helm | `v4.2.0` | <https://github.com/helm/helm/releases/tag/v4.2.0> |
+| kustomize | `kustomize/v5.8.1` | <https://github.com/kubernetes-sigs/kustomize/releases/tag/kustomize/v5.8.1> |
+| yamllint | `v1.38.0` | <https://github.com/adrienverge/yamllint/releases/tag/v1.38.0> |
+| actionlint | `v1.7.12` | <https://github.com/rhysd/actionlint/releases/tag/v1.7.12> |
+| Trivy | `v0.71.0` | <https://github.com/aquasecurity/trivy/releases/tag/v0.71.0> |
 
 Note: `kubectl` n’a pas de release latest exploitable sur `kubernetes/kubectl` via l’endpoint testé; j’ai donc pris la release Kubernetes stable repérée comme référence de version de schémas pour `kubeconform`.
 
