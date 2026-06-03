@@ -12,6 +12,8 @@ spec:
     metadata:
       labels:
         app: forgejo-runner-homelab
+      annotations:
+        checksum/runner-config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
       securityContext:
         fsGroup: {{ .Values.securityContext.fsGroup }}
@@ -72,6 +74,7 @@ spec:
                     uuid: ${RUNNER_UUID}
                     token: ${RUNNER_TOKEN}
               EOF
+              sleep 5
               forgejo-runner daemon --config /data/config.yaml
           resources:
 {{ toYaml .Values.runner.resources | nindent 12 }}
