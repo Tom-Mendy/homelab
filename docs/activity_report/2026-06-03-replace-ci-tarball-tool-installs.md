@@ -14,6 +14,16 @@ This happened after the previous fix moved Helm away from `apt` and into a
 direct `curl` download from `get.helm.sh`. That avoided the missing apt package
 problem, but still left CI dependent on ad hoc binary downloads from the runner.
 
+After replacing the tarball installs with Actions, the first follow-up run
+failed because Forgejo resolved the Gitleaks action through
+`https://data.forgejo.org`, where that action does not exist:
+
+```text
+unable to clone 'https://data.forgejo.org/gitleaks/gitleaks-action'
+remote: Not found.
+fatal: repository 'https://data.forgejo.org/gitleaks/gitleaks-action/' not found
+```
+
 ## Reasoning Path
 
 Inspect the active Forgejo workflow:
@@ -33,7 +43,7 @@ curl -sSL https://github.com/gitleaks/gitleaks/releases/download/...
 The replacement plan used maintained Actions where possible:
 
 - `azure/setup-helm@v5.0.0` for Helm.
-- `gitleaks/gitleaks-action@v3` for secret scanning.
+- `docker://ghcr.io/gitleaks/gitleaks:v8.30.1` for secret scanning.
 - `docker://ghcr.io/yannh/kubeconform:master` for kubeconform.
 
 The kubeconform Docker action validates files in the workspace. It does not
@@ -54,12 +64,9 @@ Workflow changes:
 
 ```yaml
 - name: Scan for committed secrets
-  uses: gitleaks/gitleaks-action@v3
-  env:
-      GITLEAKS_VERSION: 8.30.1
-      GITLEAKS_ENABLE_COMMENTS: "false"
-      GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false"
-      GITLEAKS_ENABLE_SUMMARY: "false"
+  uses: docker://ghcr.io/gitleaks/gitleaks:v8.30.1
+  with:
+      args: detect --source . --redact --no-banner --verbose
 ```
 
 ```yaml
@@ -150,8 +157,8 @@ gitleaks detect --source . --redact --no-banner --verbose
 Observed output:
 
 ```text
-163 commits scanned.
-scan completed in 280ms
+164 commits scanned.
+scan completed in 279ms
 no leaks found
 ```
 
@@ -160,5 +167,5 @@ no leaks found
 Forgejo CI no longer downloads Helm, kubeconform, or gitleaks with ad hoc
 tarball `curl` steps.
 
-The validation flow now uses maintained Actions and a Docker action for
-tooling, while keeping the existing Helm render/lint and storage policy checks.
+The validation flow now uses maintained Actions and Docker actions for tooling,
+while keeping the existing Helm render/lint and storage policy checks.
