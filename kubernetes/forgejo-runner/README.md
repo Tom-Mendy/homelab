@@ -8,13 +8,17 @@ The runner uses:
 - `data.forgejo.org/forgejo/runner:12`
 - `docker:dind`
 - `runs-on: ubuntu-latest`
-- runner label `ubuntu-latest:docker://node:20-bookworm`
+- runner label `ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-latest`
 
 The Docker sidecar follows the Forgejo Docker-in-Docker guidance: a separate
 privileged `docker:dind` daemon is exposed only inside the pod, and the runner
 sets both `runner.envs.DOCKER_HOST` and `container.docker_host` to that daemon.
 Job containers receive `DOCKER_HOST=tcp://dind.docker.internal:2375`, with
 `container.options` mapping that name to Docker's host gateway.
+
+The runner process uses `forgejo-runner one-job --wait` instead of the long-lived
+daemon mode. After each job the runner container exits and Kubernetes restarts
+it, which keeps the poller fresh while reusing the same Docker sidecar pod.
 
 ## Secret
 
