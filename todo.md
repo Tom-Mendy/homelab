@@ -10,7 +10,7 @@
 - [ ] Optional: move Forgejo runner live-only Secret to Infisical.
 - [x] Optional: purge/rotate old Git history secrets if this repository was
   pushed/shared while secrets were committed.
-- [ ] Add secret scanning CI with gitleaks or equivalent.
+- [x] Add secret scanning CI with gitleaks or equivalent.
 
 ## Phase P1 - GitOps Reproducibility
 

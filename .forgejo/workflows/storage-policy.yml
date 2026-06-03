@@ -1,17 +1,53 @@
-name: storage-policy
+name: homelab-validation
 
 on:
-  pull_request:
-  push:
-    branches:
-      - main
+    pull_request:
+    push:
+        branches:
+            - main
+
+env:
+    KUBECONFORM_VERSION: "0.6.7"
+    GITLEAKS_VERSION: "8.30.1"
 
 jobs:
-  check-storage-policy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install ripgrep
-        run: apt-get update && apt-get install -y ripgrep
-      - name: Check Kubernetes storage policy
-        run: ./scripts/check-storage-policy.sh
+    validate:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+
+            - name: Install system tools
+              run: |
+                  apt-get update
+                  apt-get install -y curl helm ripgrep
+
+            - name: Install kubeconform
+              run: |
+                  curl -sSL \
+                    "https://github.com/yannh/kubeconform/releases/download/v${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" \
+                    -o /tmp/kubeconform.tar.gz
+                  tar -C /tmp -xzf /tmp/kubeconform.tar.gz kubeconform
+                  install /tmp/kubeconform /usr/local/bin/kubeconform
+                  kubeconform -v
+
+            - name: Install gitleaks
+              run: |
+                  curl -sSL \
+                    "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+                    -o /tmp/gitleaks.tar.gz
+                  tar -C /tmp -xzf /tmp/gitleaks.tar.gz gitleaks
+                  install /tmp/gitleaks /usr/local/bin/gitleaks
+                  gitleaks version
+
+            - name: Scan for committed secrets
+              run: gitleaks detect --source . --redact --no-banner --verbose
+
+            - name: Lint and render local Helm charts
+              run: ./scripts/test-helm-chart.sh
+
+            - name: Validate rendered local charts with kubeconform
+              run: ./scripts/kubeconform-local-charts.sh
+
+            - name: Check Kubernetes storage policy
+              run: ./scripts/check-storage-policy.sh

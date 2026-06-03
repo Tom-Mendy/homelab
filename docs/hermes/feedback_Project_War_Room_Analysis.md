@@ -124,6 +124,7 @@ J’ai aussi enregistré le contexte essentiel du projet pour les prochaines foi
   - Politique storage claire dans `AGENTS.md`.
 
 - **What blocks real usage:**
+
 - Secrets en clair.
   - Pas de preuve automatisée “je peux rebuild/restore”.
   - README/docs un peu driftés par rapport aux apps réelles.
@@ -186,6 +187,7 @@ J’ai aussi enregistré le contexte essentiel du projet pour les prochaines foi
 
 - **Structural problems:**
   - Mélange legacy Ansible app deployment + GitOps dans `ansible/roles/kubernetes/tasks/main.yml`.
+
 - Certains docs ne suivent plus les apps réelles.
   - Secrets et values sensibles mélangés dans les manifests GitOps.
 
@@ -252,6 +254,7 @@ J’ai aussi enregistré le contexte essentiel du projet pour les prochaines foi
   - Secrets dans `values.yaml`/`Secret.yaml`.
   - Apps admin exposées par ingress sans preuve de forward-auth/IP allowlist.
   - `NET_ADMIN` + `/dev/net/tun` pour VPN workloads.
+
 - Docker-in-Docker privilégié pour Forgejo runner.
 
 - **Attack surface:**
@@ -319,7 +322,6 @@ J’ai aussi enregistré le contexte essentiel du projet pour les prochaines foi
   - Ansible + Kubespray bootstrap exists.
   - Argo CD app-of-apps exists.
 - Some upstream chart versions are floating.
-
 - **Automation quick wins:**
   1. Add Helm install in CI.
   2. Render all `kubernetes/*/Chart.yaml`.
