@@ -15,33 +15,22 @@ jobs:
               with:
                   fetch-depth: 0
 
-            - name: Install system tools
-              run: |
-                  apt-get update
-                  apt-get install -y ripgrep
-
-            - name: Install helm
-              uses: Azure/setup-helm@v5.0.0
-              with:
-                  version: v3.18.3
-
             - name: Scan for committed secrets
               uses: docker://ghcr.io/gitleaks/gitleaks:v8.30.1
               with:
                   args: detect --source . --redact --no-banner --verbose
 
             - name: Lint and render local Helm charts
-              run: ./scripts/test-helm-chart.sh
+              uses: docker://alpine/helm:3.18.3
+              with:
+                  entrypoint: /bin/sh
+                  args: -ec './scripts/test-helm-chart.sh'
 
             - name: Render local charts for kubeconform
-              run: |
-                  rm -rf .forgejo-rendered
-                  mkdir -p .forgejo-rendered
-                  while IFS= read -r chart
-                  do
-                    helm template test "kubernetes/${chart}" \
-                      > ".forgejo-rendered/${chart}.yaml"
-                  done < kubernetes/active-local-charts.txt
+              uses: docker://alpine/helm:3.18.3
+              with:
+                  entrypoint: /bin/sh
+                  args: -ec './scripts/render-local-charts-for-kubeconform.sh'
 
             - name: Validate rendered local charts with kubeconform
               uses: docker://ghcr.io/yannh/kubeconform:master
