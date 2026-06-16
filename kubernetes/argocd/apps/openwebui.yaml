@@ -1,32 +1,32 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: openwebui
-  namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "5"
+    name: openwebui
+    namespace: argocd
+    annotations:
+        argocd.argoproj.io/sync-wave: "5"
 spec:
-  project: default
-  sources:
-    - repoURL: https://helm.openwebui.com/
-      chart: open-webui
-      targetRevision: ">=0.0.0-0"
-      helm:
-        releaseName: openwebui
-        valueFiles:
-          - $values/kubernetes/openwebui/openwebui-values.yaml
-    - repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
-      targetRevision: main
-      ref: values
-    - repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
-      targetRevision: main
-      path: kubernetes/openwebui
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: openwebui
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+    project: default
+    sources:
+        - repoURL: https://helm.openwebui.com/
+          chart: open-webui
+          targetRevision: "6.15.0"
+          helm:
+              releaseName: openwebui
+              valueFiles:
+                  - $values/kubernetes/openwebui/openwebui-values.yaml
+        - repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
+          targetRevision: main
+          ref: values
+        - repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
+          targetRevision: main
+          path: kubernetes/openwebui
+    destination:
+        server: https://kubernetes.default.svc
+        namespace: openwebui
+    syncPolicy:
+        automated:
+            prune: true
+            selfHeal: true
+        syncOptions:
+            - CreateNamespace=true
