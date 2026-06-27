@@ -14,7 +14,7 @@ spec:
           helm:
               releaseName: openwebui
               valueFiles:
-                  - $values/kubernetes/openwebui/openwebui-values.yaml
+                  - $values/kubernetes/openwebui/values.yaml
         - repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
           targetRevision: main
           ref: values
