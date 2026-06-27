@@ -53,6 +53,28 @@ docs/argocd-gitops.md
 kubernetes/github-runners/README.md
 ```
 
+Deleted the live child Argo CD app after the root `homelab` app synced the Git
+change:
+
+```sh
+kubectl annotate app -n argocd homelab argocd.argoproj.io/refresh=hard --overwrite
+kubectl delete app -n argocd github-runners-capstone2 --ignore-not-found=true
+```
+
+The Argo CD app deletion left ARC custom resources behind, so the scale set was
+deleted directly:
+
+```sh
+kubectl delete autoscalingrunnerset -n arc-runners arc-runner-set-capstone2 --ignore-not-found=true
+```
+
+One orphaned listener remained after the scale set delete, so it was removed
+directly:
+
+```sh
+kubectl delete autoscalinglistener -n arc-systems arc-runner-set-capstone2-c8655b54-listener --ignore-not-found=true
+```
+
 ## Verification
 
 Check for active current references:
@@ -72,5 +94,5 @@ Run the storage policy check even though this change does not add storage:
 ## Outcome
 
 The repository no longer defines `github-runners-capstone2` or
-`arc-runner-set-capstone2`. After the change is pushed and synced, Argo CD can
-prune the app and ARC resources.
+`arc-runner-set-capstone2`. The root `homelab` Argo CD app is synced to the
+removal commit, and the live Capstone2 ARC custom resources were removed.
