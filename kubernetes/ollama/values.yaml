@@ -2,7 +2,7 @@ namespace: ollama
 
 image:
   repository: ollama/ollama
-  tag: 0.9.6@sha256:f478761c18fea69b1624e095bce0f8aab06825d09ccabcd0f88828db0df185ce
+  tag: 0.30.11@sha256:c484b703176aa19dfc0a54cbfb60ab8094b38faa04283fb77eba1d33319e5eca
   pullPolicy: IfNotPresent
 
 deployment:
