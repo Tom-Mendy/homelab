@@ -4,7 +4,7 @@ ingress:
   name: openwebui-ingress
   host: openwebui.home.tom-mendy.com
   className: ""
-  serviceName: openwebui-open-webui
+  serviceName: open-webui
   servicePort: 8080
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
