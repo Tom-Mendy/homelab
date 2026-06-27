@@ -3,7 +3,6 @@
 This directory configures GitHub Actions Runner Controller (ARC) with Argo CD apps:
 
 - `actions-runner-controller` (namespace: `arc-systems`)
-- `github-runners-capstone2` (namespace: `arc-runners`)
 - `github-runners-portfolio` (namespace: `arc-runners`)
 - `github-runners-dotfiles` (namespace: `arc-runners`)
 
@@ -11,7 +10,6 @@ This directory configures GitHub Actions Runner Controller (ARC) with Argo CD ap
 
 The runner scale sets read the secret referenced by `githubConfigSecret` in:
 
-- `runner-scale-set-capstone2-values.yaml`
 - `runner-scale-set-portfolio-values.yaml`
 - `runner-scale-set-dotfiles-values.yaml`
 
@@ -61,7 +59,6 @@ kubectl create secret generic arc-github-auth \
 
 Update `githubConfigUrl` in each values file for your desired scope:
 
-- `runner-scale-set-capstone2-values.yaml`
 - `runner-scale-set-portfolio-values.yaml`
 - `runner-scale-set-dotfiles-values.yaml`
 - Repository: `https://github.com/<owner>/<repo>`
@@ -105,10 +102,9 @@ Recommended recovery order:
 1. Sync `actions-runner-controller-crds`
 2. Sync `actions-runner-controller`
 3. Restart controller pod in `arc-systems`
-4. Sync `github-runners-capstone2`, `github-runners-portfolio`, and `github-runners-dotfiles`
+4. Sync `github-runners-portfolio` and `github-runners-dotfiles`
 
 Use these labels in workflows:
 
-- `runs-on: arc-runner-set-capstone2` for `Tom-Mendy/Capstone2`
 - `runs-on: arc-runner-set-portfolio` for `Tom-Mendy/Portfolio`
 - `runs-on: arc-runner-set-dotfiles` for `Tom-Mendy/dotfiles`
