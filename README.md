@@ -43,7 +43,6 @@ with Argo CD GitOps for app reconciliation.
 - `actions-runner-controller`
 - `actions-runner-controller-crds`
 - `github-runners`
-- `github-runners-capstone2`
 - `github-runners-portfolio`
 
 ## Quick start
