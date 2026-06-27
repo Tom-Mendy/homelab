@@ -6,7 +6,7 @@ Use `nfs-k8s` for standard Kubernetes PVCs.
 
 The backing store is the Synology NFS export:
 
-- Server: `192.168.1.1`
+- Server: `10.0.0.11`
 - Export: `/volume1/k8s`
 - StorageClass: `nfs-k8s`
 - Reclaim policy: `Retain`

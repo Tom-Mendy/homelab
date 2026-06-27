@@ -22,7 +22,7 @@ Configured in `values.yaml`:
 - Downloads: `/volume1/Downloads`
 - Movies: `/volume1/video/Film`
 - Series: `/volume1/video/Serie`
-- NFS server: `192.168.1.1`
+- NFS server: `10.0.0.11`
 
 Container identity defaults:
 

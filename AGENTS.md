@@ -16,7 +16,7 @@ volumes:
 storageClassName: nfs-k8s
 ```
 
-The approved backing store is the Synology NFS export at `192.168.1.1`, rooted
+The approved backing store is the Synology NFS export at `10.0.0.11`, rooted
 at `/volume1/k8s`. Workload data should be isolated by namespace/application/PVC
 subdirectories managed by the NFS provisioner.
 

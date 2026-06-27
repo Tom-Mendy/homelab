@@ -28,7 +28,7 @@ musicStorage:
   pvName: navidrome-music-pv
   pvcName: navidrome-music-pvc
   size: 200Gi
-  nfsServer: 192.168.1.1
+  nfsServer: 10.0.0.11
   nfsPath: /volume1/music
 
 dataStorage:
