@@ -112,6 +112,14 @@ persistence:
   existingClaim: open-webui
 ```
 
+The old chart had websocket support disabled by default. The new chart enables
+websocket Redis by default, so the merged values explicitly keep it disabled:
+
+```yaml
+websocket:
+  enabled: false
+```
+
 The local OpenWebUI extras chart also manages the `open-webui` PVC with
 `volumeName: pvc-090fcf5b-66f0-457f-9279-f5167b075af5`.
 

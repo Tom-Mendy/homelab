@@ -27,6 +27,9 @@ pipelines:
     storageClass: nfs-k8s
     size: 50Gi
 
+websocket:
+  enabled: false
+
 extraEnvVars:
   - name: ENABLE_WEB_SEARCH
     value: "true"
