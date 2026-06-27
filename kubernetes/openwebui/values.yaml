@@ -1,5 +1,42 @@
 namespace: openwebui
 
+fullnameOverride: open-webui
+
+ollama:
+  enabled: false
+  host: ollama.ollama.svc.cluster.local
+  port: 11434
+
+deployment:
+  podAnnotations:
+    keel.sh/policy: all
+
+service:
+  type: ClusterIP
+  port: 8080
+
+persistence:
+  enabled: true
+  existingClaim: open-webui
+  storageClass: nfs-k8s
+  size: 50Gi
+
+pipelines:
+  enabled: false
+  persistence:
+    storageClass: nfs-k8s
+    size: 50Gi
+
+extraEnvVars:
+  - name: ENABLE_WEB_SEARCH
+    value: "true"
+  - name: WEB_SEARCH_ENGINE
+    value: "searxng"
+  - name: SEARXNG_QUERY_URL
+    value: "http://searxng.searxng.svc.cluster.local:8080/search"
+  - name: SEARXNG_LANGUAGE
+    value: "all"
+
 ingress:
   name: openwebui-ingress
   host: openwebui.home.tom-mendy.com
