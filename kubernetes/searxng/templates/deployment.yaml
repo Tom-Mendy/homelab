@@ -21,7 +21,7 @@ spec:
       containers:
         {{- if .Values.vpn.enabled }}
         - name: gluetun
-          image: qmcgaw/gluetun:v3.41.1@sha256:1a5bf4b4820a879cdf8d93d7ef0d2d963af56670c9ebff8981860b6804ebc8ab
+          image: qmcgaw/gluetun:latest@sha256:bd84f4f090ca61170c8329a72d4f451255b01f6489486a621bfcb89749fb80ab
           securityContext:
             capabilities:
               add:

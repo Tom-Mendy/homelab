@@ -75,6 +75,14 @@ kubernetes/media/templates/infisical-secret.yaml
 kubernetes/searxng/templates/infisical-secret.yaml
 ```
 
+SearXNG still reported `OutOfSync` after the pods recovered because Keel had
+updated the live `gluetun` sidecar image. The healthy live digest was pinned in
+the chart:
+
+```text
+qmcgaw/gluetun:latest@sha256:bd84f4f090ca61170c8329a72d4f451255b01f6489486a621bfcb89749fb80ab
+```
+
 The live SearXNG `InfisicalStaticSecret` was patched and generated a raw-valid
 secret immediately:
 
