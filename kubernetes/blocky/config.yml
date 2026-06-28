@@ -7,30 +7,30 @@ upstream:
     - 192.168.1.254
 customDNS:
   mapping:
-    prowlarr.home.tom-mendy.com: 192.168.1.20
-    sonarr.home.tom-mendy.com: 192.168.1.20
-    radarr.home.tom-mendy.com: 192.168.1.20
-    bazarr.home.tom-mendy.com: 192.168.1.20
-    qbittorrent.home.tom-mendy.com: 192.168.1.20
-    nzbget.home.tom-mendy.com: 192.168.1.20
-    autobrr.home.tom-mendy.com: 192.168.1.20
-    keel.home.tom-mendy.com: 192.168.1.20
-    trilium.home.tom-mendy.com: 192.168.1.20
-    blocky.home.tom-mendy.com: 192.168.1.20
-    ollama.home.tom-mendy.com: 192.168.1.20
-    openwebui.home.tom-mendy.com: 192.168.1.20
-    searxng.home.tom-mendy.com: 192.168.1.20
-    stirling-pdf.home.tom-mendy.com: 192.168.1.20
-    navidrome.home.tom-mendy.com: 192.168.1.20
-    vaultwarden.home.tom-mendy.com: 192.168.1.20
-    homepage.home.tom-mendy.com: 192.168.1.20
-    prometheus.home.tom-mendy.com: 192.168.1.20
-    forgejo.home.tom-mendy.com: 192.168.1.20
-    grafana.home.tom-mendy.com: 192.168.1.20
-    argocd.home.tom-mendy.com: 192.168.1.20
-    atuin.home.tom-mendy.com: 192.168.1.20
-    infisical.home.tom-mendy.com: 192.168.1.20
-    authentik.home.tom-mendy.com: 192.168.1.20
+    prowlarr.home.tom-mendy.com: 10.0.0.60
+    sonarr.home.tom-mendy.com: 10.0.0.60
+    radarr.home.tom-mendy.com: 10.0.0.60
+    bazarr.home.tom-mendy.com: 10.0.0.60
+    qbittorrent.home.tom-mendy.com: 10.0.0.60
+    nzbget.home.tom-mendy.com: 10.0.0.60
+    autobrr.home.tom-mendy.com: 10.0.0.60
+    keel.home.tom-mendy.com: 10.0.0.60
+    trilium.home.tom-mendy.com: 10.0.0.60
+    blocky.home.tom-mendy.com: 10.0.0.60
+    ollama.home.tom-mendy.com: 10.0.0.60
+    openwebui.home.tom-mendy.com: 10.0.0.60
+    searxng.home.tom-mendy.com: 10.0.0.60
+    stirling-pdf.home.tom-mendy.com: 10.0.0.60
+    navidrome.home.tom-mendy.com: 10.0.0.60
+    vaultwarden.home.tom-mendy.com: 10.0.0.60
+    homepage.home.tom-mendy.com: 10.0.0.60
+    prometheus.home.tom-mendy.com: 10.0.0.60
+    forgejo.home.tom-mendy.com: 10.0.0.60
+    grafana.home.tom-mendy.com: 10.0.0.60
+    argocd.home.tom-mendy.com: 10.0.0.60
+    atuin.home.tom-mendy.com: 10.0.0.60
+    infisical.home.tom-mendy.com: 10.0.0.60
+    authentik.home.tom-mendy.com: 10.0.0.60
 prometheus:
   enable: true
   path: /metrics

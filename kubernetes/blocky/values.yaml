@@ -19,6 +19,6 @@ podAnnotations:
 service:
   type: LoadBalancer
   annotations:
-    metallb.universe.tf/loadBalancerIPs: 192.168.1.21
+    metallb.universe.tf/loadBalancerIPs: 10.0.0.61
   dnsPort: 53
   httpPort: 4000

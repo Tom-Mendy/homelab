@@ -10,24 +10,24 @@ This document describes the network topology and infrastructure of the homelab e
 
 | Node | IP Address | Roles | User | OS |
 |------|------------|-------|------|----|
-| node1 | 192.168.1.11 | Control Plane, etcd | tmendy | Ubuntu Server |
-| node2 | 192.168.1.12 | Worker | tmendy | Ubuntu Server |
-| node3 | 192.168.1.13 | Worker (GPU label) | tmendy | Ubuntu Server |
+| node1 | 10.0.0.21 | Control Plane, etcd | tmendy | Ubuntu Server |
+| node2 | 10.0.0.22 | Worker | tmendy | Ubuntu Server |
+| node3 | 10.0.0.23 | Worker (GPU label) | tmendy | Ubuntu Server |
 
 ## Network Topology
 
 ```mermaid
 graph TB
-    subgraph "Homelab Network (192.168.1.0/24)"
+    subgraph "Homelab Network (10.0.0.0/24)"
         subgraph "Kubernetes Cluster"
-            node1["node1<br/>192.168.1.11<br/>Control Plane + etcd"]
-            node2["node2<br/>192.168.1.12<br/>Worker"]
-            node3["node3<br/>192.168.1.13<br/>Worker + GPU label"]
+            node1["node1<br/>10.0.0.21<br/>Control Plane + etcd"]
+            node2["node2<br/>10.0.0.22<br/>Worker"]
+            node3["node3<br/>10.0.0.23<br/>Worker + GPU label"]
         end
 
         subgraph "Ingress & DNS"
-            traefik["Traefik Ingress\n(MetalLB IP range 192.168.1.20-49)"]
-            blocky["Blocky DNS\nLoadBalancer 192.168.1.21"]
+            traefik["Traefik Ingress\n(MetalLB IP 10.0.0.60)"]
+            blocky["Blocky DNS\nLoadBalancer 10.0.0.61"]
         end
 
         subgraph "GitOps Control"
@@ -70,22 +70,23 @@ graph TB
 
 ### Network Specifications
 
-- **Network Range**: 192.168.1.0/24
+- **Network Range**: 10.0.0.0/24
+- **LoadBalancer Range**: 10.0.0.60-10.0.0.89
 - **SSH User**: tmendy (with sudo privileges)
 - **Management**: Ansible-managed infrastructure
 
 ### Node Functions
 
-#### node1 (192.168.1.11)
+#### node1 (10.0.0.21)
 
 - Kubernetes Control Plane
 - etcd member
 
-#### node2 (192.168.1.12)
+#### node2 (10.0.0.22)
 
 - Worker node
 
-#### node3 (192.168.1.13)
+#### node3 (10.0.0.23)
 
 - Worker node
 - Labeled `gpu=true` by Ansible prerequisites
