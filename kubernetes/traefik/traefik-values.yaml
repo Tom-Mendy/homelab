@@ -1,5 +1,7 @@
 service:
   type: LoadBalancer
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: 10.0.0.60
 
 env:
   - name: CF_DNS_API_TOKEN
