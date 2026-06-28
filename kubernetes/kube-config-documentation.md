@@ -9,22 +9,26 @@ sudo chown "$(id -u):$(id -g)" "$HOME/.kube/config"
 chmod 600 "$HOME/.kube/config"
 ```
 
-## Use `kubectl` locally against `192.168.1.11`
+## Use `kubectl` locally against `10.0.0.21`
 
 Run these commands on your local machine.
 
 ```bash
 mkdir -p "$HOME/.kube"
-scp <user>@192.168.1.11:/etc/kubernetes/admin.conf "$HOME/.kube/config-homelab"
+scp <user>@10.0.0.21:/etc/kubernetes/admin.conf "$HOME/.kube/config-homelab"
 chmod 600 "$HOME/.kube/config-homelab"
 
-# Ensure kubectl points to the reachable control-plane IP
+# Ensure kubectl points to the reachable control-plane IP.
+# The current API certificate contains the DNS name node1, so keep that TLS name
+# while connecting to the new IP.
 CTX=$(kubectl --kubeconfig "$HOME/.kube/config-homelab" config current-context)
 CLUSTER=$(kubectl --kubeconfig "$HOME/.kube/config-homelab" \
   config view \
   -o jsonpath="{.contexts[?(@.name==\"$CTX\")].context.cluster}")
 kubectl --kubeconfig "$HOME/.kube/config-homelab" \
-  config set-cluster "$CLUSTER" --server=https://192.168.1.11:6443
+  config set-cluster "$CLUSTER" \
+    --server=https://10.0.0.21:6443 \
+    --tls-server-name=node1
 ```
 
 Use it one-off:
