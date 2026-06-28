@@ -12,12 +12,12 @@ with Argo CD GitOps for app reconciliation.
 
 ## Current architecture
 
-- **Nodes**: `node1` (`192.168.1.11`), `node2` (`192.168.1.12`), `node3` (`192.168.1.13`)
+- **Nodes**: `node1` (`10.0.0.21`), `node2` (`10.0.0.22`), `node3` (`10.0.0.23`)
 - **Control plane**: `node1`
 - **Workers**: `node2`, `node3`
 - **Ingress**: Traefik
-- **LoadBalancer IPs**: MetalLB (`192.168.1.20-192.168.1.49`)
-- **DNS**: Blocky (`blocky` service exposed at `192.168.1.21`)
+- **LoadBalancer IPs**: MetalLB (`10.0.0.60-10.0.0.89`)
+- **DNS**: Blocky (`blocky` service exposed at `10.0.0.61`)
 - **Domain convention**: `*.home.tom-mendy.com`
 
 ## Deployed services
