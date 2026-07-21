@@ -31,7 +31,7 @@ Defined Argo CD Applications:
   `stirling-pdf`, `ollama`, `openwebui`
 - `actions-runner-controller-crds`, `actions-runner-controller`,
   `github-runners-auth`, `github-runners-dotfiles`, `github-runners-portfolio`,
-  `forgejo-runner-homelab`
+  `github-runners-sumfeet`, `forgejo-runner-homelab`
 
 ## Sync-wave order
 
@@ -46,7 +46,8 @@ From `kubernetes/argocd/apps/*.yaml`:
 - wave `5`: `openwebui`
 - wave `5`: `actions-runner-controller`
 - wave `6`: `forgejo-runner-homelab`, `github-runners-auth`
-- wave `8`: `github-runners-portfolio`, `github-runners-dotfiles`
+- wave `8`: `github-runners-portfolio`, `github-runners-dotfiles`,
+  `github-runners-sumfeet`
 
 ## Important Ansible variables
 

@@ -1,0 +1,28 @@
+githubConfigUrl: "https://github.com/MrAmarok/sumfeet"
+githubConfigSecret: arc-github-auth-sumfeet
+
+runnerScaleSetName: "arc-runner-set-sumfeet"
+
+maxRunners: 5
+minRunners: 0
+
+containerMode:
+  type: "dind"
+
+controllerServiceAccount:
+  namespace: arc-systems
+  name: arc-gha-rs-controller
+
+template:
+  spec:
+    containers:
+      - name: runner
+        image: ghcr.io/actions/actions-runner:2.334.0@sha256:b6614fce332517f74d0a76e7c762fb08e4f2ff13dcf333183397c8a5725b6e8e
+        command: ["/home/runner/run.sh"]
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "2"
+            memory: "2Gi"

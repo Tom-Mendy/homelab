@@ -2,6 +2,7 @@ namespace: arc-runners
 
 secret:
   name: arc-github-auth
+  sumfeetName: arc-github-auth-sumfeet
 
 infisicalSecret:
   enabled: true
