@@ -59,6 +59,49 @@ Migrate one workload at a time.
 8. Remove any old local-path PV and node-local directory only after the
    replacement is confirmed healthy.
 
+## Rebuilding a cluster with existing nfs-k8s data
+
+When rebuilding the cluster, do not let the NFS provisioner create fresh PVC
+directories for workloads that already have data under `/volume1/k8s`.
+
+Before the rebuild, record the binding identity:
+
+```bash
+kubectl get pvc -A \
+  -o custom-columns='NS:.metadata.namespace,PVC:.metadata.name,SC:.spec.storageClassName,VOLUME:.spec.volumeName'
+kubectl get pv \
+  -o custom-columns='PV:.metadata.name,SC:.spec.storageClassName,SERVER:.spec.nfs.server,PATH:.spec.nfs.path,CLAIM:.spec.claimRef.namespace/.spec.claimRef.name'
+```
+
+On the rebuilt cluster, recreate a static NFS PV for each existing dynamic
+`nfs-k8s` path, then recreate the matching PVC with the same namespace, PVC
+name, and `volumeName`. The Kubernetes object UID will change; the important
+identity is the PV/PVC name pair and the NFS path.
+
+## Draining a node with single-instance CloudNativePG
+
+Some homelab PostgreSQL clusters intentionally run as a single CloudNativePG
+instance. Their PDBs block normal eviction because there is no standby instance.
+
+For a planned Talos maintenance window, accept downtime for those applications
+instead of adding temporary database replicas:
+
+```bash
+kubectl get clusters.postgresql.cnpg.io -A -o wide
+kubectl get pdb -A -o wide
+kubectl drain node2 \
+  --ignore-daemonsets \
+  --delete-emptydir-data \
+  --disable-eviction
+kubectl get pods -n authentik -o wide
+kubectl get pods -n infisical -o wide
+kubectl get clusters.postgresql.cnpg.io -A -o wide
+```
+
+Use `--disable-eviction` only during the maintenance window. It bypasses PDB
+protection, so Authentik and Infisical may be unavailable while their database
+pods restart on another schedulable node.
+
 ## Priority
 
 Migrate in this order:
