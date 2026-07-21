@@ -116,4 +116,4 @@ Use these labels in workflows:
 
 - `runs-on: arc-runner-set-portfolio` for `Tom-Mendy/Portfolio`
 - `runs-on: arc-runner-set-dotfiles` for `Tom-Mendy/dotfiles`
-- `runs-on: arc-runner-set-sumfeet` for `MrAmarok/sumfeet`
+- `runs-on: arc-runner-set-sumfeet-tom` for `MrAmarok/sumfeet`
