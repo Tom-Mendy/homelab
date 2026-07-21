@@ -44,6 +44,7 @@ with Argo CD GitOps for app reconciliation.
 - `actions-runner-controller-crds`
 - `github-runners`
 - `github-runners-portfolio`
+- `github-runners-sumfeet`
 
 ## Quick start
 
