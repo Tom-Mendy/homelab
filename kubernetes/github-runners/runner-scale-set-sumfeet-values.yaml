@@ -1,7 +1,7 @@
 githubConfigUrl: "https://github.com/MrAmarok/sumfeet"
 githubConfigSecret: arc-github-auth-sumfeet
 
-runnerScaleSetName: "arc-runner-set-sumfeet-tom"
+runnerScaleSetName: "self-hosted"
 
 maxRunners: 5
 minRunners: 0
