@@ -1,6 +1,7 @@
 # GitHub Actions Runners (ARC)
 
-This directory configures GitHub Actions Runner Controller (ARC) with Argo CD apps:
+This directory configures GitHub Actions Runner Controller (ARC) 0.14.2 with
+Argo CD apps:
 
 - `actions-runner-controller` (namespace: `arc-systems`)
 - `github-runners-portfolio` (namespace: `arc-runners`)
@@ -116,4 +117,13 @@ Use these labels in workflows:
 
 - `runs-on: arc-runner-set-portfolio` for `Tom-Mendy/Portfolio`
 - `runs-on: arc-runner-set-dotfiles` for `Tom-Mendy/dotfiles`
-- `runs-on: self-hosted` for `MrAmarok/sumfeet`
+- `runs-on: self-hosted` for `MrAmarok/sumfeet` through the scale set
+  `arc-runner-set-sumfleet-tom`
+
+Confirm the Sumfeet name and labels after an upgrade:
+
+```bash
+kubectl get autoscalingrunnerset arc-runner-set-sumfleet-tom \
+  --namespace arc-runners \
+  -o jsonpath='{.spec.runnerScaleSetName}{" "}{.spec.runnerScaleSetLabels}{"\n"}'
+```
