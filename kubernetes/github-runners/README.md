@@ -5,6 +5,7 @@ This directory configures GitHub Actions Runner Controller (ARC) with Argo CD ap
 - `actions-runner-controller` (namespace: `arc-systems`)
 - `github-runners-portfolio` (namespace: `arc-runners`)
 - `github-runners-dotfiles` (namespace: `arc-runners`)
+- `github-runners-sumfeet` (namespace: `arc-runners`)
 
 ## 1. Create GitHub auth secret
 
@@ -12,13 +13,18 @@ The runner scale sets read the secret referenced by `githubConfigSecret` in:
 
 - `runner-scale-set-portfolio-values.yaml`
 - `runner-scale-set-dotfiles-values.yaml`
+- `runner-scale-set-sumfeet-values.yaml`
 
 The preferred path is Infisical. Store the rotated GitHub token in project
 `homelab`, env `prod`, path `/github-runners`:
 
 ```text
 github_token=<rotated-github-token>
+sumfleet_github_token=<sumfeet-github-token>
 ```
+
+The Sumfeet token is mapped to `github_token` in the dedicated Kubernetes
+Secret `arc-github-auth-sumfeet`.
 
 Create a Kubernetes Auth machine identity for:
 
@@ -61,6 +67,7 @@ Update `githubConfigUrl` in each values file for your desired scope:
 
 - `runner-scale-set-portfolio-values.yaml`
 - `runner-scale-set-dotfiles-values.yaml`
+- `runner-scale-set-sumfeet-values.yaml`
 - Repository: `https://github.com/<owner>/<repo>`
 - Organization: `https://github.com/<org>`
 - Enterprise: `https://github.com/enterprises/<enterprise>`
@@ -102,9 +109,11 @@ Recommended recovery order:
 1. Sync `actions-runner-controller-crds`
 2. Sync `actions-runner-controller`
 3. Restart controller pod in `arc-systems`
-4. Sync `github-runners-portfolio` and `github-runners-dotfiles`
+4. Sync `github-runners-portfolio`, `github-runners-dotfiles`, and
+   `github-runners-sumfeet`
 
 Use these labels in workflows:
 
 - `runs-on: arc-runner-set-portfolio` for `Tom-Mendy/Portfolio`
 - `runs-on: arc-runner-set-dotfiles` for `Tom-Mendy/dotfiles`
+- `runs-on: arc-runner-set-sumfeet` for `MrAmarok/sumfeet`

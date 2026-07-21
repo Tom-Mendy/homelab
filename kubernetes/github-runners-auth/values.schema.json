@@ -8,9 +8,10 @@
     "secret": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name"],
+      "required": ["name", "sumfeetName"],
       "properties": {
-        "name": { "type": "string", "minLength": 1 }
+        "name": { "type": "string", "minLength": 1 },
+        "sumfeetName": { "type": "string", "minLength": 1 }
       }
     },
     "infisicalSecret": {
