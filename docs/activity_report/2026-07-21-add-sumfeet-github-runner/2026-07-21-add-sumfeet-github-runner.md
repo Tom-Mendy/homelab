@@ -22,18 +22,21 @@ scale sets in `arc-runners`. The smallest compatible change was therefore to:
 3. Add one repository-scoped `gha-runner-scale-set` release.
 4. Let the existing recursive Argo CD root application discover the new
    application manifest.
+5. Use `self-hosted` as the scale set name because chart 0.13.1 uses that name
+   as the GitHub routing label and does not expose additional scale set labels.
 
 The new interfaces are:
 
 - Infisical input: `sumfleet_github_token`
 - Kubernetes Secret: `arc-github-auth-sumfeet`
 - Kubernetes Secret key: `github_token`
-- Workflow label: `arc-runner-set-sumfeet`
+- Workflow label: `self-hosted`
 - Argo CD application: `github-runners-sumfeet`
 
 The scale set follows the existing configuration: zero idle runners, up to five
 runners, Docker-in-Docker mode, the pinned runner image, and the shared
-controller service account. It creates no persistent volumes.
+controller service account. Its runner limit was adjusted to 4 CPU and 4 GiB
+while the change was being deployed. It creates no persistent volumes.
 
 ## Commands and results
 
@@ -113,7 +116,7 @@ The rendered `AutoscalingRunnerSet` contained:
 ```yaml
 githubConfigUrl: https://github.com/MrAmarok/sumfeet
 githubConfigSecret: arc-github-auth-sumfeet
-runnerScaleSetName: arc-runner-set-sumfeet
+runnerScaleSetName: self-hosted
 ```
 
 ### Kubernetes server dry-runs
@@ -131,6 +134,12 @@ infisicalstaticsecret.secrets.infisical.com/arc-github-auth configured (server d
 $ kubectl apply --dry-run=server \
     -f kubernetes/argocd/apps/github-runners-sumfeet.yaml
 application.argoproj.io/github-runners-sumfeet created (server dry run)
+
+$ kubectl apply --dry-run=server -f /tmp/sumfeet-runner-render.yaml
+serviceaccount/self-hosted-gha-rs-no-permission created (server dry run)
+role.rbac.authorization.k8s.io/self-hosted-gha-rs-manager created (server dry run)
+rolebinding.rbac.authorization.k8s.io/self-hosted-gha-rs-manager created (server dry run)
+autoscalingrunnerset.actions.github.com/self-hosted created (server dry run)
 ```
 
 <!-- rumdl-enable MD013 -->
@@ -181,16 +190,89 @@ These `NotFound` results are useful confirmation that no manual deployment
 bypassed GitOps. After the change reaches the tracked `main` branch, the root
 application will create and reconcile both resources.
 
+### Live reconciliation and label correction
+
+The first live reconciliation used the concurrently adjusted name
+`arc-runner-set-sumfeet-Tom`. Kubernetes rejected the uppercase character:
+
+<!-- rumdl-disable MD013 -->
+
+```console
+ServiceAccount "arc-runner-set-sumfeet-Tom-gha-rs-no-permission" is invalid:
+metadata.name: Invalid value: "arc-runner-set-sumfeet-Tom-gha-rs-no-permission":
+a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.'
+```
+
+<!-- rumdl-enable MD013 -->
+
+The name was first normalized to lowercase. The requested GitHub label was
+then set through the supported ARC 0.13.1 mechanism: the scale set itself was
+renamed `self-hosted`. Adding `runnerScaleSetLabels` was not used because that
+value is ignored by chart 0.13.1 and the installed CRD does not contain the
+corresponding spec field.
+
+Two RBAC resources from the rejected name were left in termination with the
+ARC cleanup finalizer. They were removed after verifying their exact names:
+
+<!-- rumdl-disable MD013 -->
+
+```console
+$ kubectl delete role arc-runner-set-sumfeet-Tom-gha-rs-manager \
+    -n arc-runners
+role.rbac.authorization.k8s.io "arc-runner-set-sumfeet-Tom-gha-rs-manager" deleted
+
+$ kubectl delete rolebinding arc-runner-set-sumfeet-Tom-gha-rs-manager \
+    -n arc-runners
+rolebinding.rbac.authorization.k8s.io "arc-runner-set-sumfeet-Tom-gha-rs-manager" deleted
+
+$ kubectl patch role arc-runner-set-sumfeet-Tom-gha-rs-manager \
+    -n arc-runners --type=merge -p '{"metadata":{"finalizers":[]}}'
+role.rbac.authorization.k8s.io/arc-runner-set-sumfeet-Tom-gha-rs-manager patched
+
+$ kubectl patch rolebinding arc-runner-set-sumfeet-Tom-gha-rs-manager \
+    -n arc-runners --type=merge -p '{"metadata":{"finalizers":[]}}'
+rolebinding.rbac.authorization.k8s.io/arc-runner-set-sumfeet-Tom-gha-rs-manager patched
+```
+
+<!-- rumdl-enable MD013 -->
+
+The final Argo CD and ARC state is healthy:
+
+<!-- rumdl-disable MD013 -->
+
+```console
+$ kubectl get application github-runners-sumfeet -n argocd
+github-runners-sumfeet   Synced   Healthy   Succeeded
+
+$ kubectl get autoscalingrunnerset self-hosted -n arc-runners
+self-hosted   0   5   https://github.com/MrAmarok/sumfeet   arc-github-auth-sumfeet
+
+$ kubectl get autoscalinglisteners -A
+arc-systems   self-hosted-fc6cdddb-listener   self-hosted
+
+$ kubectl get pods -n arc-runners
+self-hosted-k7pxr-runner-csgxw   Running   true
+self-hosted-k7pxr-runner-llzv6   Running   true
+
+$ kubectl get secret arc-github-auth-sumfeet -n arc-runners \
+    -o go-template='{{range $k,$v := .data}}{{$k}{{"\\n"}}{{end}}'
+github_token
+
+$ kubectl get infisicalstaticsecret arc-github-auth -n arc-runners
+LastReconcileStatus=True   Reconciliation successful
+```
+
+<!-- rumdl-enable MD013 -->
+
 ## Final outcome
 
-The GitOps manifests now define a dedicated Sumfeet runner scale set and a
-dedicated Kubernetes auth Secret populated from `sumfleet_github_token`. Helm
-rendering, Kubernetes server validation, the storage policy, schema parsing,
-and whitespace checks pass.
+The dedicated Sumfeet runner scale set and Kubernetes auth Secret are deployed
+and healthy. The Secret is populated from `sumfleet_github_token` and exposes
+only `github_token`. Helm rendering, Kubernetes server validation, the storage
+policy, schema parsing, and whitespace checks pass.
 
-Deployment remains pending the normal commit, push, and Argo CD reconciliation.
-Once reconciled, workflows in `MrAmarok/sumfeet` can select the runners with:
+Workflows in `MrAmarok/sumfeet` can select the runners with:
 
 ```yaml
-runs-on: arc-runner-set-sumfeet
+runs-on: self-hosted
 ```
