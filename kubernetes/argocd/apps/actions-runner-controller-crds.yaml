@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/actions/actions-runner-controller.git
-    targetRevision: master
+    targetRevision: gha-runner-scale-set-0.14.2
     path: charts/gha-runner-scale-set-controller/crds
   destination:
     server: https://kubernetes.default.svc
