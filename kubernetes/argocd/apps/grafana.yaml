@@ -24,9 +24,17 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: grafana
+  ignoreDifferences:
+    - group: ""
+      kind: PersistentVolumeClaim
+      name: grafana
+      namespace: grafana
+      jsonPointers:
+        - /spec/volumeName
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true

@@ -186,6 +186,20 @@ Node Exporter dashboard pattern: a datasource variable selects the existing
 Prometheus datasource by type, and panels reference `${DS_PROMETHEUS}`. This
 preserves the datasource stored in Grafana and avoids a database migration.
 
+The recovery rollout created `grafana-7b45cf956d-vkgjv`, which became `1/1
+Running`. During the same sync, Argo CD tried to remove the bound PVC's
+server-assigned `spec.volumeName` and Kubernetes rejected the immutable-field
+patch:
+
+```text
+PersistentVolumeClaim "grafana" is invalid: spec: Forbidden:
+spec is immutable after creation
+```
+
+The application now ignores only `/spec/volumeName` for the `grafana` PVC and
+uses `RespectIgnoreDifferences=true`. This preserves the bound `nfs-k8s` volume
+and prevents future syncs from attempting to clear its server-assigned name.
+
 ## Universal Filtering
 
 The strict policy does not depend on client discovery:
