@@ -10,3 +10,4 @@ binaryData:
   node-exporter.json: {{ .Files.Get "dashboards/node-exporter.json" | b64enc | quote }}
   argocd.json: {{ .Files.Get "dashboards/argocd.json" | b64enc | quote }}
   blocky.json: {{ .Files.Get "dashboards/blocky.json" | b64enc | quote }}
+  kubernetes.json: {{ .Files.Get "dashboards/kubernetes.json" | b64enc | quote }}
