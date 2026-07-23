@@ -200,6 +200,44 @@ The application now ignores only `/spec/volumeName` for the `grafana` PVC and
 uses `RespectIgnoreDifferences=true`. This preserves the bound `nfs-k8s` volume
 and prevents future syncs from attempting to clear its server-assigned name.
 
+The datasource recovery was pushed as commit `f1654b4`. The PVC drift rule was
+pushed as `741b0c2`. The failed operation had captured the previous sync
+options, so it was terminated before starting a fresh reconciliation:
+
+```sh
+kubectl -n argocd patch application grafana \
+  --type merge -p '{"operation":null}'
+kubectl -n argocd annotate application grafana \
+  argocd.argoproj.io/refresh=hard --overwrite
+```
+
+The new operation completed successfully:
+
+```text
+sync: Synced
+health: Healthy
+phase: Succeeded
+message: successfully synced (all tasks run)
+pod: grafana-775d6bffc6-fhtgt  1/1  Running  0 restarts
+```
+
+Grafana logs showed dashboard provisioning completed and the HTTP server
+listening on port `3000`. The mounted dashboard contained UID `blocky-dns`,
+the live datasource configuration no longer contained `uid: prometheus`, and
+the public health endpoint returned:
+
+```json
+{
+  "database": "ok",
+  "version": "13.0.1+security-01",
+  "commit": "9bbe672d"
+}
+```
+
+The log also contained a non-fatal background update error for the bundled
+Elasticsearch plugin because that image directory is read-only. Grafana
+remained ready and healthy; this was unrelated to datasource provisioning.
+
 ## Universal Filtering
 
 The strict policy does not depend on client discovery:
