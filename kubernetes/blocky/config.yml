@@ -1,10 +1,12 @@
-upstream:
-  default:
-    - 9.9.9.9
-    - 1.1.1.2
-    - 1.1.1.1
-    - 8.8.8.8
-    - 192.168.1.254
+upstreams:
+  groups:
+    default:
+      - 9.9.9.9
+      - 1.1.1.2
+      - 1.1.1.1
+      - 8.8.8.8
+      - 10.0.0.1
+      - 192.168.1.254
 customDNS:
   mapping:
     prowlarr.home.tom-mendy.com: 10.0.0.60
@@ -31,8 +33,16 @@ customDNS:
     atuin.home.tom-mendy.com: 10.0.0.60
     infisical.home.tom-mendy.com: 10.0.0.60
     authentik.home.tom-mendy.com: 10.0.0.60
+blocking:
+  denylists:
+    strict:
+      - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro-onlydomains.txt
+  clientGroupsBlock:
+    default:
+      - strict
 prometheus:
   enable: true
   path: /metrics
-port: 53
-httpPort: 4000
+ports:
+  dns: 53
+  http: 4000
