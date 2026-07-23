@@ -11,3 +11,4 @@ binaryData:
   argocd.json: {{ .Files.Get "dashboards/argocd.json" | b64enc | quote }}
   blocky.json: {{ .Files.Get "dashboards/blocky.json" | b64enc | quote }}
   kubernetes.json: {{ .Files.Get "dashboards/kubernetes.json" | b64enc | quote }}
+  traefik.json: {{ .Files.Get "dashboards/traefik.json" | b64enc | quote }}
