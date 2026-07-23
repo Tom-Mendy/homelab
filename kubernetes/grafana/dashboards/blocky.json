@@ -111,7 +111,7 @@
       "title": "Blocking",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 4,
@@ -179,7 +179,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "min(blocky_blocking_enabled{job=~\"$job\", instance=~\"$instance\"})",
@@ -196,7 +196,7 @@
       "title": "Query rate",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 4,
@@ -245,7 +245,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(rate(blocky_query_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
@@ -262,7 +262,7 @@
       "title": "Blocked",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 4,
@@ -311,7 +311,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(increase(blocky_response_total{response_type=\"BLOCKED\", job=~\"$job\", instance=~\"$instance\"}[$__range])) / sum(increase(blocky_query_total{job=~\"$job\", instance=~\"$instance\"}[$__range]))",
@@ -328,7 +328,7 @@
       "title": "p95 latency",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 4,
@@ -384,7 +384,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.95, sum by (le) (rate(blocky_request_duration_seconds_bucket{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])))",
@@ -401,7 +401,7 @@
       "title": "Cache hit ratio",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 4,
@@ -458,7 +458,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(rate(blocky_cache_hits_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) / (sum(rate(blocky_cache_hits_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) + sum(rate(blocky_cache_misses_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])))",
@@ -475,7 +475,7 @@
       "title": "Errors",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 4,
@@ -532,7 +532,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(increase(blocky_error_total{job=~\"$job\", instance=~\"$instance\"}[$__range]))",
@@ -549,7 +549,7 @@
       "title": "Version",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 4,
@@ -597,7 +597,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "blocky_build_info{job=~\"$job\", instance=~\"$instance\"}",
@@ -614,7 +614,7 @@
       "title": "Uptime",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 4,
@@ -663,7 +663,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "time() - max(process_start_time_seconds{job=~\"$job\", instance=~\"$instance\"})",
@@ -680,7 +680,7 @@
       "title": "Denylist entries",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 4,
@@ -728,7 +728,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(blocky_denylist_cache_entries{job=~\"$job\", instance=~\"$instance\"})",
@@ -745,7 +745,7 @@
       "title": "Last list refresh",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 4,
@@ -801,7 +801,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "time() - max(blocky_last_list_group_refresh_timestamp_seconds{job=~\"$job\", instance=~\"$instance\"})",
@@ -818,7 +818,7 @@
       "title": "Cache entries",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 4,
@@ -866,7 +866,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(blocky_cache_entries{job=~\"$job\", instance=~\"$instance\"})",
@@ -883,7 +883,7 @@
       "title": "Failed list downloads",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 4,
@@ -940,7 +940,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(increase(blocky_failed_downloads_total{job=~\"$job\", instance=~\"$instance\"}[$__range])) or vector(0)",
@@ -1157,7 +1157,7 @@
       "title": "Queries by outcome",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 9,
@@ -1359,7 +1359,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum by (response_type) (rate(blocky_response_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
@@ -1377,7 +1377,7 @@
       "title": "Query rate by client (top 10)",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 9,
@@ -1458,7 +1458,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "topk(10, sum by (client) (rate(blocky_query_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])))",
@@ -1476,7 +1476,7 @@
       "title": "Top clients",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 9,
@@ -1531,7 +1531,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "topk(10, sum by (client) (ceil(increase(blocky_query_total{job=~\"$job\", instance=~\"$instance\"}[$__range]))))",
@@ -1549,7 +1549,7 @@
       "title": "Query types",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 8,
@@ -1604,7 +1604,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum by (type) (ceil(increase(blocky_query_total{job=~\"$job\", instance=~\"$instance\"}[$__range])))",
@@ -1622,7 +1622,7 @@
       "title": "Response codes",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 8,
@@ -1677,7 +1677,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum by (response_code) (ceil(increase(blocky_response_total{job=~\"$job\", instance=~\"$instance\"}[$__range])))",
@@ -1695,7 +1695,7 @@
       "title": "Response reasons",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 8,
@@ -1750,7 +1750,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum by (reason) (ceil(increase(blocky_response_total{job=~\"$job\", instance=~\"$instance\"}[$__range])))",
@@ -1781,7 +1781,7 @@
       "title": "Request duration percentiles",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 9,
@@ -1908,7 +1908,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.50, sum by (le) (rate(blocky_request_duration_seconds_bucket{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])))",
@@ -1920,7 +1920,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.90, sum by (le) (rate(blocky_request_duration_seconds_bucket{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])))",
@@ -1932,7 +1932,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.99, sum by (le) (rate(blocky_request_duration_seconds_bucket{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])))",
@@ -1950,7 +1950,7 @@
       "title": "Request duration heatmap",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 9,
@@ -2012,7 +2012,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum by (le) (increase(blocky_request_duration_seconds_bucket{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
@@ -2032,7 +2032,7 @@
       "title": "p95 duration by outcome",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 8,
@@ -2234,7 +2234,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.95, sum by (le, response_type) (rate(blocky_request_duration_seconds_bucket{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])))",
@@ -2265,7 +2265,7 @@
       "title": "Blocking active",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 3,
@@ -2341,7 +2341,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "min(blocky_blocking_enabled{job=~\"$job\", instance=~\"$instance\"})",
@@ -2359,7 +2359,7 @@
       "title": "Blocked queries",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 8,
@@ -2487,7 +2487,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(rate(blocky_response_total{response_type=\"BLOCKED\", job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
@@ -2499,7 +2499,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(rate(blocky_response_total{response_type=\"BLOCKED\", job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) / sum(rate(blocky_query_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
@@ -2517,7 +2517,7 @@
       "title": "Top block reasons",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 8,
@@ -2572,7 +2572,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "topk(10, sum by (reason) (ceil(increase(blocky_response_total{response_type=\"BLOCKED\", job=~\"$job\", instance=~\"$instance\"}[$__range]))))",
@@ -2590,7 +2590,7 @@
       "title": "Denylist entries by group",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 7,
@@ -2645,7 +2645,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum by (group) (blocky_denylist_cache_entries{job=~\"$job\", instance=~\"$instance\"})",
@@ -2662,7 +2662,7 @@
       "title": "Allowlist entries by group",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 7,
@@ -2717,7 +2717,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum by (group) (blocky_allowlist_cache_entries{job=~\"$job\", instance=~\"$instance\"})",
@@ -2734,7 +2734,7 @@
       "title": "Failed list downloads",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 7,
@@ -2829,7 +2829,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(increase(blocky_failed_downloads_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
@@ -2860,7 +2860,7 @@
       "title": "Cache hit ratio",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 8,
@@ -2959,7 +2959,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(rate(blocky_cache_hits_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) / (sum(rate(blocky_cache_hits_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) + sum(rate(blocky_cache_misses_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])))",
@@ -2976,7 +2976,7 @@
       "title": "Cache size",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 8,
@@ -3057,7 +3057,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(blocky_cache_entries{job=~\"$job\", instance=~\"$instance\"})",
@@ -3069,7 +3069,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(blocky_prefetch_domain_name_cache_entries{job=~\"$job\", instance=~\"$instance\"})",
@@ -3087,7 +3087,7 @@
       "title": "Prefetch activity",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 8,
@@ -3168,7 +3168,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(rate(blocky_prefetches_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
@@ -3180,7 +3180,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(rate(blocky_prefetch_hits_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
@@ -3198,7 +3198,7 @@
       "title": "Redis buffer drops",
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "h": 8,
@@ -3295,7 +3295,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(rate(blocky_redis_cache_buffer_drops_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
@@ -3325,7 +3325,7 @@
           "title": "Validations by result",
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "gridPos": {
             "h": 8,
@@ -3467,7 +3467,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "prometheus"
+                "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
               "expr": "sum by (result) (rate(blocky_dnssec_validation_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
@@ -3485,7 +3485,7 @@
           "title": "Validation p95 duration",
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "gridPos": {
             "h": 8,
@@ -3566,7 +3566,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "prometheus"
+                "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
               "expr": "histogram_quantile(0.95, sum by (le, result) (rate(blocky_dnssec_validation_duration_seconds_bucket{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])))",
@@ -3583,7 +3583,7 @@
           "title": "Validation cache hits",
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "gridPos": {
             "h": 8,
@@ -3664,7 +3664,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "prometheus"
+                "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
               "expr": "sum(rate(blocky_dnssec_cache_hits_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
@@ -3695,7 +3695,7 @@
           "title": "Dropped queries by protocol",
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "gridPos": {
             "h": 8,
@@ -3776,7 +3776,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "prometheus"
+                "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
               "expr": "sum by (protocol) (rate(blocky_rate_limit_drops_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
@@ -3794,7 +3794,7 @@
           "title": "Active buckets",
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "gridPos": {
             "h": 8,
@@ -3875,7 +3875,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "prometheus"
+                "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
               "expr": "sum(blocky_rate_limit_active_buckets{job=~\"$job\", instance=~\"$instance\"})",
@@ -3893,7 +3893,7 @@
           "title": "Bucket store cap exhausted",
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "gridPos": {
             "h": 8,
@@ -3990,7 +3990,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "prometheus"
+                "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
               "expr": "sum(rate(blocky_rate_limit_cap_exhausted_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
@@ -4022,7 +4022,7 @@
           "title": "Memory",
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "gridPos": {
             "h": 8,
@@ -4103,7 +4103,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "prometheus"
+                "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
               "expr": "sum(go_memstats_alloc_bytes{job=~\"$job\", instance=~\"$instance\"})",
@@ -4115,7 +4115,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "prometheus"
+                "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
               "expr": "sum(go_memstats_sys_bytes{job=~\"$job\", instance=~\"$instance\"})",
@@ -4127,7 +4127,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "prometheus"
+                "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
               "expr": "sum(process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\"})",
@@ -4144,7 +4144,7 @@
           "title": "Goroutines",
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "gridPos": {
             "h": 8,
@@ -4225,7 +4225,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "prometheus"
+                "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
               "expr": "sum(go_goroutines{job=~\"$job\", instance=~\"$instance\"})",
@@ -4242,7 +4242,7 @@
           "title": "CPU usage",
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "gridPos": {
             "h": 8,
@@ -4323,7 +4323,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "prometheus"
+                "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
               "expr": "sum(rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]))",
@@ -4348,6 +4348,17 @@
   "templating": {
     "list": [
       {
+        "current": {},
+        "includeAll": false,
+        "label": "Datasource",
+        "name": "DS_PROMETHEUS",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
         "hide": 2,
         "label": "blocky API URL",
         "name": "blocky_url",
@@ -4371,7 +4382,7 @@
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "prometheus"
+          "uid": "${DS_PROMETHEUS}"
         },
         "definition": "label_values(blocky_build_info, job)",
         "includeAll": true,
@@ -4393,7 +4404,7 @@
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "prometheus"
+          "uid": "${DS_PROMETHEUS}"
         },
         "definition": "label_values(blocky_build_info{job=~\"$job\"}, instance)",
         "includeAll": true,
