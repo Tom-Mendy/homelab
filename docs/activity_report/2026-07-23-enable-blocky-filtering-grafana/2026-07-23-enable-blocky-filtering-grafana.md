@@ -24,8 +24,8 @@ The smallest complete change was therefore to:
 2. Configure HaGeZi Multi PRO as the strict policy for every client.
 3. Add an HTTPS ingress for the API already exposed by Blocky's service.
 4. Replace the unused MySQL dashboard with the official Prometheus dashboard.
-5. Give the provisioned Prometheus datasource a stable UID and embed that UID
-   in the dashboard.
+5. Resolve the existing Prometheus datasource through a Grafana dashboard
+   variable.
 
 The single `strict` group uses HaGeZi Multi PRO as a standalone list.
 `clientGroupsBlock.default` applies it to every client, so client names, PTR
@@ -152,9 +152,39 @@ rg -n '\$\{DS_PROMETHEUS\}|VAR_BLOCKY_URL|http://blocky:4000|DS_MYSQL' \
   kubernetes/grafana/dashboards/blocky.json
 ```
 
-The UID check passed and the placeholder search returned no matches. All
-Prometheus panels use datasource UID `prometheus`, and the hidden API variable
+The UID check passed. All Prometheus panels resolve the existing datasource
+through the `DS_PROMETHEUS` dashboard variable, and the hidden API variable
 contains `https://blocky.home.tom-mendy.com`.
+
+## Grafana Datasource Provisioning Recovery
+
+The first deployment attempted to assign the existing Prometheus datasource a
+new fixed UID:
+
+```yaml
+name: Prometheus
+uid: prometheus
+```
+
+Grafana stores the datasource created by the previous configuration in its
+persistent SQLite database with an automatically generated UID. Provisioning
+could not change that identity in place, so the new Grafana pod exited during
+startup:
+
+```sh
+kubectl -n grafana logs grafana-68b495599-ftlf5 --previous
+```
+
+```text
+Failed to provision data sources
+Datasource provisioning error: data source not found
+invalid service state: Failed
+```
+
+The fixed UID was removed. The Blocky dashboard now follows the already-working
+Node Exporter dashboard pattern: a datasource variable selects the existing
+Prometheus datasource by type, and panels reference `${DS_PROMETHEUS}`. This
+preserves the datasource stored in Grafana and avoids a database migration.
 
 ## Universal Filtering
 
@@ -218,7 +248,7 @@ The repository now contains:
 - No hostname lookup or per-device mappings.
 - A TLS ingress for `blocky.home.tom-mendy.com`.
 - The official Blocky Prometheus dashboard with HTTPS control buttons.
-- A stable `prometheus` Grafana datasource UID.
+- Dynamic selection of the existing Prometheus datasource.
 - Provisioning of `blocky.json` through the existing dashboard ConfigMap.
 
 The live cluster was not mutated manually because Argo CD owns these resources
