@@ -1,6 +1,6 @@
 apiVersion: v2
 name: media-local
-description: Local Helm chart for ARR stack with ProtonVPN sidecars and NAS NFS storage
+description: Local Helm chart for ARR stack with VPN sidecars and NAS NFS storage
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
