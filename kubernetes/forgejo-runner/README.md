@@ -16,8 +16,9 @@ sets both `runner.envs.DOCKER_HOST` and `container.docker_host` to that daemon.
 Job containers receive `DOCKER_HOST=tcp://dind.docker.internal:2375`, with
 `container.options` mapping that name to Docker's host gateway.
 
-The runner process uses `forgejo-runner daemon` so the Deployment keeps one
-ready runner pod instead of treating normal one-job exits as CrashLoopBackOff.
+The runner process runs `forgejo-runner one-job --wait` in a container-local
+loop. Each completed job gets a fresh poller without restarting the pod; failed
+polls retry after five seconds instead of entering a tight loop.
 
 ## Secret
 
