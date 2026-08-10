@@ -58,10 +58,15 @@
     "ingress": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["enabled", "host", "className", "annotations"],
+      "required": ["enabled", "host", "aliases", "className", "annotations"],
       "properties": {
         "enabled": { "type": "boolean" },
         "host": { "type": "string", "minLength": 1 },
+        "aliases": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
         "className": { "type": "string" },
         "annotations": { "type": "object", "additionalProperties": { "type": "string" } }
       }

@@ -1,7 +1,7 @@
 namespace: endfield
 
 image:
-  repository: forgejo.home.tom-mendy.com/tom-mendy/endfield-checkin
+  repository: forgejo.tom-mendy.com/tom-mendy/endfield-checkin
   tag: latest
   pullPolicy: IfNotPresent
   pullSecrets:
@@ -10,7 +10,7 @@ image:
 registryAuth:
   createSecret: false
   secretName: forgejo-registry-creds
-  server: forgejo.home.tom-mendy.com
+  server: forgejo.tom-mendy.com
   username: ""
   password: ""
 
