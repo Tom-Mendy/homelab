@@ -1,6 +1,0 @@
-- name: Deploy Navidrome local Helm chart
-  kubernetes.core.helm:
-    name: navidrome-local
-    chart_ref: "{{ playbook_dir + '/../../kubernetes/navidrome' }}"
-    release_namespace: navidrome
-    create_namespace: true

@@ -1,6 +1,0 @@
-- name: Deploy Homepage local Helm chart
-  kubernetes.core.helm:
-    name: homepage-local
-    chart_ref: "{{ playbook_dir + '/../../kubernetes/homepage' }}"
-    release_namespace: homepage
-    create_namespace: true

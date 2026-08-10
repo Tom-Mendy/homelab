@@ -1,8 +1,0 @@
-- name: Load Argo CD root application manifest
-  ansible.builtin.set_fact:
-    argocd_root_application: "{{ lookup('template', 'argocd-root-application.yaml.j2') | from_yaml }}"
-
-- name: Apply Argo CD root application
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ argocd_root_application }}"
