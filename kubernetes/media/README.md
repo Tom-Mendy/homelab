@@ -5,7 +5,7 @@ by the other charts in `kubernetes/`.
 
 ## Included apps
 
-- `qBittorrent` (+ `Gluetun` sidecar)
+- `qBittorrent` (+ `NymVPN` sidecar)
 - `NZBGet` (+ `Gluetun` sidecar)
 - `Prowlarr`
 - `Sonarr`
@@ -13,7 +13,9 @@ by the other charts in `kubernetes/`.
 - `Bazarr`
 - `Autobrr`
 
-Only downloader apps are VPN-routed, ARR apps stay outside VPN.
+Only downloader apps are VPN-routed, ARR apps stay outside VPN. During the
+NymVPN pilot, qBittorrent uses NymVPN while NZBGet keeps ProtonVPN as its
+rollback path.
 
 ## Storage (NFS / NAS)
 
@@ -29,7 +31,31 @@ Container identity defaults:
 - `PUID=1023`
 - `PGID=100`
 
-## ProtonVPN credentials
+## NymVPN pilot
+
+The NymVPN sidecar image is built by `.forgejo/workflows/nymvpn-sidecar.yml`
+and published as:
+
+```text
+forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.10.0-1
+```
+
+Configure these secrets in Infisical project `homelab`, environment `prod`,
+path `/media`:
+
+- `NYM_ACCESS_CODE`: the 24-word NymVPN access code.
+
+The access code is mounted as a read-only file. NymVPN configuration and device
+state are stored on `qbittorrent-nymvpn-pvc` with storage class `nfs-k8s`.
+The pod uses the NymVPN DNS resolver on `127.0.0.1` and does not start
+qBittorrent until the VPN startup probe succeeds.
+
+Before publishing the image, add the repository action secret
+`REGISTRY_TOKEN`. It must be a Forgejo personal access token allowed to write
+packages. The package is publicly pullable, so Kubernetes needs no registry
+credential.
+
+## ProtonVPN rollback credentials
 
 For WireGuard, configure in `values.yaml`:
 
@@ -44,6 +70,8 @@ If you use OpenVPN instead, configure:
 For safer handling, set `vpn.createSecret=false` and provide a pre-created
 secret named by `vpn.secretName`. In this repository, Infisical creates
 `protonvpn-credentials` from project `homelab`, env `prod`, path `/media`.
+Keep it until the qBittorrent pilot has run successfully for 48 hours and
+NZBGet has also migrated to NymVPN.
 
 ## Local Helm test (optional)
 

@@ -1,4 +1,22 @@
 {{- $app := .Values.apps.qbittorrent }}
+{{- $vpnProvider := default "protonvpn" $app.vpnProvider }}
+{{- if and .Values.vpn.enabled $app.vpn (eq $vpnProvider "nymvpn") }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qbittorrent-nymvpn-pvc
+  namespace: {{ .Values.namespace }}
+  annotations:
+    helm.sh/resource-policy: keep
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.nymVpn.stateStorage.size }}
+  storageClassName: {{ .Values.nymVpn.stateStorage.className }}
+---
+{{- end }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -29,8 +47,61 @@ spec:
       labels:
         app: qbittorrent
     spec:
+      {{- if and .Values.vpn.enabled $app.vpn (eq $vpnProvider "nymvpn") }}
+      dnsPolicy: None
+      dnsConfig:
+        nameservers:
+          - 127.0.0.1
+      initContainers:
+        - name: nymvpn-state-init
+          image: {{ .Values.nymVpn.image | quote }}
+          imagePullPolicy: {{ .Values.nymVpn.pullPolicy }}
+          command: ["/bin/sh", "-c", "mkdir -p /nym/config /nym/state"]
+          volumeMounts:
+            - name: nymvpn-state
+              mountPath: /nym
+        - name: nymvpn
+          image: {{ .Values.nymVpn.image | quote }}
+          imagePullPolicy: {{ .Values.nymVpn.pullPolicy }}
+          restartPolicy: Always
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          env:
+            - name: NYMVPN_ENTRY_COUNTRY
+              value: {{ .Values.nymVpn.entryCountry | quote }}
+            - name: NYMVPN_EXIT_COUNTRY
+              value: {{ .Values.nymVpn.exitCountry | quote }}
+          startupProbe:
+            exec:
+              command: ["/usr/local/bin/nymvpn-entrypoint", "check"]
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            exec:
+              command: ["/usr/local/bin/nymvpn-entrypoint", "check"]
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["/usr/local/bin/nymvpn-entrypoint", "check"]
+            failureThreshold: 3
+            periodSeconds: 20
+          volumeMounts:
+            - name: tun
+              mountPath: /dev/net/tun
+            - name: nymvpn-state
+              mountPath: /etc/nym
+              subPath: config
+            - name: nymvpn-state
+              mountPath: /var/lib/nym-vpnd
+              subPath: state
+            - name: nymvpn-access-code
+              mountPath: /run/secrets/nymvpn
+              readOnly: true
+      {{- end }}
       containers:
-        {{- if and .Values.vpn.enabled $app.vpn }}
+        {{- if and .Values.vpn.enabled $app.vpn (eq $vpnProvider "protonvpn") }}
         - name: gluetun
           image: qmcgaw/gluetun:v3.41.1@sha256:1a5bf4b4820a879cdf8d93d7ef0d2d963af56670c9ebff8981860b6804ebc8ab
           securityContext:
@@ -104,11 +175,23 @@ spec:
           persistentVolumeClaim:
             claimName: media-downloads-pvc
         {{- end }}
-        {{- if and .Values.vpn.enabled $app.vpn }}
+        {{- if and .Values.vpn.enabled $app.vpn (ne $vpnProvider "none") }}
         - name: tun
           hostPath:
             path: /dev/net/tun
             type: CharDevice
+        {{- end }}
+        {{- if and .Values.vpn.enabled $app.vpn (eq $vpnProvider "nymvpn") }}
+        - name: nymvpn-state
+          persistentVolumeClaim:
+            claimName: qbittorrent-nymvpn-pvc
+        - name: nymvpn-access-code
+          secret:
+            secretName: {{ .Values.nymVpn.secretName }}
+            defaultMode: 0400
+            items:
+              - key: NYM_ACCESS_CODE
+                path: access-code
         {{- end }}
 ---
 apiVersion: v1
