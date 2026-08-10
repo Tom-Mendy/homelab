@@ -79,5 +79,5 @@ NZBGet has also migrated to NymVPN.
 helm template media ./kubernetes/media
 ```
 
-Argo CD app `kubernetes/argocd/apps/media.yaml` points to this
-chart path and will sync it automatically.
+Flux HelmRelease `media` points to this chart path and reconciles it
+automatically.

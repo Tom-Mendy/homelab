@@ -101,7 +101,7 @@ admin accounts exist.
 ## Validation Commands
 
 ```sh
-kubectl get applications -n argocd authentik infisical infisical-operator
+kubectl get helmreleases -n flux-system authentik infisical infisical-operator
 kubectl get svc -n authentik authentik-server
 kubectl get pods -n authentik
 kubectl get pods -n infisical

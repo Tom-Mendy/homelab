@@ -34,10 +34,10 @@ customDNS:
     forgejo.tom-mendy.com: 10.0.0.60
     forgejo.home.tom-mendy.com: 10.0.0.60
     grafana.home.tom-mendy.com: 10.0.0.60
-    argocd.home.tom-mendy.com: 10.0.0.60
     atuin.home.tom-mendy.com: 10.0.0.60
     infisical.home.tom-mendy.com: 10.0.0.60
     authentik.home.tom-mendy.com: 10.0.0.60
+    flux.home.tom-mendy.com: 10.0.0.60
 blocking:
   denylists:
     strict:

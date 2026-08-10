@@ -1,7 +1,7 @@
 # GitHub Actions Runners (ARC)
 
 This directory configures GitHub Actions Runner Controller (ARC) 0.14.2 with
-Argo CD apps:
+Flux HelmReleases:
 
 - `actions-runner-controller` (namespace: `arc-systems`)
 - `github-runners-portfolio` (namespace: `arc-runners`)
@@ -64,26 +64,21 @@ kubectl create secret generic arc-github-auth \
 
 ## 2. Confirm target URL
 
-Update `githubConfigUrl` in each values file for your desired scope:
+Update `githubConfigUrl` in each runner scale-set values file for your desired
+scope:
 
-- `portfolio/values.yaml`
-- `dotfiles/values.yaml`
-- `sumfeet/values.yaml`
 - Repository: `https://github.com/<owner>/<repo>`
 - Organization: `https://github.com/<org>`
 - Enterprise: `https://github.com/enterprises/<enterprise>`
 
 ## 3. Deploy via existing GitOps flow
 
-```bash
-cd ansible
-./run.sh playbooks/deploy-apps.yml
-```
+Push the values change and reconcile the corresponding Flux HelmRelease.
 
 ## 4. Validate
 
 ```bash
-kubectl --kubeconfig "$HOME/.kube/config-homelab" get applications -n argocd
+kubectl --kubeconfig "$HOME/.kube/config-homelab" get helmreleases -n flux-system
 kubectl --kubeconfig "$HOME/.kube/config-homelab" get pods -n arc-systems
 kubectl --kubeconfig "$HOME/.kube/config-homelab" get pods -n arc-runners
 ```
@@ -102,15 +97,14 @@ Expected CRDs include:
 - `ephemeralrunners.actions.github.com`
 - `ephemeralrunnersets.actions.github.com`
 
-If missing, force re-sync `actions-runner-controller` in Argo CD and
+If missing, reconcile the `arc-controller` Flux HelmRelease and
 restart the controller pod.
 
 Recommended recovery order:
 
-1. Sync `actions-runner-controller-crds`
-2. Sync `actions-runner-controller`
-3. Restart controller pod in `arc-systems`
-4. Sync `github-runners-portfolio`, `github-runners-dotfiles`, and
+1. Reconcile `arc-controller`, which installs the ARC CRDs and controller.
+2. Restart the controller pod in `arc-systems` if CRD discovery was stale.
+3. Reconcile `github-runners-portfolio`, `github-runners-dotfiles`, and
    `github-runners-sumfeet`
 
 Use these labels in workflows:

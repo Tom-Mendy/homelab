@@ -1,0 +1,16 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: FluxInstance
+metadata:
+  name: flux
+  namespace: flux-system
+spec:
+  distribution:
+    version: 2.9.x
+    registry: ghcr.io/fluxcd
+  sync:
+    kind: GitRepository
+    url: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
+    ref: refs/heads/main
+    path: kubernetes/flux/cluster
+    pullSecret: flux-system
+

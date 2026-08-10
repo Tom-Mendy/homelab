@@ -1,11 +1,11 @@
 # Backup Procedures
 
-This document defines practical backup steps for this homelabrepository
+This document defines practical backup steps for this homelab repository
 and cluster workloads.
 
 ## Scope
 
-- Git repository content (`ansible/`, `kubernetes/`, `docs/`)
+- Git repository content (`kubernetes/`, `docs/`, `scripts/`)
 - Kubernetes manifests as deployed state (export)
 - Persistent data for stateful apps
 
@@ -41,7 +41,7 @@ Optional archive export:
 ```bash
 mkdir -p backups
 tar -czf backups/homelab-$(date +%F).tar.gz \
- ansible kubernetes docs README.md
+ kubernetes docs scripts README.md
 ```
 
 ## 2) Kubernetes resource export
@@ -52,7 +52,7 @@ Use this to capture current cluster object state (useful before upgrades).
 mkdir -p backups/k8s-$(date +%F)
 kubectl get ns -o yaml > backups/k8s-$(date +%F)/namespaces.yaml
 
-for ns in argocd traefik blocky homepage keel prometheus grafana \
+for ns in flux-system traefik blocky homepage keel prometheus grafana \
   navidrome vaultwarden forgejo default; do
  kubectl get all,cm,secret,ing,pvc -n "$ns" -o yaml \
   > backups/k8s-$(date +%F)/${ns}.yaml || true
@@ -83,7 +83,7 @@ Recommended approach:
 
 ## 4) Pre-maintenance backup checklist
 
-Before running `ansible/playbooks/update.yml`, `deploy-apps.yml`, or `reset.yml`:
+Before a cluster upgrade, GitOps migration, or destructive maintenance:
 
 1. Push all pending Git changes.
 2. Export Kubernetes resources.
