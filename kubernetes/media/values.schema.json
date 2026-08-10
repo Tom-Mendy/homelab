@@ -41,13 +41,14 @@
     "nymVpn": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["image", "pullPolicy", "secretName", "entryCountry", "exitCountry", "stateStorage"],
+      "required": ["image", "pullPolicy", "secretName", "entryCountry", "exitCountry", "podCidr", "stateStorage"],
       "properties": {
         "image": { "type": "string", "minLength": 1 },
         "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] },
         "secretName": { "type": "string", "minLength": 1 },
         "entryCountry": { "type": "string", "pattern": "^[A-Z]{2}$" },
         "exitCountry": { "type": "string", "pattern": "^[A-Z]{2}$" },
+        "podCidr": { "type": "string", "pattern": "^[0-9.]+/[0-9]+$" },
         "stateStorage": {
           "type": "object",
           "additionalProperties": false,
