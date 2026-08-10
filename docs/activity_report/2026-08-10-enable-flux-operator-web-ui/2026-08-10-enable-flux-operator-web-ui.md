@@ -86,3 +86,29 @@ login to Authentik. Blocky and Homepage include the new endpoint. The Authentik
 provider, groups, and client secret must be created before installing the
 operator, as documented in `docs/flux-gitops.md`. No live cluster resource was
 changed during this activity.
+## RBAC namespace visibility fix
+
+The Flux Web UI showed `Limited Access` for a user whose OIDC groups included
+`homelab-admins`. The predefined `flux-web-admin` and `flux-web-user` roles
+existed, but their bindings were missing from the cluster.
+
+```text
+kubectl get clusterrole flux-web-admin flux-web-user
+... roles existed ...
+
+kubectl get clusterrolebinding flux-web-admins flux-web-viewers
+... no bindings found ...
+
+kubectl apply -f kubernetes/flux/bootstrap/web-rbac.yaml
+clusterrolebinding.rbac.authorization.k8s.io/flux-web-admins created
+clusterrolebinding.rbac.authorization.k8s.io/flux-web-viewers created
+
+kubectl auth can-i get resourcesets.fluxcd.controlplane.io \
+  --as='nainjoueur64@gmail.com' --as-group='homelab-admins' \
+  --namespace=flux-system
+yes
+```
+
+The administrator group now has access to ResourceSets and Flux resources in
+all namespaces. A fresh OIDC session is required in the browser so the UI
+uses the updated authorization path.

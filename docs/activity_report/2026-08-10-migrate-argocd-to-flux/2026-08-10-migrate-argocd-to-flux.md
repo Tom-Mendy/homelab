@@ -164,3 +164,43 @@ or approved static Synology NFS volumes. The live Argo-to-Flux ownership
 transfer remains intentionally unexecuted until the migration is committed,
 pushed to Forgejo, and performed through the documented maintenance-window
 sequence.
+## Flux Operator installation
+
+Argo CD remains active while Flux is installed beside it. The OIDC client
+secret had already been synchronized by Infisical, so the Operator was
+installed without writing the secret to Git or shell history:
+
+```text
+helm upgrade --install flux-operator oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator \
+  --version '0.58.x' --namespace flux-system \
+  --values kubernetes/flux/bootstrap/values.yaml \
+  --set-file web.config.authentication.oauth2.clientSecret=/dev/stdin --wait
+Release "flux-operator" does not exist. Installing it now.
+Pulled ... flux-operator:0.58.0
+STATUS: deployed
+```
+
+The next required bootstrap input is the dedicated Forgejo deploy key and its
+`known_hosts` file. Flux must not be switched on or Argo CD stopped until the
+`flux-system` Secret can be created and the `FluxInstance` reports Ready.
+## Argo CD removal
+
+Flux had a Ready `FluxInstance`, GitRepository, Kustomization, and 38 Ready
+HelmReleases before the cutover. The Argo application controller had already
+been scaled to zero. The 33 Argo Applications were removed after clearing
+their finalizers, which kept the workloads in place.
+
+```text
+kubectl -n argocd delete applications --all --wait=true
+33 Applications deleted
+
+helm uninstall argocd --namespace argocd --wait
+release "argocd" uninstalled
+
+kubectl delete namespace argocd --wait=true
+namespace "argocd" deleted
+```
+
+Argo CD CRDs were retained by Helm's resource policy; they are inert without
+the Argo controllers and can be removed separately after the migration has
+been observed in production.
