@@ -1,1 +1,58 @@
 namespace: grafana
+
+service:
+  type: ClusterIP
+
+deploymentStrategy:
+  type: Recreate
+
+initChownData:
+  enabled: false
+
+persistence:
+  enabled: true
+  storageClassName: nfs-k8s
+  accessModes:
+    - ReadWriteOnce
+  size: 5Gi
+
+ingress:
+  enabled: true
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+  hosts:
+    - grafana.home.tom-mendy.com
+  path: /
+  pathType: Prefix
+  tls:
+    - hosts:
+        - grafana.home.tom-mendy.com
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus-server.prometheus.svc.cluster.local
+        isDefault: true
+        editable: true
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: default
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/default
+
+dashboardsConfigMaps:
+  default: grafana-dashboards

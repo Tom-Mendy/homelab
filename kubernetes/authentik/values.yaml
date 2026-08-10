@@ -9,3 +9,49 @@ infisicalSecret:
   envSlug: prod
   secretsPath: /authentik
 
+authentik:
+  existingSecret:
+    secretName: authentik-secrets
+  error_reporting:
+    enabled: false
+  postgresql:
+    host: authentik-postgres-rw.authentik.svc.cluster.local
+    name: authentik
+    user: authentik
+    port: 5432
+
+global:
+  env:
+    - name: AUTHENTIK_POSTGRESQL__HOST
+      value: authentik-postgres-rw.authentik.svc.cluster.local
+    - name: AUTHENTIK_POSTGRESQL__NAME
+      value: authentik
+    - name: AUTHENTIK_POSTGRESQL__USER
+      value: authentik
+    - name: AUTHENTIK_POSTGRESQL__PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: authentik-postgres-app
+          key: password
+    - name: AUTHENTIK_POSTGRESQL__PORT
+      value: "5432"
+
+postgresql:
+  enabled: false
+
+server:
+  replicas: 1
+  ingress:
+    enabled: true
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    hosts:
+      - authentik.home.tom-mendy.com
+    tls:
+      - hosts:
+          - authentik.home.tom-mendy.com
+
+worker:
+  replicas: 1

@@ -14,7 +14,7 @@ spec:
       helm:
         releaseName: traefik
         valueFiles:
-          - $values/kubernetes/traefik/traefik-values.yaml
+          - $values/kubernetes/traefik/values.yaml
     - repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
       targetRevision: main
       ref: values
