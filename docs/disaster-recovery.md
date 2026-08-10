@@ -96,7 +96,7 @@ Validate key endpoints:
 - `homepage.home.tom-mendy.com`
 - `grafana.home.tom-mendy.com`
 - `prometheus.home.tom-mendy.com`
-- `forgejo.home.tom-mendy.com`
+- `forgejo.tom-mendy.com`
 - `vaultwarden.home.tom-mendy.com`
 
 ## Known caveats
