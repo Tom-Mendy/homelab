@@ -39,7 +39,9 @@ been stopped as described in that runbook.
 3. Add external chart sources to `kubernetes/flux/cluster/sources.yaml` when
    required.
 4. Add DNS and homepage entries when the service has a user-facing endpoint.
-5. Run the repository validation commands from the Flux runbook.
+5. Add native OIDC clients to the Authentik Blueprint and store each client
+   secret under its own `/oidc/<client>` Infisical path.
+6. Run the repository validation commands from the Flux runbook.
 
 ## Documentation
 

@@ -37,6 +37,13 @@ spec:
               value: {{ .Values.oauth2Client.enableAutoRegistration | quote }}
             - name: FORGEJO__oauth2_client__USERNAME
               value: {{ .Values.oauth2Client.username | quote }}
+            {{- if .Values.oidc.enabled }}
+            - name: FORGEJO_OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.oidc.secretName }}
+                  key: FORGEJO_OIDC_CLIENT_SECRET
+            {{- end }}
             - name: FORGEJO__actions__ENABLED
               value: {{ .Values.actions.enabled | quote }}
             - name: FORGEJO__actions__DEFAULT_ACTIONS_URL
@@ -44,7 +51,27 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+            {{- if .Values.oidc.enabled }}
+            - name: oidc-script
+              mountPath: /opt/forgejo/configure-oidc.sh
+              subPath: configure-oidc.sh
+              readOnly: true
+            {{- end }}
+          {{- if .Values.oidc.enabled }}
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - /opt/forgejo/configure-oidc.sh
+          {{- end }}
       volumes:
         - name: data
           persistentVolumeClaim:
             claimName: {{ .Values.storage.pvcName }}
+        {{- if .Values.oidc.enabled }}
+        - name: oidc-script
+          configMap:
+            name: forgejo-oidc-script
+            defaultMode: 0555
+        {{- end }}

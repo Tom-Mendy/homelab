@@ -69,18 +69,15 @@ admin accounts exist.
   - cannot access authentik admin
   - only sees assigned applications
 
-## Forgejo SSO
+## OIDC Applications
 
-- In authentik, create an OIDC provider and application for Forgejo.
-- Restrict application access to:
-  - `homelab-admins`
-  - `forgejo-users`
-  - optionally `homelab-guests` if all guests should get Forgejo access
-- In Forgejo, create an OpenID Connect authentication source pointing to
-  authentik.
-- Store Forgejo OIDC client credentials in Infisical under `/forgejo` or
-  `/oidc/forgejo`.
-- Keep Forgejo local login enabled until the guest login path is verified.
+- Keep providers, applications, groups, and access bindings in
+  `kubernetes/authentik/blueprints/oidc-clients.yaml`.
+- Store the three rotated client secrets under `/oidc/forgejo`,
+  `/oidc/grafana`, and `/oidc/flux` as documented in `docs/flux-gitops.md`.
+- Grant application access through `forgejo-users`, `grafana-users`, and
+  `flux-viewers`; `homelab-admins` can access all three applications.
+- Keep local Forgejo and Grafana login enabled for recovery.
 - Test with the guest account:
   - login through authentik
   - Forgejo account creation or account linking
@@ -91,6 +88,8 @@ admin accounts exist.
 
 - Configure apps one by one.
 - Prefer native OIDC support.
+- Add each native client to the Blueprint and keep its secret in a dedicated
+  `/oidc/<client>` Infisical path.
 - Use authentik proxy provider only for apps without native OIDC.
 - Do not protect machine/API endpoints with browser SSO unless tested:
   - Atuin sync

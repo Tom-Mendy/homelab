@@ -1,0 +1,10 @@
+{{- if .Values.oidc.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forgejo-oidc-script
+  namespace: {{ .Values.namespace }}
+data:
+  configure-oidc.sh: |
+{{ .Files.Get "files/configure-oidc.sh" | nindent 4 }}
+{{- end }}
