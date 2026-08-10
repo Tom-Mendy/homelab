@@ -21,6 +21,10 @@ oauth2Client:
   enableAutoRegistration: true
   username: nickname
 
+oidc:
+  enabled: true
+  secretName: forgejo-oidc
+
 actions:
   enabled: "true"
   defaultActionsUrl: https://data.forgejo.org

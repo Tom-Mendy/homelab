@@ -1,0 +1,83 @@
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalConnection
+metadata:
+  name: {{ .Values.oidc.infisical.connectionName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  address: {{ .Values.oidc.infisical.address | quote }}
+---
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalAuth
+metadata:
+  name: {{ .Values.oidc.infisical.authName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  method: kubernetes
+  infisicalConnectionRef:
+    name: {{ .Values.oidc.infisical.connectionName }}
+    namespace: {{ .Values.namespace }}
+  kubernetes:
+    identityIdRef:
+      name: {{ .Values.oidc.infisical.identitySecretName }}
+      namespace: {{ .Values.namespace }}
+      key: identityId
+    serviceAccountRef:
+      name: authentik-infisical-sync
+      namespace: {{ .Values.namespace }}
+---
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalStaticSecret
+metadata:
+  name: {{ .Values.oidc.infisical.secretName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  infisicalAuthRef:
+    name: {{ .Values.oidc.infisical.authName }}
+    namespace: {{ .Values.namespace }}
+  sources:
+    - projectId: {{ .Values.oidc.infisical.projectId | quote }}
+      environmentSlug: {{ .Values.oidc.infisical.envSlug | quote }}
+      secretPath: /oidc
+      recursive: false
+  targets:
+    - name: authentik-oidc
+      namespace: authentik
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          FORGEJO_OIDC_CLIENT_SECRET: "{{`{{ .FORGEJO_OIDC_CLIENT_SECRET.Value }}`}}"
+          GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "{{`{{ .GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET.Value }}`}}"
+          FLUX_WEB_CLIENT_SECRET: "{{`{{ .FLUX_WEB_CLIENT_SECRET.Value }}`}}"
+    - name: forgejo-oidc
+      namespace: forgejo
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          FORGEJO_OIDC_CLIENT_SECRET: "{{`{{ .FORGEJO_OIDC_CLIENT_SECRET.Value }}`}}"
+    - name: grafana-oidc
+      namespace: grafana
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "{{`{{ .GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET.Value }}`}}"
+    - name: flux-web-client
+      namespace: flux-system
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          FLUX_WEB_CLIENT_SECRET: "{{`{{ .FLUX_WEB_CLIENT_SECRET.Value }}`}}"
+  syncOptions:
+    refreshInterval: 1m
+    instantUpdates: false
