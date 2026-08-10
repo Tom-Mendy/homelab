@@ -3,6 +3,7 @@ namespace: keel
 service:
   name: keel
   port: 9300
+  enabled: true
 
 ingress:
   name: keel-ingress
@@ -25,3 +26,18 @@ infisicalSecret:
   projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
   envSlug: prod
   secretsPath: /keel
+
+keel:
+  policy: patch
+
+helmProvider:
+  enabled: false
+
+basicauth:
+  enabled: true
+  user: admin
+  password: ""
+
+secret:
+  create: false
+  name: keel

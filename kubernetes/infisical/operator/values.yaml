@@ -6,4 +6,3 @@ controllerManager:
 telemetry:
   serviceMonitor:
     enabled: false
-

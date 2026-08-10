@@ -14,7 +14,7 @@ spec:
       helm:
         releaseName: authentik
         valueFiles:
-          - $values/kubernetes/authentik/authentik-values.yaml
+          - $values/kubernetes/authentik/values.yaml
     - repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
       targetRevision: main
       ref: values

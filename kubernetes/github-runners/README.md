@@ -12,9 +12,9 @@ Argo CD apps:
 
 The runner scale sets read the secret referenced by `githubConfigSecret` in:
 
-- `runner-scale-set-portfolio-values.yaml`
-- `runner-scale-set-dotfiles-values.yaml`
-- `runner-scale-set-sumfeet-values.yaml`
+- `portfolio/values.yaml`
+- `dotfiles/values.yaml`
+- `sumfeet/values.yaml`
 
 The preferred path is Infisical. Store the rotated GitHub token in project
 `homelab`, env `prod`, path `/github-runners`:
@@ -66,9 +66,9 @@ kubectl create secret generic arc-github-auth \
 
 Update `githubConfigUrl` in each values file for your desired scope:
 
-- `runner-scale-set-portfolio-values.yaml`
-- `runner-scale-set-dotfiles-values.yaml`
-- `runner-scale-set-sumfeet-values.yaml`
+- `portfolio/values.yaml`
+- `dotfiles/values.yaml`
+- `sumfeet/values.yaml`
 - Repository: `https://github.com/<owner>/<repo>`
 - Organization: `https://github.com/<org>`
 - Enterprise: `https://github.com/enterprises/<enterprise>`
