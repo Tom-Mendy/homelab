@@ -18,11 +18,12 @@ vpn:
     wireguardPrivateKey: ""
 
 nymVpn:
-  image: forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.10.0-1
+  image: forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.10.0-2
   pullPolicy: IfNotPresent
   secretName: nymvpn-credentials
   entryCountry: FR
   exitCountry: CH
+  podCidr: 10.233.64.0/18
   stateStorage:
     className: nfs-k8s
     size: 1Gi
