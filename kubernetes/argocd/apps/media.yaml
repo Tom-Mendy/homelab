@@ -14,9 +14,16 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: media
+  ignoreDifferences:
+    - group: ""
+      kind: PersistentVolumeClaim
+      namespace: media
+      jsonPointers:
+        - /spec/volumeName
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true
