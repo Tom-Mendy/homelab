@@ -31,6 +31,7 @@ customDNS:
     vaultwarden.home.tom-mendy.com: 10.0.0.60
     homepage.home.tom-mendy.com: 10.0.0.60
     prometheus.home.tom-mendy.com: 10.0.0.60
+    forgejo.tom-mendy.com: 10.0.0.60
     forgejo.home.tom-mendy.com: 10.0.0.60
     grafana.home.tom-mendy.com: 10.0.0.60
     argocd.home.tom-mendy.com: 10.0.0.60

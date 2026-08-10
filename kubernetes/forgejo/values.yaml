@@ -32,7 +32,9 @@ service:
 
 ingress:
   enabled: true
-  host: forgejo.home.tom-mendy.com
+  host: forgejo.tom-mendy.com
+  aliases:
+    - forgejo.home.tom-mendy.com
   className: ""
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure

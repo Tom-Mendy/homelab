@@ -12,7 +12,7 @@ Internal services use:
 Examples currently present in DNS mapping (`kubernetes/blocky/config.yml`):
 
 - `argocd.home.tom-mendy.com`
-- `forgejo.home.tom-mendy.com`
+- `forgejo.tom-mendy.com`
 - `grafana.home.tom-mendy.com`
 - `homepage.home.tom-mendy.com`
 - `keel.home.tom-mendy.com`
