@@ -75,7 +75,12 @@ spec:
                     token: ${RUNNER_TOKEN}
               EOF
               sleep 5
-              forgejo-runner --config /data/config.yaml daemon
+              while true; do
+                if forgejo-runner --config /data/config.yaml one-job --wait; then
+                  continue
+                fi
+                sleep 5
+              done
           resources:
 {{ toYaml .Values.runner.resources | nindent 12 }}
           volumeMounts:
