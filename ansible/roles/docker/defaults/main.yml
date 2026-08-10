@@ -1,4 +1,0 @@
----
-# Users to be added to the 'docker' group for non-root docker usage.
-# Override in inventory/group_vars/host_vars as needed.
-docker_users: [tmendy]

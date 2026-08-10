@@ -1,6 +1,0 @@
-- name: Deploy Vaultwarden local Helm chart
-  kubernetes.core.helm:
-    name: vaultwarden-local
-    chart_ref: "{{ playbook_dir + '/../../kubernetes/vaultwarden' }}"
-    release_namespace: vaultwarden
-    create_namespace: true

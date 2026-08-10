@@ -1,4 +1,0 @@
-- name: Deploy Kubernetes Applications
-  hosts: kube_control_plane
-  roles:
-    - kubernetes

@@ -1,5 +1,0 @@
-collections:
-- name: https://github.com/kubernetes-sigs/kubespray
-  type: git
-  version: master
-- name: kubernetes.core
