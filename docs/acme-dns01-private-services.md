@@ -85,7 +85,7 @@ helm repo add traefik https://traefik.github.io/charts
 helm repo update
 helm upgrade --install traefik traefik/traefik \
   -n traefik --create-namespace \
-  -f kubernetes/traefik/traefik-values.yaml
+  -f kubernetes/traefik/values.yaml
 helm upgrade --install blocky kubernetes/blocky -n blocky --create-namespace
 helm upgrade --install navidrome kubernetes/navidrome -n navidrome --create-namespace
 helm upgrade --install vaultwarden kubernetes/vaultwarden -n vaultwarden --create-namespace

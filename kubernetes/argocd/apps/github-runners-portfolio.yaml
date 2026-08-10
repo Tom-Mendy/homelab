@@ -16,7 +16,7 @@ spec:
       helm:
         releaseName: arc-runner-set-portfolio
         valueFiles:
-          - $values/kubernetes/github-runners/runner-scale-set-portfolio-values.yaml
+          - $values/kubernetes/github-runners/portfolio/values.yaml
     - repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
       targetRevision: main
       ref: values

@@ -14,7 +14,7 @@ spec:
       helm:
         releaseName: newt
         valueFiles:
-          - $values/kubernetes/newt/newt-values.yaml
+          - $values/kubernetes/newt/values.yaml
     - repoURL: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
       targetRevision: main
       ref: values
