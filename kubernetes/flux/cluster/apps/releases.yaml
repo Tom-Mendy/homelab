@@ -44,6 +44,8 @@ spec:
     - kind: ConfigMap
       name: grafana-values
   dependsOn:
+    - name: grafana-extras
+    - name: authentik-extras
     - name: nfs-provisioner
     - name: prometheus
     - name: traefik
@@ -69,8 +71,6 @@ spec:
       sourceRef:
         kind: GitRepository
         name: flux-system
-  dependsOn:
-    - name: grafana
   install:
     createNamespace: true
   driftDetection:
@@ -244,6 +244,7 @@ spec:
         kind: GitRepository
         name: flux-system
   dependsOn:
+    - name: authentik-extras
     - name: nfs-provisioner
     - name: traefik
   install:
@@ -725,6 +726,7 @@ spec:
     - kind: ConfigMap
       name: authentik-values
   dependsOn:
+    - name: authentik-extras
     - name: authentik-postgres
     - name: traefik
   install:
@@ -750,7 +752,8 @@ spec:
         kind: GitRepository
         name: flux-system
   dependsOn:
-    - name: authentik
+    - name: infisical
+    - name: infisical-operator
   install:
     createNamespace: true
   driftDetection:

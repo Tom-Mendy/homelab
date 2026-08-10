@@ -17,32 +17,72 @@ The Flux source is the private Forgejo repository at
 - A new read-only Forgejo deploy key. Do not reuse the former Argo CD key.
 - A trusted `known_hosts` file collected for the Forgejo SSH service.
 - A current backup of application data and Kubernetes resources.
-- An Authentik OAuth2/OpenID provider with client ID `flux-web`.
+- The Authentik OIDC Infisical identity and secrets described below.
 
 Never commit the private deploy key, kubeconfig, or Secret YAML.
 
 ## Install Flux beside Argo CD
 
-In Authentik, create an OAuth2/OpenID provider and application with:
+Create a Kubernetes-auth Machine Identity named `authentik-oidc-sync` in
+Infisical. Allow the `authentik/authentik-infisical-sync` ServiceAccount to use
+it and grant read-only recursive access to `/oidc` in `homelab/prod`.
 
-- slug: `flux-web`
-- client ID: `flux-web`
-- redirect URI: `https://flux.home.tom-mendy.com/oauth2/callback`
-- scopes: `openid`, `profile`, `email`, `offline_access`, and `groups`
+Create three independent 32-byte client secrets in Infisical:
 
-Create the `flux-admins` and `flux-viewers` Authentik groups, then add users to
-the appropriate group. Export the generated client secret only for the current
-shell:
+| Path    | Key                                   |
+| ------- | ------------------------------------- |
+| `/oidc` | `FORGEJO_OIDC_CLIENT_SECRET`          |
+| `/oidc` | `GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET` |
+| `/oidc` | `FLUX_WEB_CLIENT_SECRET`              |
+
+Create the namespace and the non-secret Machine Identity reference. Do not put
+any client secret in this Kubernetes Secret:
 
 ```bash
-read -rsp 'Authentik Flux client secret: ' FLUX_WEB_CLIENT_SECRET
-export FLUX_WEB_CLIENT_SECRET
+kubectl apply -f kubernetes/flux/bootstrap/namespace.yaml
+read -r infisical_oidc_id
+kubectl -n authentik create secret generic \
+  authentik-oidc-infisical-identity \
+  --from-literal=identityId="$INFISICAL_OIDC_ID" \
+  --dry-run=client -o yaml | kubectl apply -f -
+unset INFISICAL_OIDC_ID
 ```
 
-Install Flux Operator with its TLS ingress and Authentik OIDC login:
+Install the Authentik bootstrap resources and wait for Infisical to distribute
+the scoped Secrets:
 
 ```bash
-printf '%s' "$FLUX_WEB_CLIENT_SECRET" | \
+helm upgrade --install authentik-extras kubernetes/authentik \
+  --namespace authentik
+kubectl -n authentik wait infisicalauth/authentik-oidc-infisical \
+  --for=condition=Ready --timeout=5m
+kubectl -n authentik wait infisicalstaticsecret/authentik-oidc \
+  --for=condition=Ready --timeout=5m
+kubectl get secret -n authentik authentik-oidc
+kubectl get secret -n forgejo forgejo-oidc
+kubectl get secret -n grafana grafana-oidc
+kubectl get secret -n flux-system flux-web-client
+```
+
+Upgrade Authentik so its worker applies the Blueprint, then add the cluster
+administrator to `homelab-admins` in Authentik:
+
+```bash
+helm upgrade --install authentik \
+  https://github.com/goauthentik/helm/releases/download/\
+authentik-2026.5.2/authentik-2026.5.2.tgz \
+  --namespace authentik \
+  --values kubernetes/authentik/values.yaml \
+  --wait
+kubectl -n authentik rollout status deployment/authentik-worker
+```
+
+Install Flux Operator with its TLS ingress and Authentik OIDC login. The client
+secret travels through stdin and is not written to Git or the shell history:
+
+```bash
+kubectl -n flux-system get secret flux-web-client \
+  -o jsonpath='{.data.FLUX_WEB_CLIENT_SECRET}' | base64 -d | \
   helm upgrade --install flux-operator \
     oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator \
     --version '0.58.x' \
@@ -51,7 +91,6 @@ printf '%s' "$FLUX_WEB_CLIENT_SECRET" | \
     --values kubernetes/flux/bootstrap/values.yaml \
     --set-file web.config.authentication.oauth2.clientSecret=/dev/stdin \
     --wait
-unset FLUX_WEB_CLIENT_SECRET
 ```
 
 Apply the group-to-Kubernetes role bindings:

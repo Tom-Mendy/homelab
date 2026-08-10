@@ -9,6 +9,17 @@ infisicalSecret:
   envSlug: prod
   secretsPath: /authentik
 
+oidc:
+  blueprintConfigMapName: authentik-oidc-blueprint
+  infisical:
+    connectionName: authentik-oidc-infisical
+    authName: authentik-oidc-infisical
+    identitySecretName: authentik-oidc-infisical-identity
+    secretName: authentik-oidc
+    address: https://infisical.home.tom-mendy.com
+    projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+    envSlug: prod
+
 authentik:
   existingSecret:
     secretName: authentik-secrets
@@ -21,6 +32,10 @@ authentik:
     port: 5432
 
 global:
+  envFrom:
+    - secretRef:
+        name: authentik-oidc
+        optional: true
   env:
     - name: AUTHENTIK_POSTGRESQL__HOST
       value: authentik-postgres-rw.authentik.svc.cluster.local
@@ -38,6 +53,10 @@ global:
 
 postgresql:
   enabled: false
+
+blueprints:
+  configMaps:
+    - authentik-oidc-blueprint
 
 server:
   replicas: 1
