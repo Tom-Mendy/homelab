@@ -73,6 +73,8 @@ spec:
               value: {{ .Values.nymVpn.entryCountry | quote }}
             - name: NYMVPN_EXIT_COUNTRY
               value: {{ .Values.nymVpn.exitCountry | quote }}
+            - name: NYMVPN_POD_CIDR
+              value: {{ .Values.nymVpn.podCidr | quote }}
           startupProbe:
             exec:
               command: ["/usr/local/bin/nymvpn-entrypoint", "check"]

@@ -12,7 +12,7 @@ ADD --checksum=sha256:408f948922e64596c9ae4c727de6e8b8c568756937dd4271c69dd9df41
   /tmp/nym-vpnd.deb
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends /tmp/nym-vpnc.deb /tmp/nym-vpnd.deb ca-certificates \
+  && apt-get install -y --no-install-recommends /tmp/nym-vpnc.deb /tmp/nym-vpnd.deb ca-certificates iproute2 \
   && rm -rf /var/lib/apt/lists/* /tmp/nym-vpn*.deb
 
 COPY --chmod=0755 entrypoint.sh /usr/local/bin/nymvpn-entrypoint
