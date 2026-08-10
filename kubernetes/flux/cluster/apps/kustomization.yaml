@@ -1,0 +1,56 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: flux-system
+resources:
+  - releases.yaml
+configMapGenerator:
+  - name: arc-controller-values
+    files:
+      - values.yaml=../../../github-runners/controller/values.yaml
+  - name: arc-dotfiles-values
+    files:
+      - values.yaml=../../../github-runners/dotfiles/values.yaml
+  - name: arc-portfolio-values
+    files:
+      - values.yaml=../../../github-runners/portfolio/values.yaml
+  - name: arc-sumfeet-values
+    files:
+      - values.yaml=../../../github-runners/sumfeet/values.yaml
+  - name: authentik-values
+    files:
+      - values.yaml=../../../authentik/values.yaml
+  - name: cloudnative-pg-values
+    files:
+      - values.yaml=../../../cloudnative-pg/values.yaml
+  - name: grafana-values
+    files:
+      - values.yaml=../../../grafana/values.yaml
+  - name: infisical-values
+    files:
+      - values.yaml=../../../infisical/values.yaml
+  - name: infisical-operator-values
+    files:
+      - values.yaml=../../../infisical/operator/values.yaml
+  - name: keel-values
+    files:
+      - values.yaml=../../../keel/values.yaml
+  - name: newt-values
+    files:
+      - values.yaml=../../../newt/values.yaml
+  - name: nfs-provisioner-values
+    files:
+      - values.yaml=../../../nfs-provisioner/values.yaml
+  - name: openwebui-values
+    files:
+      - values.yaml=../../../openwebui/values.yaml
+  - name: prometheus-values
+    files:
+      - values.yaml=../../../prometheus/values.yaml
+  - name: traefik-values
+    files:
+      - values.yaml=../../../traefik/values.yaml
+generatorOptions:
+  annotations:
+    reconcile.fluxcd.io/watch: Enabled
+configurations:
+  - kustomizeconfig.yaml

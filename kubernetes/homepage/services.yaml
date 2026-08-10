@@ -20,6 +20,10 @@
         icon: authentik.svg
         href: https://authentik.home.tom-mendy.com
         description: Identity provider
+    - Flux:
+        icon: flux-cd.svg
+        href: https://flux.home.tom-mendy.com
+        description: GitOps status
     - Keel:
          icon: kubernetes.svg
          href: https://keel.home.tom-mendy.com
@@ -62,10 +66,6 @@
         description: Music player
 
 - Developer:
-    - Argo CD:
-        icon: argo-cd.svg
-        href: https://argocd.home.tom-mendy.com/
-        description: GitOps continuous delivery
     - Forgejo:
         icon: forgejo.svg
         href: https://forgejo.tom-mendy.com/

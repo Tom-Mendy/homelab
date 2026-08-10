@@ -1,0 +1,983 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nfs-provisioner
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: nfs-provisioner
+  targetNamespace: nfs-provisioner
+  storageNamespace: nfs-provisioner
+  chart:
+    spec:
+      chart: nfs-subdir-external-provisioner
+      version: 4.0.18
+      sourceRef:
+        kind: HelmRepository
+        name: nfs-provisioner
+  valuesFrom:
+    - kind: ConfigMap
+      name: nfs-provisioner-values
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: grafana
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: grafana
+  targetNamespace: grafana
+  storageNamespace: grafana
+  chart:
+    spec:
+      chart: grafana
+      version: 12.4.1
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+  valuesFrom:
+    - kind: ConfigMap
+      name: grafana-values
+  dependsOn:
+    - name: nfs-provisioner
+    - name: prometheus
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: grafana-extras
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: grafana-extras
+  targetNamespace: grafana
+  storageNamespace: grafana
+  chart:
+    spec:
+      chart: ./kubernetes/grafana
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: grafana
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: navidrome
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: navidrome
+  targetNamespace: navidrome
+  storageNamespace: navidrome
+  chart:
+    spec:
+      chart: ./kubernetes/navidrome
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: nfs-provisioner
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: vaultwarden
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: vaultwarden
+  targetNamespace: vaultwarden
+  storageNamespace: vaultwarden
+  chart:
+    spec:
+      chart: ./kubernetes/vaultwarden
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: nfs-provisioner
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: trilium
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: trilium
+  targetNamespace: default
+  storageNamespace: default
+  chart:
+    spec:
+      chart: ./kubernetes/trilium
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: traefik
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik-postgres
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: authentik-postgres
+  targetNamespace: authentik
+  storageNamespace: authentik
+  chart:
+    spec:
+      chart: ./kubernetes/authentik-postgres
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: cloudnative-pg
+    - name: nfs-provisioner
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: atuin
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: atuin
+  targetNamespace: atuin
+  storageNamespace: atuin
+  chart:
+    spec:
+      chart: ./kubernetes/atuin
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: infisical
+    - name: infisical-operator
+    - name: nfs-provisioner
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: endfield
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: endfield
+  targetNamespace: endfield
+  storageNamespace: endfield
+  chart:
+    spec:
+      chart: ./kubernetes/endfield
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: infisical
+    - name: infisical-operator
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: forgejo
+  targetNamespace: forgejo
+  storageNamespace: forgejo
+  chart:
+    spec:
+      chart: ./kubernetes/forgejo
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: nfs-provisioner
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: media
+spec:
+  interval: 30m
+  timeout: 15m
+  releaseName: media
+  targetNamespace: media
+  storageNamespace: media
+  chart:
+    spec:
+      chart: ./kubernetes/media
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: infisical
+    - name: infisical-operator
+    - name: nfs-provisioner
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: newt
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: newt
+  targetNamespace: newt-system
+  storageNamespace: newt-system
+  chart:
+    spec:
+      chart: newt
+      version: 1.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: newt
+  valuesFrom:
+    - kind: ConfigMap
+      name: newt-values
+  dependsOn:
+    - name: traefik
+  install:
+    createNamespace: true
+    disableSchemaValidation: true
+  upgrade:
+    disableSchemaValidation: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: newt-extras
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: newt-extras
+  targetNamespace: newt-system
+  storageNamespace: newt-system
+  chart:
+    spec:
+      chart: ./kubernetes/newt
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: infisical
+    - name: infisical-operator
+    - name: newt
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ollama
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: ollama
+  targetNamespace: ollama
+  storageNamespace: ollama
+  chart:
+    spec:
+      chart: ./kubernetes/ollama
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: nfs-provisioner
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: stirling-pdf
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: stirling-pdf
+  targetNamespace: stirling-pdf
+  storageNamespace: stirling-pdf
+  chart:
+    spec:
+      chart: ./kubernetes/stirling-pdf
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: nfs-provisioner
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cloudnative-pg
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: cloudnative-pg
+  targetNamespace: cnpg-system
+  storageNamespace: cnpg-system
+  chart:
+    spec:
+      chart: cloudnative-pg
+      version: 0.28.2
+      sourceRef:
+        kind: HelmRepository
+        name: cloudnative-pg
+  valuesFrom:
+    - kind: ConfigMap
+      name: cloudnative-pg-values
+  install:
+    createNamespace: true
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: infisical-operator
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: infisical-operator
+  targetNamespace: infisical-operator
+  storageNamespace: infisical-operator
+  chart:
+    spec:
+      chart: secrets-operator
+      version: 0.11.0
+      sourceRef:
+        kind: HelmRepository
+        name: infisical
+  valuesFrom:
+    - kind: ConfigMap
+      name: infisical-operator-values
+  install:
+    createNamespace: true
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: traefik
+  targetNamespace: traefik
+  storageNamespace: traefik
+  chart:
+    spec:
+      chart: traefik
+      version: 40.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+  valuesFrom:
+    - kind: ConfigMap
+      name: traefik-values
+  dependsOn:
+    - name: nfs-provisioner
+  install:
+    createNamespace: true
+    crds: Create
+    disableSchemaValidation: true
+  upgrade:
+    crds: CreateReplace
+    disableSchemaValidation: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: infisical-postgres
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: infisical-postgres
+  targetNamespace: infisical
+  storageNamespace: infisical
+  chart:
+    spec:
+      chart: ./kubernetes/infisical-postgres
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: cloudnative-pg
+    - name: nfs-provisioner
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: infisical
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: infisical
+  targetNamespace: infisical
+  storageNamespace: infisical
+  chart:
+    spec:
+      chart: infisical-standalone
+      version: 1.8.0
+      sourceRef:
+        kind: HelmRepository
+        name: infisical
+  valuesFrom:
+    - kind: ConfigMap
+      name: infisical-values
+  dependsOn:
+    - name: infisical-postgres
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik-extras
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: traefik-extras
+  targetNamespace: traefik
+  storageNamespace: traefik
+  chart:
+    spec:
+      chart: ./kubernetes/traefik
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: infisical
+    - name: infisical-operator
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blocky
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: blocky
+  targetNamespace: blocky
+  storageNamespace: blocky
+  chart:
+    spec:
+      chart: ./kubernetes/blocky
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: homepage
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: homepage
+  targetNamespace: homepage
+  storageNamespace: homepage
+  chart:
+    spec:
+      chart: ./kubernetes/homepage
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: keel
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: keel
+  targetNamespace: keel
+  storageNamespace: keel
+  chart:
+    spec:
+      chart: keel
+      version: 1.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: keel
+  valuesFrom:
+    - kind: ConfigMap
+      name: keel-values
+  dependsOn:
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: keel-extras
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: keel-extras
+  targetNamespace: keel
+  storageNamespace: keel
+  chart:
+    spec:
+      chart: ./kubernetes/keel
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: infisical
+    - name: infisical-operator
+    - name: keel
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: prometheus
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: prometheus
+  targetNamespace: prometheus
+  storageNamespace: prometheus
+  chart:
+    spec:
+      chart: prometheus
+      version: 29.9.0
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus
+  valuesFrom:
+    - kind: ConfigMap
+      name: prometheus-values
+  dependsOn:
+    - name: nfs-provisioner
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: prometheus-extras
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: prometheus-extras
+  targetNamespace: prometheus
+  storageNamespace: prometheus
+  chart:
+    spec:
+      chart: ./kubernetes/prometheus
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: prometheus
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik
+spec:
+  interval: 30m
+  timeout: 15m
+  releaseName: authentik
+  targetNamespace: authentik
+  storageNamespace: authentik
+  chart:
+    spec:
+      chart: authentik
+      version: 2026.5.2
+      sourceRef:
+        kind: HelmRepository
+        name: authentik
+  valuesFrom:
+    - kind: ConfigMap
+      name: authentik-values
+  dependsOn:
+    - name: authentik-postgres
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik-extras
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: authentik-extras
+  targetNamespace: authentik
+  storageNamespace: authentik
+  chart:
+    spec:
+      chart: ./kubernetes/authentik
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: authentik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: searxng
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: searxng
+  targetNamespace: searxng
+  storageNamespace: searxng
+  chart:
+    spec:
+      chart: ./kubernetes/searxng
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: infisical
+    - name: infisical-operator
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: openwebui
+spec:
+  interval: 30m
+  timeout: 15m
+  releaseName: openwebui
+  targetNamespace: openwebui
+  storageNamespace: openwebui
+  chart:
+    spec:
+      chart: open-webui
+      version: 14.8.0
+      sourceRef:
+        kind: HelmRepository
+        name: openwebui
+  valuesFrom:
+    - kind: ConfigMap
+      name: openwebui-values
+  dependsOn:
+    - name: nfs-provisioner
+    - name: ollama
+    - name: searxng
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: openwebui-extras
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: openwebui-extras
+  targetNamespace: openwebui
+  storageNamespace: openwebui
+  chart:
+    spec:
+      chart: ./kubernetes/openwebui
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: openwebui
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: arc-controller
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: arc
+  targetNamespace: arc-systems
+  storageNamespace: arc-systems
+  chartRef:
+    kind: OCIRepository
+    name: arc-controller
+  valuesFrom:
+    - kind: ConfigMap
+      name: arc-controller-values
+  install:
+    createNamespace: true
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: github-runners-auth
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: github-runners-auth
+  targetNamespace: arc-runners
+  storageNamespace: arc-runners
+  chart:
+    spec:
+      chart: ./kubernetes/github-runners-auth
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: arc-controller
+    - name: infisical
+    - name: infisical-operator
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: github-runners-dotfiles
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: arc-runner-set-dotfiles
+  targetNamespace: arc-runners
+  storageNamespace: arc-runners
+  chartRef:
+    kind: OCIRepository
+    name: arc-runner-set
+  valuesFrom:
+    - kind: ConfigMap
+      name: arc-dotfiles-values
+  dependsOn:
+    - name: arc-controller
+    - name: github-runners-auth
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: github-runners-portfolio
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: arc-runner-set-portfolio
+  targetNamespace: arc-runners
+  storageNamespace: arc-runners
+  chartRef:
+    kind: OCIRepository
+    name: arc-runner-set
+  valuesFrom:
+    - kind: ConfigMap
+      name: arc-portfolio-values
+  dependsOn:
+    - name: arc-controller
+    - name: github-runners-auth
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: github-runners-sumfeet
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: arc-runner-set-sumfeet
+  targetNamespace: arc-runners
+  storageNamespace: arc-runners
+  chartRef:
+    kind: OCIRepository
+    name: arc-runner-set
+  valuesFrom:
+    - kind: ConfigMap
+      name: arc-sumfeet-values
+  dependsOn:
+    - name: arc-controller
+    - name: github-runners-auth
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo-runner-homelab
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: forgejo-runner-homelab
+  targetNamespace: forgejo-runner
+  storageNamespace: forgejo-runner
+  chart:
+    spec:
+      chart: ./kubernetes/forgejo-runner
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: forgejo
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled

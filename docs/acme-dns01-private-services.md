@@ -11,7 +11,6 @@ Internal services use:
 
 Examples currently present in DNS mapping (`kubernetes/blocky/config.yml`):
 
-- `argocd.home.tom-mendy.com`
 - `forgejo.tom-mendy.com`
 - `grafana.home.tom-mendy.com`
 - `homepage.home.tom-mendy.com`
@@ -64,21 +63,14 @@ infisicalSecret:
   identityID: "<machine-identity-id>"
 ```
 
-The fallback example below is only for manual break-glass use. Do not commit
-real token values.
+1. Reconcile updated Traefik and apps:
 
 ```bash
-kubectl apply -f kubernetes/traefik/traefik-cloudflare-secret.example.yaml
+kubectl -n flux-system annotate helmrelease traefik traefik-extras \
+  reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite
 ```
 
-1. Deploy updated Traefik and apps:
-
-```bash
-cd ansible
-./run.sh playbooks/deploy-apps.yml
-```
-
-or render/apply the local charts directly for a manual break-glass run:
+For a manual break-glass run, render/apply the charts directly:
 
 ```bash
 helm repo add traefik https://traefik.github.io/charts
