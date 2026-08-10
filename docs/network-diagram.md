@@ -31,7 +31,7 @@ graph TB
         end
 
         subgraph "GitOps Control"
-            argocd["Argo CD\nargocd.home.tom-mendy.com"]
+            flux["Flux Operator + Flux\nflux-system"]
         end
 
         subgraph "Worker Nodes"
@@ -42,11 +42,11 @@ graph TB
 
     node1 --> traefik
     node1 --> blocky
-    node1 --> argocd
+    node1 --> flux
     node2 --> traefik
     node3 --> traefik
     blocky --> traefik
-    argocd --> traefik
+    flux --> traefik
 
     %% Style
     classDef controlPlane fill:#e1f5fe
@@ -56,7 +56,7 @@ graph TB
 
     class node1 controlPlane
     class worker2,worker3 workerNode
-    class traefik,blocky,argocd platform
+    class traefik,blocky,flux platform
     class node1,node2,node3 physicalNode
 ```
 
@@ -73,7 +73,7 @@ graph TB
 - **Network Range**: 10.0.0.0/24
 - **LoadBalancer Range**: 10.0.0.60-10.0.0.89
 - **SSH User**: tmendy (with sudo privileges)
-- **Management**: Ansible-managed infrastructure
+- **Management**: Kubernetes plus Flux GitOps
 
 ### Node Functions
 
@@ -89,12 +89,9 @@ graph TB
 #### node3 (10.0.0.23)
 
 - Worker node
-- Labeled `gpu=true` by Ansible prerequisites
+- Labeled `gpu=true` for GPU workloads
 
-## Ansible Management
+## GitOps Management
 
-All nodes are managed through Ansible with the following groups:
-
-- `kube_control_plane`: `node1`
-- `etcd`: `node1`
-- `kube_node`: `node2`, `node3`
+Flux Operator and the Flux controllers run in `flux-system`. They reconcile the
+application charts from the in-cluster Forgejo repository.

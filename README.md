@@ -1,131 +1,52 @@
 # Homelab Infrastructure
 
-Kubernetes homelab managed with Ansible + Kubespray,
-with Argo CD GitOps for app reconciliation.
+Kubernetes homelab with Flux Operator and Flux managing applications from Git.
 
-## What is in this repo
-
-- Cluster lifecycle automation in `ansible/`
-- Kubernetes apps and manifests in `kubernetes/`
-- Operational runbooks in `docs/`
-- Homepage dashboard configuration in `kubernetes/homepage/services.yaml`
-
-## Current architecture
+## Architecture
 
 - **Nodes**: `node1` (`10.0.0.21`), `node2` (`10.0.0.22`), `node3` (`10.0.0.23`)
 - **Control plane**: `node1`
 - **Workers**: `node2`, `node3`
 - **Ingress**: Traefik
-- **LoadBalancer IPs**: MetalLB (`10.0.0.60-10.0.0.89`)
-- **DNS**: Blocky (`blocky` service exposed at `10.0.0.61`)
-- **Domain convention**: `*.home.tom-mendy.com`
+- **Storage**: Synology NFS (`10.0.0.11:/volume1/k8s`) through `nfs-k8s`
+- **GitOps**: Flux Operator, Flux controllers, and native Flux resources
+- **Git source**: the in-cluster Forgejo `homelab` repository
 
-## Deployed services
-
-### GitOps-managed (Argo CD Applications)
-
-- `traefik`
-- `blocky`
-- `homepage`
-- `keel`
-- `prometheus`
-- `grafana`
-- `navidrome`
-- `vaultwarden`
-- `forgejo`
-- `trilium`
-- `media`
-- `newt`
-- `stirling-pdf`
-- `ollama`
-- `openwebui`
-- `searxng`
-- `actions-runner-controller`
-- `actions-runner-controller-crds`
-- `github-runners`
-- `github-runners-portfolio`
-- `github-runners-sumfeet`
-
-## Quick start
-
-### 1) Prepare access
-
-1. Clone repository:
-
-   ```bash
-   git clone https://github.com/Tom-Mendy/homelab.git
-   cd homelab
-   ```
-
-2. Place SSH key for Ansible at `ansible/private_key`.
-3. Review `ansible/inventory.ini`.
-
-### 2) Install cluster (first bootstrap)
-
-```bash
-cd ansible
-./run.sh playbooks/install.yml
-```
-
-### 3) Deploy platform + apps
-
-```bash
-cd ansible
-./run.sh playbooks/deploy-apps.yml
-```
-
-## Ansible playbooks
-
-From `ansible/`:
-
-- Install base + Kubernetes: `./run.sh playbooks/install.yml`
-- Deploy apps/platform: `./run.sh playbooks/deploy-apps.yml`
-- OS update tasks: `./run.sh playbooks/update.yml`
-- Reboot all nodes: `./run.sh playbooks/reboot.yml`
-- Reset Kubernetes cluster: `./run.sh playbooks/reset.yml`
-
-## Deployment mode
-
-`ansible/roles/kubernetes/defaults/main.yml` defines:
-
-- `kubernetes_deploy_mode=gitops` (default)
-- `kubernetes_deploy_mode=legacy` (direct Ansible service deployment)
-
-Override example:
-
-```bash
-cd ansible
-./run.sh playbooks/deploy-apps.yml -e kubernetes_deploy_mode=legacy
-```
-
-## Service onboarding checklist
-
-When adding a new internal service:
-
-1. Add Kubernetes manifests/chart under `kubernetes/<service>/`
-2. Add DNS mapping in `kubernetes/blocky/config.yml` (`customDNS.mapping`)
-3. Add homepage entry in `kubernetes/homepage/services.yaml`
-4. If GitOps-managed, add an Argo CD Application in `kubernetes/argocd/apps/`
-
-## Repository layout (summary)
+## Repository layout
 
 ```text
 homelab/
-├── ansible/                 # Playbooks, inventory, roles, run.sh
-├── docs/                    # Runbooks and architecture docs
-├── kubernetes/              # App manifests/charts and GitOps apps
-├── navidrome/               # Local utility script(s)
-└── README.md
+├── docs/                    # Operations and recovery runbooks
+├── kubernetes/              # Application charts and Flux resources
+├── navidrome/               # Local utility scripts
+└── scripts/                 # Repository validation scripts
 ```
 
-## Documentation index
+## GitOps bootstrap
 
-- `docs/network-diagram.md`
-- `docs/argocd-gitops.md`
-- `docs/acme-dns01-private-services.md`
-- `docs/backup-procedures.md`
-- `docs/disaster-recovery.md`
-- `kubernetes/kube-config-to-normal-user.md`
-- `kubernetes/ollama/README.md`
+The one-time bootstrap uses Helm and kubectl. It installs Flux Operator, creates
+the private Forgejo pull Secret outside Git, and applies the `FluxInstance`.
+
+Follow [`docs/flux-gitops.md`](docs/flux-gitops.md). Do not push the removal of
+Argo CD Applications until Flux has been installed and Argo reconciliation has
+been stopped as described in that runbook.
+
+## Service onboarding
+
+1. Add or update the chart under `kubernetes/<service>/`.
+2. Add the corresponding `HelmRelease` to
+   `kubernetes/flux/cluster/apps/releases.yaml`.
+3. Add external chart sources to `kubernetes/flux/cluster/sources.yaml` when
+   required.
+4. Add DNS and homepage entries when the service has a user-facing endpoint.
+5. Run the repository validation commands from the Flux runbook.
+
+## Documentation
+
+- [`docs/flux-gitops.md`](docs/flux-gitops.md)
+- [`docs/network-diagram.md`](docs/network-diagram.md)
+- [`docs/kubernetes-storage.md`](docs/kubernetes-storage.md)
+- [`docs/backup-procedures.md`](docs/backup-procedures.md)
+- [`docs/disaster-recovery.md`](docs/disaster-recovery.md)
 
 ![Keel dashboard](./docs/images/keel.png)

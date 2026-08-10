@@ -1,0 +1,118 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: authentik
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://charts.goauthentik.io
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: cloudnative-pg
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://cloudnative-pg.github.io/charts
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: grafana
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://grafana-community.github.io/helm-charts
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: infisical
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://dl.cloudsmith.io/public/infisical/helm-charts/helm/charts/
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: keel
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://charts.keel.sh
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: newt
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://charts.fossorial.io
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: nfs-provisioner
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: openwebui
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://helm.openwebui.com/
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: prometheus
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://prometheus-community.github.io/helm-charts
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: traefik
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://traefik.github.io/charts
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: arc-controller
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller
+  ref:
+    tag: 0.14.2
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: arc-runner-set
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
+  ref:
+    tag: 0.14.2
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+

@@ -1,106 +1,71 @@
 # Disaster Recovery
 
-This runbook describes how to recover the homelab after partial
-or total cluster failure.
-
 ## Recovery objectives
 
-- Restore Kubernetes control plane and worker nodes
-- Restore platform services (MetalLB, Traefik, Blocky, Argo CD)
-- Restore business-critical apps and data
+- Restore the Kubernetes control plane and workers.
+- Restore Synology NFS access and the `nfs-k8s` provisioner.
+- Restore Forgejo, Flux Operator, Flux, and application workloads.
 
-## Prerequisites
+## Single-service failure
 
-- Access to this repository
-- SSH access to all nodes (`ansible/private_key`)
-- Correct inventory in `ansible/inventory.ini`
-- Access to application data backups
+Inspect Flux and workload status:
 
-## Recovery levels
+```bash
+kubectl -n flux-system get gitrepositories,kustomizations,helmreleases
+kubectl get pods -A
+```
 
-## Level 1: Single service failure
+Fix desired state in Git. To request an immediate retry without the Flux CLI:
 
-1. Inspect Argo CD and pod status:
+```bash
+kubectl -n flux-system annotate helmrelease <name> \
+  reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite
+```
 
-   ```bash
-   kubectl get applications -n argocd
-   kubectl get pods -A
-   ```
+## Node failure
 
-2. If GitOps-managed, sync/fix via Argo CD by reconciling desired state in Git.
-3. If needed, redeploy platform/apps:
+1. Recover node OS and network access.
+2. Confirm the remaining nodes and NFS storage are healthy.
+3. Check that evicted workloads reschedule on another worker.
+4. Reconcile failed Flux resources after the node returns.
 
-   ```bash
-   cd ansible
-   ./run.sh playbooks/deploy-apps.yml
-   ```
+```bash
+kubectl get nodes -o wide
+kubectl get pods -A -o wide
+kubectl get pvc,pv -A
+kubectl -n flux-system get helmreleases
+```
 
-## Level 2: Node failure
+## Full cluster rebuild
 
-1. Recover node OS/network access.
-2. Validate inventory reachability:
+The Git source is the in-cluster Forgejo service. Flux cannot bootstrap from it
+until Forgejo is restored, so keep an external repository backup.
 
-   ```bash
-   cd ansible
-   ./run.sh playbooks/update.yml --check
-   ```
-
-3. Re-run app deployment to reconcile workloads:
-
-   ```bash
-   ./run.sh playbooks/deploy-apps.yml
-   ```
-
-4. Restore app data for impacted PVCs if needed.
-
-## Level 3: Full cluster rebuild
-
-Use when control plane/etcd is unrecoverable.
-
-1. Recreate/repair nodes (OS + SSH + networking).
-2. (Optional) reset old cluster state:
-
-   ```bash
-   cd ansible
-   ./run.sh playbooks/reset.yml
-   ```
-
-3. Install Kubernetes with Kubespray:
-
-   ```bash
-   ./run.sh playbooks/install.yml
-   ```
-
-4. Deploy platform and applications:
-
-   ```bash
-   ./run.sh playbooks/deploy-apps.yml
-   ```
-
-5. Restore persistent data backups to required PVCs/services.
+1. Rebuild Kubernetes and restore network access.
+2. Install the NFS provisioner and restore required static PV/PVC bindings from
+   the storage recovery inventory.
+3. Restore Forgejo and its data from Synology NFS, then confirm SSH access to the
+   `homelab` repository.
+4. Follow `docs/flux-gitops.md` to install Flux Operator, create the SSH pull
+   Secret, and apply the `FluxInstance`.
+5. Restore application data backups and wait for all HelmReleases to become
+   ready.
 
 ## Post-recovery validation
-
-Run at minimum:
 
 ```bash
 kubectl get nodes -o wide
 kubectl get pods -A
-kubectl get svc -A
-kubectl get ingress -A
+kubectl get svc,ingress -A
+kubectl get pvc,pv -A
+kubectl -n flux-system get fluxinstance,gitrepositories,kustomizations,helmreleases
 ```
 
-Validate key endpoints:
+Validate at least Homepage, Grafana, Prometheus, Forgejo, Vaultwarden, Infisical,
+DNS, ingress, databases, and application data.
 
-- `argocd.home.tom-mendy.com`
-- `homepage.home.tom-mendy.com`
-- `grafana.home.tom-mendy.com`
-- `prometheus.home.tom-mendy.com`
-- `forgejo.tom-mendy.com`
-- `vaultwarden.home.tom-mendy.com`
+## Caveats
 
-## Known caveats
-
-- `reset.yml` is destructive for Kubernetes state.
-- Resource YAML exports are not equivalent to full etcd backup/restore.
-- Secrets must be backed up and stored securely.
+- Resource exports are not equivalent to an etcd backup.
+- Secrets and Git deploy keys must be backed up securely outside Git.
+- Do not replace NFS-backed PVCs with worker-local storage.
