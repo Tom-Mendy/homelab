@@ -67,6 +67,50 @@ docker run --rm --cap-add NET_ADMIN ... route self-check
 success
 ```
 
-The repository change is ready for publication. The Forgejo workflow must
-publish `nymvpn-sidecar:2026.10.0-2` before the live rollout can be validated
-with the WebUI, VPN exit-country, and kill-switch tests.
+After Forgejo published `nymvpn-sidecar:2026.10.0-2`, the first pod remained
+temporarily in `ImagePullBackOff`. Its events still contained the earlier
+registry response:
+
+```text
+Failed to pull image ... nymvpn-sidecar:2026.10.0-2: not found
+```
+
+No pod was deleted. The kubelet retried automatically and the pod became
+ready. The live validation then produced:
+
+```text
+kubectl -n media rollout status deployment/qbittorrent --timeout=120s
+deployment "qbittorrent" successfully rolled out
+
+kubectl -n media exec deploy/qbittorrent -c nymvpn -- \
+  ip -4 route show 10.233.64.0/18
+10.233.64.0/18 via 169.254.1.1 dev eth0
+
+kubectl -n traefik exec deploy/traefik -- \
+  wget -qSO- http://qbittorrent.media.svc.cluster.local:8080/
+HTTP/1.1 200 OK
+
+curl --resolve qbittorrent.home.tom-mendy.com:443:10.0.0.60 \
+  https://qbittorrent.home.tom-mendy.com/
+HTTP 200
+
+kubectl -n media exec deploy/qbittorrent -c qbittorrent -- \
+  /app/qbittorrent-nox --version
+qBittorrent v5.2.2
+```
+
+The HelmRelease had reached `Stalled` during the missing-image retries. The
+local `flux` command was unavailable, so the first reconciliation command
+failed with `flux: command not found`. A normal reconciliation annotation was
+handled but could not clear `Stalled`. Renewing both `requestedAt` and
+`forceAt` started one controlled retry. Its final result was:
+
+```text
+Ready=True | UpgradeSucceeded
+Helm upgrade succeeded for release media/media.v7
+1 updated / 1 ready / 1 total
+```
+
+The unauthenticated local Web API version request returned `403 Forbidden`,
+so the running binary was queried directly instead. The final storage policy
+check also returned `storage policy ok`.
