@@ -17,6 +17,16 @@ vpn:
   credentials:
     wireguardPrivateKey: ""
 
+nymVpn:
+  image: forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.10.0-1
+  pullPolicy: IfNotPresent
+  secretName: nymvpn-credentials
+  entryCountry: FR
+  exitCountry: CH
+  stateStorage:
+    className: nfs-k8s
+    size: 1Gi
+
 infisicalSecret:
   enabled: true
   name: protonvpn-credentials
@@ -59,6 +69,7 @@ apps:
     port: 8080
     host: qbittorrent.home.tom-mendy.com
     vpn: true
+    vpnProvider: nymvpn
     mounts:
       downloads: true
       movies: false
