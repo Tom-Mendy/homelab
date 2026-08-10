@@ -1,6 +1,0 @@
-- name: Reboot hosts
-  hosts: all
-  become: true
-  gather_facts: false
-  roles:
-    - reboot

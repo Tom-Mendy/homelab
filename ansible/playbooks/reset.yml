@@ -1,5 +1,0 @@
-- name: Reset Kubernetes cluster (Kubespray)
-  ansible.builtin.import_playbook: kubernetes_sigs.kubespray.reset
-
-- name: Reboot hosts after reset
-  ansible.builtin.import_playbook: reboot.yml

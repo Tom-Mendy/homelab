@@ -1,6 +1,0 @@
-- name: Deploy Blocky local Helm chart
-  kubernetes.core.helm:
-    name: blocky-local
-    chart_ref: "{{ playbook_dir + '/../../kubernetes/blocky' }}"
-    release_namespace: blocky
-    create_namespace: true

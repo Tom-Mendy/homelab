@@ -1,6 +1,0 @@
-- name: Deploy Forgejo local Helm chart
-  kubernetes.core.helm:
-    name: forgejo-local
-    chart_ref: "{{ playbook_dir + '/../../kubernetes/forgejo' }}"
-    release_namespace: forgejo
-    create_namespace: true
