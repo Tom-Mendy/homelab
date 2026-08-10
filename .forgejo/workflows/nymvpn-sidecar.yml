@@ -1,0 +1,30 @@
+name: nymvpn-sidecar
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - kubernetes/media/nymvpn/**
+      - .forgejo/workflows/nymvpn-sidecar.yml
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE: forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.10.0-1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Log in to Forgejo registry
+        run: echo "$FORGEJO_TOKEN" | docker login forgejo.tom-mendy.com --username "$REGISTRY_USERNAME" --password-stdin
+        env:
+          REGISTRY_USERNAME: ${{ forgejo.repository_owner }}
+          FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+
+      - name: Build and push image
+        run: |
+          docker build --pull --tag "$IMAGE" kubernetes/media/nymvpn
+          docker push "$IMAGE"
