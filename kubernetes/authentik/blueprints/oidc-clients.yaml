@@ -30,6 +30,98 @@ entries:
     identifiers:
       name: openwebui-users
 
+  - model: authentik_core.group
+    id: media-users
+    identifiers:
+      name: media-users
+
+  - model: authentik_providers_proxy.proxyprovider
+    id: radarr-provider
+    identifiers:
+      name: Radarr
+    attrs:
+      authentication_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-authentication-flow]
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+      external_host: https://radarr.home.tom-mendy.com
+      mode: forward_single
+  - model: authentik_core.application
+    id: radarr-application
+    identifiers:
+      slug: radarr
+    attrs:
+      name: Radarr
+      provider: !KeyOf radarr-provider
+      meta_launch_url: https://radarr.home.tom-mendy.com/
+      policy_engine_mode: any
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf radarr-application
+      group: !KeyOf homelab-admins
+      order: 0
+    attrs:
+      enabled: true
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf radarr-application
+      group: !KeyOf media-users
+      order: 1
+    attrs:
+      enabled: true
+
+  - model: authentik_providers_proxy.proxyprovider
+    id: sonarr-provider
+    identifiers:
+      name: Sonarr
+    attrs:
+      authentication_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-authentication-flow]
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+      external_host: https://sonarr.home.tom-mendy.com
+      mode: forward_single
+  - model: authentik_core.application
+    id: sonarr-application
+    identifiers:
+      slug: sonarr
+    attrs:
+      name: Sonarr
+      provider: !KeyOf sonarr-provider
+      meta_launch_url: https://sonarr.home.tom-mendy.com/
+      policy_engine_mode: any
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf sonarr-application
+      group: !KeyOf homelab-admins
+      order: 0
+    attrs:
+      enabled: true
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf sonarr-application
+      group: !KeyOf media-users
+      order: 1
+    attrs:
+      enabled: true
+  - model: authentik_outposts.outpost
+    identifiers:
+      name: authentik Embedded Outpost
+    attrs:
+      providers:
+        - !KeyOf radarr-provider
+        - !KeyOf sonarr-provider
+
   - model: authentik_providers_oauth2.scopemapping
     id: openwebui-roles-scope
     identifiers:
