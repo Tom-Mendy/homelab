@@ -23,7 +23,21 @@ kubectl rollout status -n coder deployment/coder --timeout=10m
 Open `https://coder.home.tom-mendy.com`, sign in through Authentik, and finish
 the owner bootstrap if Coder requests it.
 
-Configure Coder Agents once in **Admin settings > AI**:
+## Optional Coder Agents integration
+
+Coder Agents and its AI Gateway require a Coder license entitlement. Check the
+deployment before trying to configure Ollama:
+
+```sh
+curl -fsS https://coder.home.tom-mendy.com/api/v2/entitlements \
+  | jq '.features | {aibridge, managed_agent_limit}'
+```
+
+The Community deployment currently reports both features as `not_entitled`.
+Standard Coder workspaces and the independent Hermes workspace still work.
+
+If those features become entitled, configure Coder Agents once in
+**Admin settings > AI**:
 
 1. Add an `OpenAI Compatible` provider named `ollama`.
 2. Use base URL `http://ollama.ollama.svc.cluster.local:11434/v1` and API key
