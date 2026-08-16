@@ -1,0 +1,166 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik-postgres
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: authentik-postgres
+  targetNamespace: authentik
+  storageNamespace: authentik
+  chart:
+    spec:
+      chart: ./kubernetes/authentik-postgres
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: cloudnative-pg
+    - name: nfs-provisioner
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: infisical-operator
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: infisical-operator
+  targetNamespace: infisical-operator
+  storageNamespace: infisical-operator
+  chart:
+    spec:
+      chart: secrets-operator
+      version: 0.11.0
+      sourceRef:
+        kind: HelmRepository
+        name: infisical
+  valuesFrom:
+    - kind: ConfigMap
+      name: infisical-operator-values
+  install:
+    createNamespace: true
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: infisical-postgres
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: infisical-postgres
+  targetNamespace: infisical
+  storageNamespace: infisical
+  chart:
+    spec:
+      chart: ./kubernetes/infisical-postgres
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: cloudnative-pg
+    - name: nfs-provisioner
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: infisical
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: infisical
+  targetNamespace: infisical
+  storageNamespace: infisical
+  chart:
+    spec:
+      chart: infisical-standalone
+      version: 1.8.0
+      sourceRef:
+        kind: HelmRepository
+        name: infisical
+  valuesFrom:
+    - kind: ConfigMap
+      name: infisical-values
+  dependsOn:
+    - name: infisical-postgres
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik
+spec:
+  interval: 30m
+  timeout: 15m
+  releaseName: authentik
+  targetNamespace: authentik
+  storageNamespace: authentik
+  chart:
+    spec:
+      chart: authentik
+      version: 2026.5.2
+      sourceRef:
+        kind: HelmRepository
+        name: authentik
+  valuesFrom:
+    - kind: ConfigMap
+      name: authentik-values
+  dependsOn:
+    - name: authentik-extras
+    - name: authentik-postgres
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik-extras
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: authentik-extras
+  targetNamespace: authentik
+  storageNamespace: authentik
+  chart:
+    spec:
+      chart: ./kubernetes/authentik
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: infisical
+    - name: infisical-operator
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+
