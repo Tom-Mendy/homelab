@@ -51,6 +51,7 @@ spec:
           FORGEJO_OIDC_CLIENT_SECRET: "{{`{{ .FORGEJO_OIDC_CLIENT_SECRET.Value }}`}}"
           GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "{{`{{ .GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET.Value }}`}}"
           FLUX_WEB_CLIENT_SECRET: "{{`{{ .FLUX_WEB_CLIENT_SECRET.Value }}`}}"
+          OPENWEBUI_OIDC_CLIENT_SECRET: "{{`{{ .OPENWEBUI_OIDC_CLIENT_SECRET.Value }}`}}"
     - name: forgejo-oidc
       namespace: forgejo
       kind: Secret
