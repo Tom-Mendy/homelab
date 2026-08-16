@@ -29,6 +29,19 @@ spec:
       labels:
         app: radarr
     spec:
+      initContainers:
+        - name: disable-local-auth
+          image: {{ $app.image | quote }}
+          command:
+            - sh
+            - -ec
+            - |
+              if [ -f /config/config.xml ]; then
+                sed -i 's#<AuthenticationMethod>[^<]*</AuthenticationMethod>#<AuthenticationMethod>None</AuthenticationMethod>#; s#<AuthenticationRequired>[^<]*</AuthenticationRequired>#<AuthenticationRequired>Disabled</AuthenticationRequired>#' /config/config.xml
+              fi
+          volumeMounts:
+            - name: config
+              mountPath: /config
       containers:
         - name: radarr
           image: {{ $app.image | quote }}
@@ -90,6 +103,7 @@ metadata:
   namespace: {{ .Values.namespace }}
   annotations:
 {{ toYaml .Values.ingress.annotations | nindent 4 }}
+    traefik.ingress.kubernetes.io/router.middlewares: {{ printf "%s-authentik-media@kubernetescrd" .Values.namespace | quote }}
 spec:
   rules:
     - host: {{ $app.host }}

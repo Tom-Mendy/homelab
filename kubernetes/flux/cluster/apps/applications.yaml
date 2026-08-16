@@ -148,6 +148,7 @@ spec:
         kind: GitRepository
         name: flux-system
   dependsOn:
+    - name: authentik
     - name: infisical
     - name: infisical-operator
     - name: nfs-provisioner
@@ -537,4 +538,3 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
-
