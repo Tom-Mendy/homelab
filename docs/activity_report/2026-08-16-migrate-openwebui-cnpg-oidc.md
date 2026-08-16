@@ -68,12 +68,41 @@ The synchronized `openwebui-oidc` Secret existed in `ollama`, but the
 
 Open WebUI now uses a new NFS-backed CloudNativePG database and its old PVC has
 been reset. The final Authentik fix adds the OIDC client-secret key to the
-worker's synchronized Secret. After that Git change is reconciled, restart the
-Authentik server and worker, then confirm:
+worker's synchronized Secret.
+
+Flux initially retained the prior Git artifact, so a reconcile request was
+needed:
+
+```sh
+kubectl -n flux-system annotate gitrepository flux-system \
+  reconcile.fluxcd.io/requestedAt="$(date -Iseconds)" --overwrite
+```
+
+```text
+Flux source updated: refs/heads/main@sha1:83c1810...
+AuthentiK secret key synchronized (88 base64 bytes)
+```
+
+Restart Authentik after the secret update, then apply the corrected mounted
+blueprint. The automatic retry did not rerun its previous failed instance.
+
+```sh
+kubectl -n authentik rollout restart deployment/authentik-server \
+  deployment/authentik-worker
+kubectl -n authentik exec deployment/authentik-worker -- \
+  ak apply_blueprint /blueprints/mounted/cm-authentik-oidc-blueprint/oidc-clients.yaml
+```
+
+Verify the provider and application:
 
 ```sh
 curl -fsS \
   https://authentik.home.tom-mendy.com/application/o/openwebui/.well-known/openid-configuration
+```
+
+```text
+OIDC discovery HTTP 200
+Open WebUI HTTP 200
 ```
 
 All persistent workloads use `nfs-k8s`; no `local-path` storage was added.
