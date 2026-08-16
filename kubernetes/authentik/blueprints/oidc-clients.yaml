@@ -192,6 +192,7 @@ entries:
       name: Open WebUI
       provider: !KeyOf openwebui-provider
       meta_launch_url: https://openwebui.home.tom-mendy.com/
+      meta_icon: https://openwebui.home.tom-mendy.com/static/favicon.png
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
@@ -254,6 +255,7 @@ entries:
       name: Forgejo
       provider: !KeyOf forgejo-provider
       meta_launch_url: https://forgejo.tom-mendy.com/user/oauth2/authentik
+      meta_icon: https://forgejo.tom-mendy.com/assets/img/logo.svg
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
@@ -316,6 +318,7 @@ entries:
       name: Grafana
       provider: !KeyOf grafana-provider
       meta_launch_url: https://grafana.home.tom-mendy.com/
+      meta_icon: https://grafana.home.tom-mendy.com/public/img/grafana_icon.svg
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
@@ -378,6 +381,7 @@ entries:
       name: Flux
       provider: !KeyOf flux-provider
       meta_launch_url: https://flux.home.tom-mendy.com/
+      meta_icon: https://flux.home.tom-mendy.com/favicon.svg
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
