@@ -44,6 +44,8 @@ set -- \
   --scopes profile \
   --scopes email \
   --scopes offline_access \
+  --required-claim-name "" \
+  --required-claim-value "" \
   --group-claim-name groups \
   --admin-group homelab-admins
 
