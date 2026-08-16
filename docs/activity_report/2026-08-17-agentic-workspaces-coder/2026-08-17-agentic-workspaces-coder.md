@@ -58,9 +58,9 @@ $ docker buildx imagetools inspect nousresearch/hermes-agent:v2026.7.1 \
 
 OpenAI documentation confirmed that local Codex clients can use `codex login`
 with ChatGPT subscription access. Hermes documentation additionally confirmed
-its native `openai-codex` device-code flow. Coder Agents remains configured
-against the existing Ollama OpenAI-compatible endpoint so no subscription
-credential is stored centrally or injected into task workspaces.
+its native `openai-codex` device-code flow. Ollama was considered for Coder
+Agents, but a live entitlement check showed that the Community deployment does
+not include the required AI features. No unavailable integration was added.
 
 ## Changes
 
@@ -72,8 +72,9 @@ credential is stored centrally or injected into task workspaces.
   standard workspaces.
 - Added two pinned Terraform templates. Both use Kubernetes Deployments and
   `nfs-k8s` PVCs, allowing rescheduling between workers.
-- Added the operator runbook for Coder Agents, Forgejo SSH, Hermes OAuth,
-  Hindsight local mode, template publication, and worker-failure checks.
+- Added the operator runbook for the licensed Coder Agents option, Forgejo SSH,
+  Hermes OAuth, Hindsight local mode, template publication, and worker-failure
+  checks.
 
 ## Validation results
 
@@ -149,6 +150,17 @@ The first final `kubeconform` retry could not access the Nix daemon socket from
 the sandbox. Running the identical validation with daemon access produced the
 successful summary above.
 
+The initial template uploads succeeded but warned that the provider lockfiles
+were absent. Terraform generated Linux AMD64 checksums for the two pinned
+providers before the final upload:
+
+```console
+$ terraform providers lock -platform=linux_amd64
+- Retrieved coder/coder 2.18.0 ...
+- Retrieved hashicorp/kubernetes 3.2.1 ...
+Success! Terraform has updated the lock file.
+```
+
 `rumdl check --fix .` also exposed pre-existing Markdown line-length issues
 outside this change. Its automatic unrelated edits were reverted. The two new
 documents pass independently:
@@ -162,8 +174,71 @@ Success: No issues found in 2 files
 
 ## Final outcome
 
-The repository now declares the complete GitOps platform and workspace
-templates. Flux reconciliation, Infisical secret creation, one-time Coder
-database configuration, template publication, and live node-drain tests remain
-explicit operator actions because they change the running cluster or external
-identity state.
+After `CODER_OIDC_CLIENT_SECRET` was created in Infisical, Flux reconciled the
+commit. The first Coder starts failed because Authentik had not yet applied the
+new provider blueprint:
+
+```console
+$ kubectl logs -n coder deployment/coder --previous
+error: create oidc config: configure oidc provider: 404 Not Found
+```
+
+Authentik then discovered and applied the changed blueprint. No manual rollout
+or direct manifest application was needed:
+
+```console
+Applying blueprint due to changed file ... Homelab OIDC clients
+Task finished ... task_name: authentik.blueprints.v1.tasks.apply_blueprint
+```
+
+Coder recovered automatically. Final observations were:
+
+```console
+$ kubectl get helmreleases -n flux-system coder coder-extras
+NAME           READY   STATUS
+coder          True    Helm install succeeded ... coder@2.35.3
+coder-extras   True    Helm install succeeded ... coder-local@0.1.0
+
+$ kubectl get pvc -n coder
+NAME               STATUS   CAPACITY   STORAGECLASS
+coder-postgres-1   Bound    10Gi       nfs-k8s
+
+$ curl -o /dev/null -w '%{http_code}' \
+    https://coder.home.tom-mendy.com/healthz
+200
+
+$ curl -o /dev/null -w '%{http_code}' \
+    https://authentik.home.tom-mendy.com/application/o/coder/\
+.well-known/openid-configuration
+200
+```
+
+After the owner account was created, the matching 2.35.3 CLI published and
+activated both workspace templates. Coder successfully initialized and planned
+each template against its in-cluster provisioner:
+
+```console
+$ coder templates list
+NAME             ORGANIZATION NAME  USED BY
+agent-workspace  coder              0 active developers
+hermes-personal  coder              0 active developers
+```
+
+The AI provider was not configured because the deployment explicitly reports
+that the required features are unavailable:
+
+```console
+$ curl -fsS https://coder.home.tom-mendy.com/api/v2/entitlements \
+    | jq '.features | {aibridge, managed_agent_limit}'
+{
+  "aibridge": {"entitlement": "not_entitled", "enabled": false},
+  "managed_agent_limit": {
+    "entitlement": "not_entitled",
+    "enabled": false
+  }
+}
+```
+
+Coder workspaces and Hermes do not depend on those licensed features. Hermes
+first-time authentication and live node-drain recovery tests remain operator
+actions because they require personal credentials and a maintenance window.
