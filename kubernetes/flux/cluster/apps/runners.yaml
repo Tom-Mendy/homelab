@@ -1,0 +1,152 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: arc-controller
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: arc
+  targetNamespace: arc-systems
+  storageNamespace: arc-systems
+  chartRef:
+    kind: OCIRepository
+    name: arc-controller
+  valuesFrom:
+    - kind: ConfigMap
+      name: arc-controller-values
+  install:
+    createNamespace: true
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: github-runners-auth
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: github-runners-auth
+  targetNamespace: arc-runners
+  storageNamespace: arc-runners
+  chart:
+    spec:
+      chart: ./kubernetes/github-runners-auth
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: arc-controller
+    - name: infisical
+    - name: infisical-operator
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: github-runners-dotfiles
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: arc-runner-set-dotfiles
+  targetNamespace: arc-runners
+  storageNamespace: arc-runners
+  chartRef:
+    kind: OCIRepository
+    name: arc-runner-set
+  valuesFrom:
+    - kind: ConfigMap
+      name: arc-dotfiles-values
+  dependsOn:
+    - name: arc-controller
+    - name: github-runners-auth
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: github-runners-portfolio
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: arc-runner-set-portfolio
+  targetNamespace: arc-runners
+  storageNamespace: arc-runners
+  chartRef:
+    kind: OCIRepository
+    name: arc-runner-set
+  valuesFrom:
+    - kind: ConfigMap
+      name: arc-portfolio-values
+  dependsOn:
+    - name: arc-controller
+    - name: github-runners-auth
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: github-runners-sumfeet
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: arc-runner-set-sumfeet
+  targetNamespace: arc-runners
+  storageNamespace: arc-runners
+  chartRef:
+    kind: OCIRepository
+    name: arc-runner-set
+  valuesFrom:
+    - kind: ConfigMap
+      name: arc-sumfeet-values
+  dependsOn:
+    - name: arc-controller
+    - name: github-runners-auth
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo-runner-homelab
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: forgejo-runner-homelab
+  targetNamespace: forgejo-runner
+  storageNamespace: forgejo-runner
+  chart:
+    spec:
+      chart: ./kubernetes/forgejo-runner
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: forgejo
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+

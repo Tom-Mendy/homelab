@@ -1,27 +1,3 @@
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: nfs-provisioner
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: nfs-provisioner
-  targetNamespace: nfs-provisioner
-  storageNamespace: nfs-provisioner
-  chart:
-    spec:
-      chart: nfs-subdir-external-provisioner
-      version: 4.0.18
-      sourceRef:
-        kind: HelmRepository
-        name: nfs-provisioner
-  valuesFrom:
-    - kind: ConfigMap
-      name: nfs-provisioner-values
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -53,6 +29,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -75,6 +52,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -101,6 +79,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -126,6 +105,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -148,31 +128,7 @@ spec:
     - name: traefik
   driftDetection:
     mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: authentik-postgres
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: authentik-postgres
-  targetNamespace: authentik
-  storageNamespace: authentik
-  chart:
-    spec:
-      chart: ./kubernetes/authentik-postgres
-      reconcileStrategy: Revision
-      sourceRef:
-        kind: GitRepository
-        name: flux-system
-  dependsOn:
-    - name: cloudnative-pg
-    - name: nfs-provisioner
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -200,6 +156,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -226,6 +183,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -252,6 +210,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -279,6 +238,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -309,6 +269,7 @@ spec:
     disableSchemaValidation: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -335,6 +296,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -363,6 +325,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -388,173 +351,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: cloudnative-pg
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: cloudnative-pg
-  targetNamespace: cnpg-system
-  storageNamespace: cnpg-system
-  chart:
-    spec:
-      chart: cloudnative-pg
-      version: 0.28.2
-      sourceRef:
-        kind: HelmRepository
-        name: cloudnative-pg
-  valuesFrom:
-    - kind: ConfigMap
-      name: cloudnative-pg-values
-  install:
-    createNamespace: true
-    crds: Create
-  upgrade:
-    crds: CreateReplace
-  driftDetection:
-    mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: infisical-operator
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: infisical-operator
-  targetNamespace: infisical-operator
-  storageNamespace: infisical-operator
-  chart:
-    spec:
-      chart: secrets-operator
-      version: 0.11.0
-      sourceRef:
-        kind: HelmRepository
-        name: infisical
-  valuesFrom:
-    - kind: ConfigMap
-      name: infisical-operator-values
-  install:
-    createNamespace: true
-    crds: Create
-  upgrade:
-    crds: CreateReplace
-  driftDetection:
-    mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: traefik
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: traefik
-  targetNamespace: traefik
-  storageNamespace: traefik
-  chart:
-    spec:
-      chart: traefik
-      version: 40.2.0
-      sourceRef:
-        kind: HelmRepository
-        name: traefik
-  valuesFrom:
-    - kind: ConfigMap
-      name: traefik-values
-  dependsOn:
-    - name: nfs-provisioner
-  install:
-    createNamespace: true
-    crds: Create
-    disableSchemaValidation: true
-  upgrade:
-    crds: CreateReplace
-    disableSchemaValidation: true
-  driftDetection:
-    mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: infisical-postgres
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: infisical-postgres
-  targetNamespace: infisical
-  storageNamespace: infisical
-  chart:
-    spec:
-      chart: ./kubernetes/infisical-postgres
-      reconcileStrategy: Revision
-      sourceRef:
-        kind: GitRepository
-        name: flux-system
-  dependsOn:
-    - name: cloudnative-pg
-    - name: nfs-provisioner
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: infisical
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: infisical
-  targetNamespace: infisical
-  storageNamespace: infisical
-  chart:
-    spec:
-      chart: infisical-standalone
-      version: 1.8.0
-      sourceRef:
-        kind: HelmRepository
-        name: infisical
-  valuesFrom:
-    - kind: ConfigMap
-      name: infisical-values
-  dependsOn:
-    - name: infisical-postgres
-    - name: traefik
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: traefik-extras
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: traefik-extras
-  targetNamespace: traefik
-  storageNamespace: traefik
-  chart:
-    spec:
-      chart: ./kubernetes/traefik
-      reconcileStrategy: Revision
-      sourceRef:
-        kind: GitRepository
-        name: flux-system
-  dependsOn:
-    - name: infisical
-    - name: infisical-operator
-    - name: traefik
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -579,6 +376,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -603,6 +401,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -630,6 +429,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -656,6 +456,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -684,6 +485,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -708,60 +510,7 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: authentik
-spec:
-  interval: 30m
-  timeout: 15m
-  releaseName: authentik
-  targetNamespace: authentik
-  storageNamespace: authentik
-  chart:
-    spec:
-      chart: authentik
-      version: 2026.5.2
-      sourceRef:
-        kind: HelmRepository
-        name: authentik
-  valuesFrom:
-    - kind: ConfigMap
-      name: authentik-values
-  dependsOn:
-    - name: authentik-extras
-    - name: authentik-postgres
-    - name: traefik
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: authentik-extras
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: authentik-extras
-  targetNamespace: authentik
-  storageNamespace: authentik
-  chart:
-    spec:
-      chart: ./kubernetes/authentik
-      reconcileStrategy: Revision
-      sourceRef:
-        kind: GitRepository
-        name: flux-system
-  dependsOn:
-    - name: infisical
-    - name: infisical-operator
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -788,149 +537,4 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: arc-controller
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: arc
-  targetNamespace: arc-systems
-  storageNamespace: arc-systems
-  chartRef:
-    kind: OCIRepository
-    name: arc-controller
-  valuesFrom:
-    - kind: ConfigMap
-      name: arc-controller-values
-  install:
-    createNamespace: true
-    crds: Create
-  upgrade:
-    crds: CreateReplace
-  driftDetection:
-    mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: github-runners-auth
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: github-runners-auth
-  targetNamespace: arc-runners
-  storageNamespace: arc-runners
-  chart:
-    spec:
-      chart: ./kubernetes/github-runners-auth
-      reconcileStrategy: Revision
-      sourceRef:
-        kind: GitRepository
-        name: flux-system
-  dependsOn:
-    - name: arc-controller
-    - name: infisical
-    - name: infisical-operator
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: github-runners-dotfiles
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: arc-runner-set-dotfiles
-  targetNamespace: arc-runners
-  storageNamespace: arc-runners
-  chartRef:
-    kind: OCIRepository
-    name: arc-runner-set
-  valuesFrom:
-    - kind: ConfigMap
-      name: arc-dotfiles-values
-  dependsOn:
-    - name: arc-controller
-    - name: github-runners-auth
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: github-runners-portfolio
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: arc-runner-set-portfolio
-  targetNamespace: arc-runners
-  storageNamespace: arc-runners
-  chartRef:
-    kind: OCIRepository
-    name: arc-runner-set
-  valuesFrom:
-    - kind: ConfigMap
-      name: arc-portfolio-values
-  dependsOn:
-    - name: arc-controller
-    - name: github-runners-auth
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: github-runners-sumfeet
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: arc-runner-set-sumfeet
-  targetNamespace: arc-runners
-  storageNamespace: arc-runners
-  chartRef:
-    kind: OCIRepository
-    name: arc-runner-set
-  valuesFrom:
-    - kind: ConfigMap
-      name: arc-sumfeet-values
-  dependsOn:
-    - name: arc-controller
-    - name: github-runners-auth
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: forgejo-runner-homelab
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: forgejo-runner-homelab
-  targetNamespace: forgejo-runner
-  storageNamespace: forgejo-runner
-  chart:
-    spec:
-      chart: ./kubernetes/forgejo-runner
-      reconcileStrategy: Revision
-      sourceRef:
-        kind: GitRepository
-        name: flux-system
-  dependsOn:
-    - name: forgejo
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
+
