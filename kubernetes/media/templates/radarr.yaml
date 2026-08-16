@@ -29,19 +29,6 @@ spec:
       labels:
         app: radarr
     spec:
-      initContainers:
-        - name: disable-local-auth
-          image: {{ $app.image | quote }}
-          command:
-            - sh
-            - -ec
-            - |
-              if [ -f /config/config.xml ]; then
-                sed -i 's#<AuthenticationMethod>[^<]*</AuthenticationMethod>#<AuthenticationMethod>None</AuthenticationMethod>#; s#<AuthenticationRequired>[^<]*</AuthenticationRequired>#<AuthenticationRequired>Disabled</AuthenticationRequired>#' /config/config.xml
-              fi
-          volumeMounts:
-            - name: config
-              mountPath: /config
       containers:
         - name: radarr
           image: {{ $app.image | quote }}
@@ -52,6 +39,10 @@ spec:
               value: {{ .Values.securityContext.pgid | quote }}
             - name: TZ
               value: {{ .Values.timezone | quote }}
+            - name: RADARR__AUTH__METHOD
+              value: External
+            - name: RADARR__AUTH__REQUIRED
+              value: Enabled
           ports:
             - containerPort: {{ $app.port }}
               name: http
