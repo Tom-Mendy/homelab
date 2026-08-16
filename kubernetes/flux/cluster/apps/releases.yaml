@@ -95,6 +95,7 @@ spec:
         name: flux-system
   dependsOn:
     - name: nfs-provisioner
+    - name: searxng
     - name: traefik
   install:
     createNamespace: true
@@ -780,60 +781,6 @@ spec:
     - name: infisical
     - name: infisical-operator
     - name: traefik
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: openwebui
-spec:
-  interval: 30m
-  timeout: 15m
-  releaseName: openwebui
-  targetNamespace: openwebui
-  storageNamespace: openwebui
-  chart:
-    spec:
-      chart: open-webui
-      version: 14.8.0
-      sourceRef:
-        kind: HelmRepository
-        name: openwebui
-  valuesFrom:
-    - kind: ConfigMap
-      name: openwebui-values
-  dependsOn:
-    - name: nfs-provisioner
-    - name: ollama
-    - name: searxng
-    - name: traefik
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: openwebui-extras
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: openwebui-extras
-  targetNamespace: openwebui
-  storageNamespace: openwebui
-  chart:
-    spec:
-      chart: ./kubernetes/openwebui
-      reconcileStrategy: Revision
-      sourceRef:
-        kind: GitRepository
-        name: flux-system
-  dependsOn:
-    - name: openwebui
   install:
     createNamespace: true
   driftDetection:

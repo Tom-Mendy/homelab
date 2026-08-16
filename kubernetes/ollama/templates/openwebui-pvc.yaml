@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.openwebui.persistence.existingClaim }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    helm.sh/resource-policy: keep
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.openwebui.persistence.size }}
+  storageClassName: {{ .Values.openwebui.persistence.storageClass }}
+  volumeName: {{ .Values.openwebui.persistence.volumeName }}

@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.openwebuiIngress.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+{{ toYaml .Values.openwebuiIngress.annotations | nindent 4 }}
+spec:
+  tls:
+    - hosts:
+        - {{ .Values.openwebuiIngress.host }}
+  rules:
+    - host: {{ .Values.openwebuiIngress.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.openwebui.fullnameOverride }}
+                port:
+                  number: {{ .Values.openwebui.service.port }}
