@@ -242,7 +242,7 @@ entries:
     attrs:
       name: Forgejo
       provider: !KeyOf forgejo-provider
-      meta_launch_url: https://forgejo.tom-mendy.com/
+      meta_launch_url: https://forgejo.tom-mendy.com/user/oauth2/authentik
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:

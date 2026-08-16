@@ -16,6 +16,10 @@ spec:
     metadata:
       labels:
         app: forgejo
+      {{- if .Values.oidc.enabled }}
+      annotations:
+        checksum/oidc-script: {{ .Files.Get "files/configure-oidc.sh" | sha256sum }}
+      {{- end }}
     spec:
       containers:
         - name: forgejo
