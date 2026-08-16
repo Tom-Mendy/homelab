@@ -35,6 +35,15 @@ entries:
     identifiers:
       name: media-users
 
+  - model: authentik_core.group
+    id: radarr-users
+    identifiers:
+      name: radarr-users
+  - model: authentik_core.group
+    id: sonarr-users
+    identifiers:
+      name: sonarr-users
+
   - model: authentik_providers_proxy.proxyprovider
     id: radarr-provider
     identifiers:
@@ -59,6 +68,7 @@ entries:
       name: Radarr
       provider: !KeyOf radarr-provider
       meta_launch_url: https://radarr.home.tom-mendy.com/
+      meta_icon: https://raw.githubusercontent.com/Radarr/Radarr/develop/Logo/64.png
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
@@ -70,7 +80,7 @@ entries:
   - model: authentik_policies.policybinding
     identifiers:
       target: !KeyOf radarr-application
-      group: !KeyOf media-users
+      group: !KeyOf radarr-users
       order: 1
     attrs:
       enabled: true
@@ -99,6 +109,7 @@ entries:
       name: Sonarr
       provider: !KeyOf sonarr-provider
       meta_launch_url: https://sonarr.home.tom-mendy.com/
+      meta_icon: https://raw.githubusercontent.com/Sonarr/Sonarr/develop/Logo/64.png
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
@@ -110,7 +121,7 @@ entries:
   - model: authentik_policies.policybinding
     identifiers:
       target: !KeyOf sonarr-application
-      group: !KeyOf media-users
+      group: !KeyOf sonarr-users
       order: 1
     attrs:
       enabled: true
