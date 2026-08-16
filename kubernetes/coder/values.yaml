@@ -1,0 +1,46 @@
+coder:
+  podAnnotations:
+    secrets.infisical.com/auto-reload: "true"
+  env:
+    - name: CODER_ACCESS_URL
+      value: https://coder.home.tom-mendy.com
+    - name: CODER_PG_CONNECTION_URL
+      valueFrom:
+        secretKeyRef:
+          name: coder-postgres-app
+          key: uri
+    - name: CODER_OIDC_ISSUER_URL
+      value: https://authentik.home.tom-mendy.com/application/o/coder/
+    - name: CODER_OIDC_CLIENT_ID
+      value: coder
+    - name: CODER_OIDC_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: coder-oidc
+          key: CODER_OIDC_CLIENT_SECRET
+    - name: CODER_OIDC_SIGN_IN_TEXT
+      value: Sign in with Authentik
+  serviceAccount:
+    workspacePerms: true
+    enableDeployments: true
+    workspaceNamespaces:
+      - name: coder-workspaces
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 2Gi
+  service:
+    type: ClusterIP
+  ingress:
+    enable: true
+    className: traefik
+    host: coder.home.tom-mendy.com
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    tls:
+      enable: true

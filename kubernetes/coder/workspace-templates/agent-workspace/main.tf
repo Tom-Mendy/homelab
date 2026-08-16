@@ -1,0 +1,185 @@
+terraform {
+  required_providers {
+    coder = {
+      source  = "coder/coder"
+      version = "2.18.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "3.2.1"
+    }
+  }
+}
+
+provider "coder" {}
+provider "kubernetes" {}
+
+data "coder_workspace" "me" {}
+data "coder_workspace_owner" "me" {}
+
+data "coder_parameter" "repository_url" {
+  name         = "repository_url"
+  display_name = "Forgejo repository"
+  type         = "string"
+  mutable      = false
+  default      = "ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git"
+
+  validation {
+    regex = "^ssh://git@forgejo\\.forgejo\\.svc\\.cluster\\.local/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+\\.git$"
+    error = "Use an SSH URL hosted by the in-cluster Forgejo service."
+  }
+}
+
+data "coder_parameter" "branch" {
+  name         = "branch"
+  display_name = "Git branch"
+  type         = "string"
+  mutable      = false
+  default      = "main"
+
+  validation {
+    regex = "^[A-Za-z0-9._/-]+$"
+    error = "Use a valid Git branch name."
+  }
+}
+
+resource "coder_agent" "main" {
+  os   = "linux"
+  arch = "amd64"
+
+  startup_script = <<-EOT
+    set -eu
+    mkdir -p "$HOME/.ssh" "$HOME/project"
+    chmod 700 "$HOME/.ssh"
+    if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
+      ssh-keygen -q -t ed25519 -N "" -f "$HOME/.ssh/id_ed25519"
+    fi
+    ssh-keyscan -H forgejo.forgejo.svc.cluster.local >> "$HOME/.ssh/known_hosts" 2>/dev/null || true
+    sort -u "$HOME/.ssh/known_hosts" -o "$HOME/.ssh/known_hosts"
+    if [ ! -d "$HOME/project/.git" ]; then
+      git clone --branch "$REPOSITORY_BRANCH" "$REPOSITORY_URL" "$HOME/project" || {
+        echo "Forgejo has not accepted this workspace key yet. Add the following public key, then clone again:"
+        cat "$HOME/.ssh/id_ed25519.pub"
+      }
+    fi
+  EOT
+
+  metadata {
+    display_name = "CPU Usage"
+    key          = "cpu"
+    script       = "coder stat cpu"
+    interval     = 10
+    timeout      = 1
+  }
+
+  metadata {
+    display_name = "RAM Usage"
+    key          = "memory"
+    script       = "coder stat mem"
+    interval     = 10
+    timeout      = 1
+  }
+}
+
+resource "coder_env" "repository_url" {
+  agent_id = coder_agent.main.id
+  name     = "REPOSITORY_URL"
+  value    = data.coder_parameter.repository_url.value
+}
+
+resource "coder_env" "repository_branch" {
+  agent_id = coder_agent.main.id
+  name     = "REPOSITORY_BRANCH"
+  value    = data.coder_parameter.branch.value
+}
+
+resource "kubernetes_persistent_volume_claim_v1" "home" {
+  metadata {
+    name      = "coder-${data.coder_workspace.me.id}-home"
+    namespace = "coder-workspaces"
+    labels = {
+      "app.kubernetes.io/name"   = "coder-workspace"
+      "com.coder.workspace.id"   = data.coder_workspace.me.id
+      "com.coder.workspace.name" = data.coder_workspace.me.name
+      "com.coder.user.id"        = data.coder_workspace_owner.me.id
+    }
+  }
+  wait_until_bound = false
+  spec {
+    access_modes       = ["ReadWriteOnce"]
+    storage_class_name = "nfs-k8s"
+    resources {
+      requests = { storage = "10Gi" }
+    }
+  }
+}
+
+resource "kubernetes_deployment_v1" "workspace" {
+  count            = data.coder_workspace.me.start_count
+  wait_for_rollout = false
+  depends_on       = [kubernetes_persistent_volume_claim_v1.home]
+
+  metadata {
+    name      = "coder-${data.coder_workspace.me.id}"
+    namespace = "coder-workspaces"
+    labels = {
+      "app.kubernetes.io/name" = "coder-workspace"
+      "com.coder.workspace.id" = data.coder_workspace.me.id
+    }
+  }
+
+  spec {
+    replicas = 1
+    strategy { type = "Recreate" }
+    selector {
+      match_labels = { "com.coder.workspace.id" = data.coder_workspace.me.id }
+    }
+    template {
+      metadata {
+        labels = {
+          "app.kubernetes.io/name" = "coder-workspace"
+          "com.coder.workspace.id" = data.coder_workspace.me.id
+        }
+      }
+      spec {
+        automount_service_account_token = false
+        security_context {
+          run_as_user     = 1000
+          run_as_group    = 1000
+          fs_group        = 1000
+          run_as_non_root = true
+          seccomp_profile { type = "RuntimeDefault" }
+        }
+        container {
+          name              = "workspace"
+          image             = "codercom/example-universal@sha256:411973a25007c309162e36958038ccf0f93d7cb48bf295f3da16bd30658c3ca7"
+          image_pull_policy = "IfNotPresent"
+          command           = ["sh", "-c", coder_agent.main.init_script]
+          security_context {
+            allow_privilege_escalation = false
+            run_as_non_root            = true
+            capabilities { drop = ["ALL"] }
+          }
+          env {
+            name  = "CODER_AGENT_TOKEN"
+            value = coder_agent.main.token
+          }
+          resources {
+            requests = { cpu = "500m", memory = "2Gi" }
+            limits   = { cpu = "2", memory = "6Gi" }
+          }
+          volume_mount {
+            name       = "home"
+            mount_path = "/home/coder"
+          }
+        }
+        volume {
+          name = "home"
+          persistent_volume_claim {
+            claim_name = kubernetes_persistent_volume_claim_v1.home.metadata[0].name
+          }
+        }
+      }
+    }
+  }
+}

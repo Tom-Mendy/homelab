@@ -69,6 +69,7 @@ spec:
           GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "{{`{{ .GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET.Value }}`}}"
           FLUX_WEB_CLIENT_SECRET: "{{`{{ .FLUX_WEB_CLIENT_SECRET.Value }}`}}"
           OPENWEBUI_OIDC_CLIENT_SECRET: "{{`{{ .OPENWEBUI_OIDC_CLIENT_SECRET.Value }}`}}"
+          CODER_OIDC_CLIENT_SECRET: "{{`{{ .CODER_OIDC_CLIENT_SECRET.Value }}`}}"
     - name: forgejo-oidc
       namespace: forgejo
       kind: Secret
@@ -105,6 +106,15 @@ spec:
         engineVersion: v1
         data:
           OPENWEBUI_OIDC_CLIENT_SECRET: "{{`{{ .OPENWEBUI_OIDC_CLIENT_SECRET.Value }}`}}"
+    - name: coder-oidc
+      namespace: coder
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          CODER_OIDC_CLIENT_SECRET: "{{`{{ .CODER_OIDC_CLIENT_SECRET.Value }}`}}"
   syncOptions:
     refreshInterval: 1m
     instantUpdates: false

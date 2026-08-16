@@ -66,6 +66,10 @@
         description: Music player
 
 - Developer:
+    - Coder:
+        icon: coder.svg
+        href: https://coder.home.tom-mendy.com/
+        description: Isolated agent workspaces
     - Forgejo:
         icon: forgejo.svg
         href: https://forgejo.tom-mendy.com/
