@@ -107,6 +107,11 @@ openwebui:
     enabled: false
 
   extraEnvVars:
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: openwebui-postgres-app
+          key: uri
     - name: ENABLE_WEB_SEARCH
       value: "true"
     - name: WEB_SEARCH_ENGINE
@@ -116,6 +121,23 @@ openwebui:
     - name: SEARXNG_LANGUAGE
       value: "all"
 
+  sso:
+    enabled: true
+    enableSignup: true
+    enableRoleManagement: true
+    oidc:
+      enabled: true
+      clientId: openwebui
+      clientExistingSecret: openwebui-oidc
+      clientExistingSecretKey: OPENWEBUI_OIDC_CLIENT_SECRET
+      providerUrl: https://authentik.home.tom-mendy.com/application/o/openwebui/.well-known/openid-configuration
+      providerName: Authentik
+      scopes: "openid email profile roles"
+    roleManagement:
+      rolesClaim: roles
+      allowedRoles: openwebui-user,openwebui-admin
+      adminRoles: openwebui-admin
+
 openwebuiIngress:
   name: openwebui-ingress
   host: openwebui.home.tom-mendy.com
@@ -123,3 +145,13 @@ openwebuiIngress:
     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+
+openwebuiPostgres:
+  name: openwebui-postgres
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17
+  storage:
+    size: 10Gi
+    storageClass: nfs-k8s
+  database: openwebui
+  owner: openwebui
