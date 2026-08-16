@@ -12,6 +12,7 @@ deployment:
 
 models:
   pull:
+    - deepseek-v4-flash:cloud
     - gemma4:e4b
     - deepseek-r1:8b
 
