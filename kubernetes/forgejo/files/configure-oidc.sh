@@ -5,6 +5,10 @@ find_auth_id() {
   awk -F '\t' '$2 == "authentik" { print $1; exit }'
 }
 
+forgejo_admin() {
+  su-exec git forgejo --config /data/gitea/conf/app.ini admin auth "$@"
+}
+
 if [ "${1:-}" = "--self-test" ]; then
   fixture='ID	Name	Type	Enabled
 10	authentik	OAuth2	true'
@@ -16,7 +20,7 @@ fi
 # ponytail: retry the local CLI until Forgejo has initialized its config and DB.
 attempt=0
 while [ "$attempt" -lt 60 ]; do
-  if auth_list="$(su-exec git forgejo admin auth list 2>/dev/null)"; then
+  if auth_list="$(forgejo_admin list 2>/dev/null)"; then
     break
   fi
   attempt=$((attempt + 1))
@@ -44,7 +48,7 @@ set -- \
   --admin-group homelab-admins
 
 if [ -n "$auth_id" ]; then
-  su-exec git forgejo admin auth update-oauth --id "$auth_id" "$@"
+  forgejo_admin update-oauth --id "$auth_id" "$@"
 else
-  su-exec git forgejo admin auth add-oauth "$@"
+  forgejo_admin add-oauth "$@"
 fi
