@@ -2,5 +2,10 @@ apiVersion: v2
 name: ollama-local
 description: Local Helm chart for Ollama
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "1.0.0"
+dependencies:
+  - name: open-webui
+    version: 14.8.0
+    repository: https://helm.openwebui.com/
+    alias: openwebui

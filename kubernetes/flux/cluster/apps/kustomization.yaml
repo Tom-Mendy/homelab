@@ -40,9 +40,6 @@ configMapGenerator:
   - name: nfs-provisioner-values
     files:
       - values.yaml=../../../nfs-provisioner/values.yaml
-  - name: openwebui-values
-    files:
-      - values.yaml=../../../openwebui/values.yaml
   - name: prometheus-values
     files:
       - values.yaml=../../../prometheus/values.yaml

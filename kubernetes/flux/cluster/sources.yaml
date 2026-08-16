@@ -64,15 +64,6 @@ spec:
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
-  name: openwebui
-  namespace: flux-system
-spec:
-  interval: 30m
-  url: https://helm.openwebui.com/
----
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
-metadata:
   name: prometheus
   namespace: flux-system
 spec:
@@ -115,4 +106,3 @@ spec:
   layerSelector:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
-
