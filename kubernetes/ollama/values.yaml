@@ -69,3 +69,57 @@ gpu:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
+
+openwebui:
+  namespaceOverride: ollama
+  fullnameOverride: open-webui
+
+  ollama:
+    enabled: false
+  ollamaUrls:
+    - http://ollama:11434
+
+  deployment:
+    podAnnotations:
+      keel.sh/policy: all
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+  persistence:
+    enabled: true
+    existingClaim: open-webui
+    storageClass: nfs-k8s
+    size: 50Gi
+    volumeName: pvc-090fcf5b-66f0-457f-9279-f5167b075af5
+
+  pipelines:
+    enabled: false
+    persistence:
+      storageClass: nfs-k8s
+      size: 50Gi
+
+  websocket:
+    enabled: false
+
+  ingress:
+    enabled: false
+
+  extraEnvVars:
+    - name: ENABLE_WEB_SEARCH
+      value: "true"
+    - name: WEB_SEARCH_ENGINE
+      value: "searxng"
+    - name: SEARXNG_QUERY_URL
+      value: "http://searxng.searxng.svc.cluster.local:8080/search"
+    - name: SEARXNG_LANGUAGE
+      value: "all"
+
+openwebuiIngress:
+  name: openwebui-ingress
+  host: openwebui.home.tom-mendy.com
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
