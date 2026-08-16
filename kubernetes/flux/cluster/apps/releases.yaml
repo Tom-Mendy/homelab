@@ -354,7 +354,10 @@ spec:
         kind: GitRepository
         name: flux-system
   dependsOn:
+    - name: authentik
+    - name: cloudnative-pg
     - name: nfs-provisioner
+    - name: searxng
     - name: traefik
   install:
     createNamespace: true
