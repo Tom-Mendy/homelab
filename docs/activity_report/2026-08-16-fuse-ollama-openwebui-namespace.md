@@ -17,7 +17,8 @@ Open WebUI is now a pinned dependency of the local `kubernetes/ollama` chart.
 Its Helm values explicitly set `namespaceOverride: ollama`; without that
 setting, a local render uses the current Helm namespace (`infisical` here).
 
-Before Flux reconciles the Git change, perform the one-time PV transfer:
+For a migration before Flux removes the legacy releases, suspend them and stop
+Open WebUI before the one-time PV transfer:
 
 ```sh
 kubectl -n flux-system patch helmrelease/openwebui --type=merge \
@@ -66,6 +67,51 @@ storage-policy check returned:
 storage policy ok
 ```
 
+After Flux applied the unified chart, Open WebUI remained pending because the
+old claim still held the retained PV:
+
+```text
+pod/open-webui-0   0/1   Pending
+persistentvolumeclaim/open-webui   Pending
+pvc-090fcf5b-66f0-457f-9279-f5167b075af5   Bound   openwebui/open-webui
+```
+
+The legacy Helm releases had already been removed, and the old namespace had
+no workload. The transfer was therefore safe to complete:
+
+```sh
+kubectl -n openwebui delete pvc open-webui
+kubectl patch pv pvc-090fcf5b-66f0-457f-9279-f5167b075af5 \
+  --type=merge -p '{"spec":{"claimRef":null}}'
+kubectl -n ollama wait --for=jsonpath='{.status.phase}'=Bound pvc/open-webui \
+  --timeout=90s
+kubectl -n ollama rollout status statefulset/open-webui --timeout=240s
+```
+
+```text
+persistentvolumeclaim "open-webui" deleted from openwebui namespace
+pvc-090fcf5b-66f0-457f-9279-f5167b075af5   Released   Retain
+persistentvolumeclaim/open-webui condition met
+partitioned roll out complete: 1 new pods have been updated...
+```
+
+Verify Open WebUI can query Ollama and both public routes respond:
+
+```sh
+kubectl -n ollama exec open-webui-0 -- python -c \
+  'import urllib.request; print(urllib.request.urlopen("http://ollama:11434/api/tags").read())'
+curl -ksS -o /dev/null -w 'openwebui HTTP %{http_code}\n' \
+  https://openwebui.home.tom-mendy.com/
+curl -ksS -o /dev/null -w 'ollama HTTP %{http_code}\n' \
+  https://ollama.home.tom-mendy.com/api/tags
+```
+
+```text
+deepseek-r1:8b, gemma4:e4b, deepseek-v4-flash:cloud
+openwebui HTTP 200
+ollama HTTP 200
+```
+
 ## Final outcome
 
 The local Ollama chart owns both workloads, the Open WebUI ingress, and both
@@ -74,5 +120,20 @@ PVCs. `ollama.home.tom-mendy.com` continues to route to the Ollama service and
 `nfs-k8s`; no `local-path` manifest was introduced.
 
 The tracked Git change removes the standalone Open WebUI Flux releases,
-values ConfigMap, Helm source, and local extras chart. The PV transfer above
-remains required during deployment to retain existing Open WebUI data.
+values ConfigMap, Helm source, and local extras chart. The retained PV is now
+bound to `ollama/open-webui`; existing Open WebUI data remains available.
+
+## Deferred volume reset
+
+A request to reset the Open WebUI volume was paused before any data was
+deleted. The StatefulSet was scaled to zero and then restored when the target
+architecture changed to CloudNativePG and Authentik OIDC:
+
+```text
+statefulset.apps/open-webui scaled
+pod/open-webui-0 condition met
+partitioned roll out complete: 1 new pods have been updated...
+```
+
+The temporary reset manifest was not applied. The existing NFS PVC and its
+data therefore remain intact until the PostgreSQL-backed deployment is ready.

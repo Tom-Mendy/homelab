@@ -1,0 +1,15 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ .Values.openwebuiPostgres.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  instances: {{ .Values.openwebuiPostgres.instances }}
+  imageName: {{ .Values.openwebuiPostgres.imageName }}
+  storage:
+    size: {{ .Values.openwebuiPostgres.storage.size }}
+    storageClass: {{ .Values.openwebuiPostgres.storage.storageClass }}
+  bootstrap:
+    initdb:
+      database: {{ .Values.openwebuiPostgres.database }}
+      owner: {{ .Values.openwebuiPostgres.owner }}
