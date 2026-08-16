@@ -39,7 +39,24 @@ spec:
       environmentSlug: {{ .Values.oidc.infisical.envSlug | quote }}
       secretPath: /oidc
       recursive: false
+    - projectId: {{ .Values.oidc.infisical.projectId | quote }}
+      environmentSlug: {{ .Values.oidc.infisical.envSlug | quote }}
+      secretPath: /authentik
+      recursive: false
   targets:
+    - name: authentik-secrets
+      namespace: authentik
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          AUTHENTIK_ENABLED: "{{`{{ .AUTHENTIK_ENABLED.Value }}`}}"
+          AUTHENTIK_ERROR_REPORTING__ENABLED: "{{`{{ .AUTHENTIK_ERROR_REPORTING__ENABLED.Value }}`}}"
+          AUTHENTIK_LOG_LEVEL: "{{`{{ .AUTHENTIK_LOG_LEVEL.Value }}`}}"
+          AUTHENTIK_SECRET_KEY: "{{`{{ .AUTHENTIK_SECRET_KEY.Value | trim }}`}}"
+          AUTHENTIK_WEB__PATH: "{{`{{ .AUTHENTIK_WEB__PATH.Value }}`}}"
     - name: authentik-oidc
       namespace: authentik
       kind: Secret

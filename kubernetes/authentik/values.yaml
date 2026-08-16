@@ -1,14 +1,5 @@
 namespace: authentik
 
-infisicalSecret:
-  enabled: false
-  name: authentik-secrets
-  hostAPI: https://infisical.home.tom-mendy.com/api
-  identityID: ""
-  projectSlug: homelab
-  envSlug: prod
-  secretsPath: /authentik
-
 oidc:
   blueprintConfigMapName: authentik-oidc-blueprint
   infisical:
@@ -32,6 +23,8 @@ authentik:
     port: 5432
 
 global:
+  deploymentAnnotations:
+    secrets.infisical.com/auto-reload: "true"
   envFrom:
     - secretRef:
         name: authentik-oidc
