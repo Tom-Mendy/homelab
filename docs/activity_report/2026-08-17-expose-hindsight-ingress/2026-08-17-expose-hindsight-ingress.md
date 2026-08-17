@@ -74,3 +74,12 @@ The Hindsight chart now creates a Traefik HTTPS Ingress for
 `hindsight.home.tom-mendy.com`, using the existing Let’s Encrypt resolver and
 routing to the existing `hindsight` ClusterIP Service on port 8888. The
 hostname must resolve to the internal Traefik address for the URL to work.
+
+Homepage was then updated with a Hindsight shortcut:
+
+```yaml
+- Hindsight:
+    icon: kubernetes.svg
+    href: https://hindsight.home.tom-mendy.com
+    description: Agent memory API
+```
