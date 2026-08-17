@@ -23,6 +23,8 @@ resource "coder_agent" "main" {
 
   startup_script = <<-EOT
     set -eu
+    UV_CONSTRAINT= uv pip freeze --python /opt/hermes/.venv/bin/python3 | grep -v '^-e ' >"$UV_CONSTRAINT"
+    [ ! -f "$HOME/.profile" ] || sed -i '\|runtime-venv-v2026.7.1|d' "$HOME/.profile"
     profile_line='export PATH="/opt/hermes/bin:/opt/hermes/.venv/bin:$HOME/.local/bin:$PATH"'
     grep -qxF "$profile_line" "$HOME/.profile" 2>/dev/null || printf '\n%s\n' "$profile_line" >> "$HOME/.profile"
     mkdir -p "$HERMES_HOME/logs"
@@ -128,6 +130,14 @@ resource "kubernetes_deployment_v1" "workspace" {
           env {
             name  = "HERMES_HOME"
             value = "/opt/data"
+          }
+          env {
+            name  = "UV_CONSTRAINT"
+            value = "/opt/data/.uv-constraints-v2026.7.1.txt"
+          }
+          env {
+            name  = "HINDSIGHT_API_URL"
+            value = "http://hindsight.agent.svc.cluster.local:8888"
           }
           env {
             name  = "MATRIX_HOMESERVER"
