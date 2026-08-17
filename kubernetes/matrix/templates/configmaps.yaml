@@ -20,6 +20,7 @@ data:
     allow_public_room_directory_over_federation = false
     allow_public_room_directory_without_auth = false
     ip_source = "rightmost_x_forwarded_for"
+    registration_token_file = "/run/secrets/registration-shared-secret"
     registration_shared_secret_file = "/run/secrets/registration-shared-secret"
 
     [[global.identity_provider]]

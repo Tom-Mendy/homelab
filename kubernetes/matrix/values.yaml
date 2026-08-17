@@ -3,6 +3,17 @@ namespace: matrix
 deploymentAnnotations:
   secrets.infisical.com/auto-reload: "true"
 
+infisicalSecret:
+  serviceAccountName: matrix-infisical-sync
+  connectionName: matrix-infisical
+  authName: matrix-infisical
+  identitySecretName: matrix-infisical-identity
+  address: https://infisical.home.tom-mendy.com
+  identityID: "b8b289b4-f869-4547-94e1-ce89928ce5a9"
+  projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+  envSlug: prod
+  secretsPath: /matrix
+
 tuwunel:
   image: ghcr.io/matrix-construct/tuwunel:v1.8.3@sha256:699fa9971c174e01c884abad8d1a3cfb2fe518e1a71f1fa16ea9dedf11873d74
   host: matrix.tom-mendy.com
