@@ -19,7 +19,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: hindsight
+                name: hindsight-control-plane
                 port:
                   name: http
 {{- end }}
