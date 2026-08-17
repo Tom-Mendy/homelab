@@ -134,3 +134,66 @@ completed, the first human Authentik login creates the Tuwunel administrator,
 and the local `hermes-bot` account is registered through a port-forward. Calls
 use Element Desktop or Element X; TURN is deferred until testing shows it is
 needed on restrictive networks.
+
+## First deployment correction
+
+After the first reconciliation, Cinny and MatrixRTC were ready, both NFS claims
+were bound, but Tuwunel was in `CrashLoopBackOff`. Public checks consequently
+returned `404` for the unhandled homeserver root, `503` for the Matrix versions
+and well-known endpoints, and `200` for Cinny.
+
+The previous Tuwunel log exposed the root cause:
+
+```text
+data did not match any variant of untagged enum Either for key "PORT" in
+`TUWUNEL_` environment variable(s)
+```
+
+Kubernetes service links had injected `TUWUNEL_PORT=tcp://...` because the
+Service is named `tuwunel`. Tuwunel treats every `TUWUNEL_*` variable as
+configuration, so it tried and failed to parse that URL as its numeric port.
+The pod now sets `enableServiceLinks: false`, fixing the shared source of those
+injected variables instead of overriding one accidental value.
+
+With that fixed, startup reached Tuwunel's registration safety check and
+stopped again because `allow_registration` requires a closed registration
+token even when OIDC is configured. The existing high-entropy shared
+registration secret was also configured as `registration_token_file`. It
+already grants the stronger shared-secret registration capability, so reusing
+it satisfies the closed-registration guard without adding or exposing another
+secret. Human registration remains gated by the Authentik provider policy.
+
+The operator had also created a dedicated `matrix-k8s-auth` Infisical Machine
+Identity. The chart was corrected to create `matrix-infisical-sync`, its
+`InfisicalConnection`, `InfisicalAuth`, and `/matrix` static secret in the
+Matrix namespace. The temporary reuse of the Authentik identity for Matrix
+runtime secrets was removed; Authentik still distributes only the OIDC client
+secret from `/oidc`.
+
+The corrected render passed Helm lint and storage checks. Kubeconform found 21
+resources: 18 valid Kubernetes resources and three skipped Infisical custom
+resources whose schemas are not in its standard registry, with no invalid
+resources or errors.
+
+The live Deployment was patched with the service-link fix and the corrected
+ConfigMap, then restarted. The first rollout-status call immediately repeated
+the old `ProgressDeadlineExceeded` condition, so the new ReplicaSet and logs
+were inspected directly. After the registration-token correction, rollout
+completed and all three Matrix pods became ready with zero restarts. Tuwunel
+opened its new RocksDB database and listened on port 8008.
+
+Public verification then returned:
+
+```text
+matrix root:       404 (expected; no website is served there)
+client versions:  200
+client well-known: 200
+Cinny:             200
+```
+
+The Matrix login API advertises Authentik through `m.login.sso`. A separate
+remaining issue was found for `rtc.tom-mendy.com`: direct Pangolin testing
+showed Traefik's default certificate and HTTP 404, while the Matrix and Chat
+Pangolin resources returned 200. This identifies the RTC HTTPS Pangolin
+resource or its host forwarding as the remaining external configuration issue,
+not a Kubernetes pod or Ingress failure.
