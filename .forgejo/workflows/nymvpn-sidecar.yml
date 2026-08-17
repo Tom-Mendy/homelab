@@ -13,7 +13,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     env:
-      IMAGE: forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.3-2
+      IMAGE: forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.3-3
     steps:
       - name: Checkout
         uses: actions/checkout@v6
