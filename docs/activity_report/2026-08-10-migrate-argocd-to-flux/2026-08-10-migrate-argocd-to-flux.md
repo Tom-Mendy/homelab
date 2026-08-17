@@ -164,6 +164,7 @@ or approved static Synology NFS volumes. The live Argo-to-Flux ownership
 transfer remains intentionally unexecuted until the migration is committed,
 pushed to Forgejo, and performed through the documented maintenance-window
 sequence.
+
 ## Flux Operator installation
 
 Argo CD remains active while Flux is installed beside it. The OIDC client
@@ -183,6 +184,7 @@ STATUS: deployed
 The next required bootstrap input is the dedicated Forgejo deploy key and its
 `known_hosts` file. Flux must not be switched on or Argo CD stopped until the
 `flux-system` Secret can be created and the `FluxInstance` reports Ready.
+
 ## Argo CD removal
 
 Flux had a Ready `FluxInstance`, GitRepository, Kustomization, and 38 Ready

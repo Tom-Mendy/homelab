@@ -149,7 +149,7 @@ resource "kubernetes_deployment_v1" "workspace" {
           }
           env {
             name  = "MATRIX_E2EE_MODE"
-            value = "optional"
+            value = "required"
           }
           env {
             name = "MATRIX_ACCESS_TOKEN"
@@ -166,6 +166,15 @@ resource "kubernetes_deployment_v1" "workspace" {
               secret_key_ref {
                 name = "hermes-matrix"
                 key  = "MATRIX_ALLOWED_USERS"
+              }
+            }
+          }
+          env {
+            name = "MATRIX_RECOVERY_KEY"
+            value_from {
+              secret_key_ref {
+                name = "hermes-matrix"
+                key  = "MATRIX_RECOVERY_KEY"
               }
             }
           }
