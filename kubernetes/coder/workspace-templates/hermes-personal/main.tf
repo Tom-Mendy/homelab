@@ -148,10 +148,6 @@ resource "kubernetes_deployment_v1" "workspace" {
             value = "@hermes-bot:matrix.tom-mendy.com"
           }
           env {
-            name  = "MATRIX_DEVICE_ID"
-            value = "HERMES_BOT"
-          }
-          env {
             name  = "MATRIX_E2EE_MODE"
             value = "optional"
           }
