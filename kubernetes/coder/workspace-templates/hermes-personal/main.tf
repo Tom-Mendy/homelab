@@ -23,6 +23,8 @@ resource "coder_agent" "main" {
 
   startup_script = <<-EOT
     set -eu
+    profile_line='export PATH="/opt/hermes/bin:/opt/hermes/.venv/bin:$HOME/.local/bin:$PATH"'
+    grep -qxF "$profile_line" "$HOME/.profile" 2>/dev/null || printf '\n%s\n' "$profile_line" >> "$HOME/.profile"
     mkdir -p "$HERMES_HOME/logs"
     if [ -f "$HERMES_HOME/config.yaml" ]; then
       nohup hermes gateway run >"$HERMES_HOME/logs/gateway-coder.log" 2>&1 &
