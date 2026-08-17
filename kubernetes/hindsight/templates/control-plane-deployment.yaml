@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hindsight-control-plane
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: hindsight-control-plane
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: hindsight-control-plane
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: control-plane
+          image: "{{ .Values.controlPlane.image.repository }}:{{ .Values.controlPlane.image.tag }}"
+          imagePullPolicy: {{ .Values.controlPlane.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          env:
+            - name: PORT
+              value: {{ .Values.controlPlane.service.port | quote }}
+            - name: HINDSIGHT_CP_DATAPLANE_API_URL
+              value: http://hindsight.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.service.port }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.controlPlane.service.port }}
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 30
+          resources:
+{{ toYaml .Values.controlPlane.resources | nindent 12 }}
