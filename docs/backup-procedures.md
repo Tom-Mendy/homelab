@@ -53,7 +53,7 @@ mkdir -p backups/k8s-$(date +%F)
 kubectl get ns -o yaml > backups/k8s-$(date +%F)/namespaces.yaml
 
 for ns in flux-system traefik blocky homepage keel prometheus grafana \
-  navidrome vaultwarden forgejo default; do
+  navidrome vaultwarden forgejo matrix default; do
  kubectl get all,cm,secret,ing,pvc -n "$ns" -o yaml \
   > backups/k8s-$(date +%F)/${ns}.yaml || true
 done
@@ -74,12 +74,16 @@ Stateful services in this repo include at least:
 - `prometheus`
 - `navidrome` data PVC
 - `trilium`
+- `matrix` (`tuwunel-data` and `tuwunel-backups`)
 
 Recommended approach:
 
 1. Identify PVC/PV used by each service.
 2. Use storage-level snapshots or application-native export.
 3. Store backups off-cluster (NAS/off-site).
+
+Matrix-specific online backup, Synology snapshot, and restore steps are in
+`kubernetes/matrix/README.md`.
 
 ## 4) Pre-maintenance backup checklist
 

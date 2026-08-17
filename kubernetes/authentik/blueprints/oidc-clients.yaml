@@ -28,6 +28,10 @@ entries:
     id: coder-users
     identifiers:
       name: coder-users
+  - model: authentik_core.group
+    id: matrix-users
+    identifiers:
+      name: matrix-users
 
   - model: authentik_core.group
     id: openwebui-users
@@ -461,6 +465,66 @@ entries:
     identifiers:
       target: !KeyOf coder-application
       group: !KeyOf coder-users
+      order: 1
+    attrs:
+      enabled: true
+
+  - model: authentik_providers_oauth2.oauth2provider
+    id: matrix-provider
+    identifiers:
+      name: Matrix
+    attrs:
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-authentication-flow]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+      client_type: confidential
+      client_id: matrix
+      client_secret: !Env [MATRIX_OIDC_CLIENT_SECRET, null]
+      issuer_mode: per_provider
+      grant_types:
+        - authorization_code
+        - refresh_token
+      redirect_uris:
+        - matching_mode: strict
+          url: https://matrix.tom-mendy.com/_matrix/client/unstable/login/sso/callback/matrix
+          redirect_uri_type: authorization
+      property_mappings:
+        - !Find
+          - authentik_providers_oauth2.scopemapping
+          - [managed, goauthentik.io/providers/oauth2/scope-openid]
+        - !Find
+          - authentik_providers_oauth2.scopemapping
+          - [managed, goauthentik.io/providers/oauth2/scope-email]
+        - !Find
+          - authentik_providers_oauth2.scopemapping
+          - [managed, goauthentik.io/providers/oauth2/scope-profile]
+      signing_key: !Find
+        - authentik_crypto.certificatekeypair
+        - [name, authentik Self-signed Certificate]
+  - model: authentik_core.application
+    id: matrix-application
+    identifiers:
+      slug: matrix
+    attrs:
+      name: Matrix
+      provider: !KeyOf matrix-provider
+      meta_launch_url: https://chat.tom-mendy.com/
+      meta_icon: https://chat.tom-mendy.com/assets/favicon.ico
+      policy_engine_mode: any
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf matrix-application
+      group: !KeyOf homelab-admins
+      order: 0
+    attrs:
+      enabled: true
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf matrix-application
+      group: !KeyOf matrix-users
       order: 1
     attrs:
       enabled: true

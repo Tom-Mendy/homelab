@@ -1,0 +1,29 @@
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalStaticSecret
+metadata:
+  name: matrix-runtime
+  namespace: {{ .Values.namespace }}
+spec:
+  infisicalAuthRef:
+    name: {{ .Values.oidc.infisical.authName }}
+    namespace: {{ .Values.namespace }}
+  sources:
+    - projectId: {{ .Values.oidc.infisical.projectId | quote }}
+      environmentSlug: {{ .Values.oidc.infisical.envSlug | quote }}
+      secretPath: /matrix
+      recursive: false
+  targets:
+    - name: matrix-runtime
+      namespace: matrix
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          registration-shared-secret: "{{`{{ .MATRIX_REGISTRATION_SHARED_SECRET.Value }}`}}"
+          LIVEKIT_KEY: "{{`{{ .LIVEKIT_KEY.Value }}`}}"
+          LIVEKIT_SECRET: "{{`{{ .LIVEKIT_SECRET.Value }}`}}"
+  syncOptions:
+    refreshInterval: 1m
+    instantUpdates: false

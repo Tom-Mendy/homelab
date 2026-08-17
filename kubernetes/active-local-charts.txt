@@ -12,6 +12,7 @@ homepage
 infisical-postgres
 keel
 media
+matrix
 navidrome
 newt
 ollama
