@@ -8,6 +8,15 @@ image:
 service:
   port: 8888
 
+ingress:
+  enabled: true
+  host: hindsight.home.tom-mendy.com
+  className: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+
 persistence:
   storageClass: nfs-k8s
   size: 10Gi
