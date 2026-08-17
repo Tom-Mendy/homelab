@@ -123,6 +123,7 @@ rotate_gateway() {
   stop_connect
   timeout 10 nym-vpnc disconnect 2>/dev/null || true
   select_exit_gateway || true
+  printf '%s\n' "selected NymVPN exit gateway: ${exit_gateway_id:-country-random}" >&2
   start_connect
   attempt_started=$(date +%s)
 }
