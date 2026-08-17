@@ -14,6 +14,10 @@ should_reconnect() {
   printf '%s\n' "$1" | grep -Eqi '^State:[[:space:]]+(Disconnected|Error)([[:space:]:]|$)'
 }
 
+rotation_due() {
+  [ "$1" -ge 60 ]
+}
+
 if [ "${1:-}" = self-test ]; then
   is_connected 'State: Connected'
   ! is_connected 'State: Disconnected'
@@ -21,6 +25,8 @@ if [ "${1:-}" = self-test ]; then
   should_reconnect 'State: Error: unavailable'
   should_reconnect 'State: Disconnected'
   ! should_reconnect 'State: Connecting wg, awaiting account readiness, try #0'
+  rotation_due 60
+  ! rotation_due 59
   exit
 fi
 
@@ -75,24 +81,56 @@ fi
 
 nym-vpnc tunnel set --two-hop on
 nym-vpnc tunnel set --ipv6 off
-nym-vpnc gateway set \
-  --entry-country "${NYMVPN_ENTRY_COUNTRY:-FR}" \
-  --exit-country "${NYMVPN_EXIT_COUNTRY:-CH}"
+entry_country=${NYMVPN_ENTRY_COUNTRY:-FR}
+exit_country=${NYMVPN_EXIT_COUNTRY:-CH}
+nym-vpnc gateway set --entry-country "$entry_country"
 nym-vpnc lan set allow
+
+exit_gateway_id=
+select_exit_gateway() {
+  gateway_ids=$(nym-vpnc gateway list-filtered wg \
+    --country "$exit_country" --min-score medium --table-style blank 2>/dev/null \
+    | awk 'length($1) >= 40 { print $1 }' || true)
+  next_gateway_id=$(printf '%s\n' "$gateway_ids" \
+    | awk -v current="$exit_gateway_id" 'length($1) >= 40 && $1 != current { print $1; exit }')
+  if [ -n "$next_gateway_id" ]; then
+    nym-vpnc gateway set --exit-id "$next_gateway_id"
+    exit_gateway_id=$next_gateway_id
+    return 0
+  fi
+  nym-vpnc gateway set --exit-country "$exit_country"
+  exit_gateway_id=
+}
+
+rotate_gateway() {
+  reason=$1
+  printf '%s\n' "rotating NymVPN exit gateway in $exit_country ($reason)" >&2
+  nym-vpnc disconnect 2>/dev/null || true
+  select_exit_gateway || true
+  nym-vpnc connect || true
+  attempt_started=$(date +%s)
+}
+
+select_exit_gateway
 nym-vpnc connect || true
 ensure_pod_route
 touch "$initialized_file"
+attempt_started=$(date +%s)
 
 while kill -0 "$daemon_pid" 2>/dev/null; do
+  now=$(date +%s)
   status=$(nym-vpnc status 2>/dev/null || true)
   if is_connected "$status"; then
     ensure_pod_route
     touch "$ready_file"
+    attempt_started=$now
   else
     rm -f "$ready_file"
     ensure_pod_route
     if should_reconnect "$status"; then
-      nym-vpnc reconnect || nym-vpnc connect || true
+      rotate_gateway "state"
+    elif rotation_due "$((now - attempt_started))"; then
+      rotate_gateway "timeout"
     fi
   fi
   sleep 10
