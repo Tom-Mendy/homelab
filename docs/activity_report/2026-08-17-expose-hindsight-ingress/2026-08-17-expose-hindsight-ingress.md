@@ -52,6 +52,40 @@ $ ./scripts/check-storage-policy.sh
 storage policy ok
 ```
 
+After the Control Plane was added, Traefik returned `no available server`.
+The chart was configured with `ghcr.io/vectorize-io/hindsight-control-plane:0.6.1`,
+but the published standalone Control Plane image is available as `0.7.0`.
+The fix updates the image tag and adds the existing Authentik forward-auth
+pattern for the `homelab-admins` group. The Authentik Outpost callback route is
+kept in a separate Ingress so the callback itself is not protected by the
+forward-auth middleware.
+
+Validation after the fix:
+
+```console
+$ helm lint kubernetes/hindsight
+1 chart(s) linted, 0 chart(s) failed
+
+$ helm lint kubernetes/authentik
+1 chart(s) linted, 0 chart(s) failed
+
+$ ./scripts/test-helm-chart.sh
+=== hindsight ===
+OK
+...
+=== vaultwarden ===
+OK
+
+$ ./scripts/check-storage-policy.sh
+storage policy ok
+```
+
+The rendered manifests contain the `0.7.0` Control Plane image, the
+`agent-authentik-hindsight@kubernetescrd` middleware, the Hindsight proxy
+provider, and the `/outpost.goauthentik.io` route. Direct cluster verification
+was unavailable from this execution environment because access to the API
+server at `10.0.0.21:6443` is blocked.
+
 The complete local Helm chart suite passed. Markdown checking was also run;
 it reported 136 pre-existing issues in 17 files, mostly line-length warnings.
 The new report did not produce a warning.
