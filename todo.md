@@ -4,7 +4,7 @@
 
 - [x] Move committed runtime secrets to Infisical where needed.
 - [x] Verify synced Kubernetes Secrets for Traefik, GitHub ARC, Newt, SearXNG,
-  media VPN, Endfield, Atuin, and Keel.
+  media VPN, Atuin, and Keel.
 - [x] Remove Grafana committed admin secret and rely on Helm-generated admin
   credentials.
 - [ ] Optional: move Forgejo runner live-only Secret to Infisical.
@@ -18,7 +18,6 @@
   chart versions.
 - [ ] Pin `latest` image tags to exact tags or digests.
   - [x] Pin running app images with researched exact tags and digests.
-  - [ ] Pin Endfield image after CI publishes immutable tags or digest is known.
   - [ ] Review and pin Forgejo runner job image label
     `ghcr.io/catthehacker/ubuntu:act-latest`.
   - [x] Pin GitHub ARC runner image after digest is known.
