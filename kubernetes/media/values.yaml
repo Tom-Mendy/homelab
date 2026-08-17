@@ -18,7 +18,7 @@ vpn:
     wireguardPrivateKey: ""
 
 nymVpn:
-  image: forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.10.0-2
+  image: forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.0-1
   pullPolicy: IfNotPresent
   secretName: nymvpn-credentials
   entryCountry: FR
