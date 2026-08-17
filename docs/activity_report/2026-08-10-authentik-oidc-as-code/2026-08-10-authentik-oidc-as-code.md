@@ -102,6 +102,7 @@ The repository now declares the Forgejo, Grafana, and Flux OIDC providers,
 applications, groups, access bindings, client configuration, and secret
 distribution. The live rotation remains gated on creating the Infisical
 Machine Identity and the three new secret values; no secret is stored in Git.
+
 ## Cluster verification
 
 The first reconciliation showed that `authentik-infisical-sync` was missing. The

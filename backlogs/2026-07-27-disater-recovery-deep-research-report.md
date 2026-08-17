@@ -34,7 +34,7 @@ Enfin, dans votre cas, il faut distinguer deux populations de données. Les **ph
 
 ## Comparatif transversal
 
-Le tableau ci-dessous résume les options les plus pertinentes “aujourd’hui” pour votre besoin. Les lignes “froides” ont un coût au To très bas mais des restaurations plus lentes ; les lignes “hot/warm” sont bien plus simples à exploiter pour des restaurations fréquentes et des backends d’outils S3. Les citations sont intégrées par ligne, car les caractéristiques proviennent directement des documents fournisseurs. 
+Le tableau ci-dessous résume les options les plus pertinentes “aujourd’hui” pour votre besoin. Les lignes “froides” ont un coût au To très bas mais des restaurations plus lentes ; les lignes “hot/warm” sont bien plus simples à exploiter pour des restaurations fréquentes et des backends d’outils S3. Les citations sont intégrées par ligne, car les caractéristiques proviennent directement des documents fournisseurs.
 
 | Option | Type | Modèle tarifaire public | Gratuit / essai | Durée mini effective | Accès | Egress / retrieval | Immutabilité | Chiffrement / gestion des clés | Régions / résidence |
 |---|---|---|---|---|---|---|---|---|---|
@@ -89,8 +89,9 @@ AWS positionne **S3 Glacier Deep Archive** comme sa classe de stockage d’archi
 **Procédure de restauration typique.** Vous initiez un `restore-object` en choisissant un niveau de restauration, AWS crée une **copie temporaire** lisible dans le bucket pour une durée donnée, puis vous téléchargez ou recopiez l’objet vers une classe chaude si vous voulez le conserver de façon permanente. Cette étape intermédiaire de réhydratation est ce qui distingue Glacier Deep Archive des stockages “hot”. citeturn45search2turn45search3
 
 **Checklist d’implémentation.**
+
 - Agréger les petits fichiers en archives plus grosses avant envoi, pour réduire l’effet des 40 Ko par objet.
-- Utiliser `restic`/`Kopia` vers S3 si vous savez piloter la classe de stockage, sinon faire une transition Lifecycle après ingestion. 
+- Utiliser `restic`/`Kopia` vers S3 si vous savez piloter la classe de stockage, sinon faire une transition Lifecycle après ingestion.
 - Activer Object Lock sur le bucket si la copie doit résister à la suppression/ransomware.
 - Tester un restore complet au moins une fois par trimestre sur un échantillon réaliste. citeturn48view0turn24search6turn23search3
 
@@ -107,6 +108,7 @@ OVHcloud propose par ailleurs une documentation S3 moderne avec **rclone**, **s3
 **Procédure de restauration typique.** L’objet ou le bucket repasse temporairement au niveau Object Storage pour dépôt/récupération ; vous restaurez ensuite via outils S3/CLI habituels une fois l’archive “dégelée”. Cela ressemble davantage à un cycle “restauration d’archive” qu’à un simple `GET`. citeturn34search12turn15search5
 
 **Checklist d’implémentation.**
+
 - Créer un bucket Object Storage dédié aux sauvegardes ; activer Object Lock au départ si vous voulez du WORM.
 - Utiliser Lifecycle pour pousser vers la classe Cold Archive seulement les points âgés.
 - Chiffrer côté serveur via SSE-OMK ou SSE-C selon votre modèle de clés.
@@ -125,6 +127,7 @@ Backblaze est aussi l’un des rares fournisseurs où la doc officielle parle tr
 **Procédure de restauration typique.** `restic restore`, `kopia restore` ou `rclone copy` depuis le bucket B2 vers une zone de staging, vérification d’intégrité, puis réinjection des données sur le NAS ou les volumes applicatifs. Pas de phase de réhydratation : l’objet est lisible directement. citeturn25search12turn26search10turn23search3
 
 **Checklist d’implémentation.**
+
 - Choisir **EU Central** si la latence/résidence européenne prime.
 - Activer **Object Lock** + rétention par défaut.
 - Utiliser des **app keys** restrictives par bucket/prefixe.
@@ -143,6 +146,7 @@ Wasabi annonce **11 neuf de durabilité**, chiffrement au repos et en transit, 
 **Procédure de restauration typique.** Identique à un S3 chaud classique : téléchargement ou restauration logique immédiate via `rclone`, `restic`, `Kopia`, ou un logiciel de backup tiers. Pas de réhydratation ; récupération directe. citeturn36search13turn23search3
 
 **Checklist d’implémentation.**
+
 - Vérifier si votre profil de données évite les suppressions <90 jours.
 - Activer Object Lock/WORM sur les buckets critiques.
 - Si vous voulez une passerelle on-prem, évaluer **Wasabi Cloud NAS** plutôt qu’un simple script `mount`.
@@ -161,6 +165,7 @@ Cloudflare propose aussi une classe **Infrequent Access** moins chère au Go, ma
 **Procédure de restauration typique.** Téléchargement direct via API S3, `rclone`, `aws s3` ou intégration applicative. Sur R2 Standard, pas de réhydratation archive. Sur IA, il faut surtout intégrer le coût de récupération, pas un long délai de restauration. citeturn27search0turn27search2turn27search3turn27search11
 
 **Checklist d’implémentation.**
+
 - Prendre R2 **Standard** pour une politique simple et restaurable.
 - Créer des **bucket locks** avant mise en production.
 - Définir le **mode de localisation des données** si la résidence est importante.
@@ -185,6 +190,7 @@ Si vous voulez **la solution la plus simple avec un seul fournisseur**, **Wasabi
 La checklist minimale que je vous conseille est la suivante. **Côté données NAS**, faites des sauvegardes **dédupliquées, chiffrées et versionnées** via `restic` ou `Kopia`. **Côté Kubernetes**, séparez les couches : `Velero` pour manifests et objets Kubernetes, snapshots/exports pour volumes persistants, dumps cohérents pour bases de données, et sauvegarde `etcd` si vous gérez vous-même le control plane. **Côté stockage**, activez systématiquement l’**immutabilité** quand elle existe, utilisez des **identifiants restrictifs** par bucket/prefixe, et testez des **restaurations réelles** plutôt que de supposer qu’un backup est bon. citeturn23search3turn22search8turn22search5turn43search1turn35search0turn27search1
 
 Enfin, pour une première implémentation réaliste sans surcoût logiciel :
+
 - **NAS / photos** : `restic` ou `Kopia` vers **B2** ou **Wasabi**, avec rétention immuable.
 - **Kubernetes** : `Velero` vers le même object store, plus exports/dumps applicatifs pour les bases.
 - **Archive profonde** : réplication périodique d’archives packagées vers **AWS Glacier Deep Archive** ou **OVH Cold Archive**.

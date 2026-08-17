@@ -86,6 +86,7 @@ login to Authentik. Blocky and Homepage include the new endpoint. The Authentik
 provider, groups, and client secret must be created before installing the
 operator, as documented in `docs/flux-gitops.md`. No live cluster resource was
 changed during this activity.
+
 ## RBAC namespace visibility fix
 
 The Flux Web UI showed `Limited Access` for a user whose OIDC groups included
