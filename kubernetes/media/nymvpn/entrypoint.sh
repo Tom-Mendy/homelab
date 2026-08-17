@@ -60,9 +60,24 @@ rm -f "$initialized_file" "$ready_file"
 # namespace with qBittorrent, not this filesystem.
 nym-vpnd run-as-service --disable-client-verification &
 daemon_pid=$!
+connect_pid=
+
+start_connect() {
+  (nym-vpnc connect || true) &
+  connect_pid=$!
+}
+
+stop_connect() {
+  if [ -n "$connect_pid" ] && kill -0 "$connect_pid" 2>/dev/null; then
+    kill "$connect_pid" 2>/dev/null || true
+    wait "$connect_pid" 2>/dev/null || true
+  fi
+  connect_pid=
+}
 
 cleanup() {
   rm -f "$initialized_file" "$ready_file"
+  stop_connect
   kill "$daemon_pid" 2>/dev/null || true
   wait "$daemon_pid" 2>/dev/null || true
 }
@@ -105,14 +120,15 @@ select_exit_gateway() {
 rotate_gateway() {
   reason=$1
   printf '%s\n' "rotating NymVPN exit gateway in $exit_country ($reason)" >&2
-  nym-vpnc disconnect 2>/dev/null || true
+  stop_connect
+  timeout 10 nym-vpnc disconnect 2>/dev/null || true
   select_exit_gateway || true
-  nym-vpnc connect || true
+  start_connect
   attempt_started=$(date +%s)
 }
 
 select_exit_gateway
-nym-vpnc connect || true
+start_connect
 ensure_pod_route
 touch "$initialized_file"
 attempt_started=$(date +%s)
