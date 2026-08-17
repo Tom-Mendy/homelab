@@ -17,6 +17,9 @@ spec:
       labels:
         app.kubernetes.io/name: tuwunel
     spec:
+      # Kubernetes otherwise injects TUWUNEL_PORT=tcp://... from the Service;
+      # Tuwunel treats TUWUNEL_* as configuration and rejects that URL as a port.
+      enableServiceLinks: false
       securityContext:
         runAsUser: 10000
         runAsGroup: 10000

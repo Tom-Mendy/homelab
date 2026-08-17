@@ -11,8 +11,10 @@ authenticate through Authentik; `hermes-bot` is the only local account.
    - `/matrix/MATRIX_REGISTRATION_SHARED_SECRET`: a random 32-byte value.
    - `/matrix/LIVEKIT_KEY`: a random 20-character alphanumeric value.
    - `/matrix/LIVEKIT_SECRET`: a random 64-character alphanumeric value.
-2. Give the existing `authentik-oidc-sync` machine identity read access to
-   `/matrix`. Its existing `/oidc` access supplies the OIDC client secret.
+2. The dedicated Infisical identity is `matrix-k8s-auth`. It must allow the
+   `matrix/matrix-infisical-sync` ServiceAccount and have read access to
+   `/matrix`. The existing Authentik identity only distributes the OIDC secret
+   from `/oidc`.
 3. Add public DNS records for `matrix.tom-mendy.com`, `chat.tom-mendy.com`, and
    `rtc.tom-mendy.com`, all pointing to the Pangolin VPS (`72.61.113.235`).
 4. In Pangolin, create HTTPS resources for those three hostnames and forward
