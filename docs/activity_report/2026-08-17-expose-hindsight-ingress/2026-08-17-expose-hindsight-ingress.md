@@ -83,3 +83,34 @@ Homepage was then updated with a Hindsight shortcut:
     href: https://hindsight.home.tom-mendy.com
     description: Agent memory API
 ```
+
+When opening the shortcut, the API returned `Not Found` at `/`. The API-only
+image intentionally has no web interface. The official Hindsight deployment
+documentation describes a separate `hindsight-control-plane` image that
+provides the UI and proxies requests to the API.
+
+The chart was extended with that Control Plane, keeping the API as an internal
+ClusterIP service:
+
+```yaml
+image: ghcr.io/vectorize-io/hindsight-control-plane:0.6.1
+HINDSIGHT_CP_DATAPLANE_API_URL: http://hindsight.agent.svc.cluster.local:8888
+```
+
+The existing Ingress now routes `hindsight.home.tom-mendy.com` to the Control
+Plane on port 9999. The local checks passed:
+
+```console
+$ helm lint kubernetes/hindsight
+1 chart(s) linted, 0 chart(s) failed
+
+$ ./scripts/test-helm-chart.sh
+=== hindsight ===
+OK
+...
+=== vaultwarden ===
+OK
+
+$ ./scripts/check-storage-policy.sh
+storage policy ok
+```

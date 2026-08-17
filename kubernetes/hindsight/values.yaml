@@ -8,6 +8,21 @@ image:
 service:
   port: 8888
 
+controlPlane:
+  image:
+    repository: ghcr.io/vectorize-io/hindsight-control-plane
+    tag: "0.6.1"
+    pullPolicy: IfNotPresent
+  service:
+    port: 9999
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
 ingress:
   enabled: true
   host: hindsight.home.tom-mendy.com
