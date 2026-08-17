@@ -80,12 +80,16 @@ kubectl get secret matrix-runtime -n matrix \
 ```
 
 Copy `/tmp/hermes-matrix-token` into Infisical as
-`/matrix/HERMES_MATRIX_ACCESS_TOKEN`, then securely delete both temporary files.
-Never paste their values into Git or shell history. Configure Hermes with:
+`/matrix/HERMES_MATRIX_ACCESS_TOKEN`. Also create
+`/matrix/HERMES_MATRIX_ALLOWED_USERS` with your own full Matrix ID, for example
+`@tom:matrix.tom-mendy.com`; multiple IDs are comma-separated. Then securely
+delete both temporary files. Never paste token values into Git or shell history.
+The Coder template configures Hermes with:
 
 - Homeserver: `https://matrix.tom-mendy.com`
 - User ID: `@hermes-bot:matrix.tom-mendy.com`
 - Access token: `/matrix/HERMES_MATRIX_ACCESS_TOKEN`
+- Allowed users: `/matrix/HERMES_MATRIX_ALLOWED_USERS`
 
 Restrict Hermes' allowed Matrix users or rooms before starting its gateway.
 

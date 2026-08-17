@@ -65,6 +65,12 @@ Create only one `hermes-personal` workspace and disable its automatic stop in
 the Coder schedule. The namespace quota permits Hermes plus two standard
 workspaces, matching the cluster's intended capacity.
 
+Before creating it, set `/matrix/HERMES_MATRIX_ALLOWED_USERS` in Infisical to
+the full Matrix ID of each human allowed to use the bot. The Matrix chart
+synchronizes it and `HERMES_MATRIX_ACCESS_TOKEN` into the `coder-workspaces`
+namespace. The template injects those values without writing the token to the
+workspace PVC.
+
 ## Forgejo access
 
 Each standard workspace creates an Ed25519 key in its persistent home. On its
