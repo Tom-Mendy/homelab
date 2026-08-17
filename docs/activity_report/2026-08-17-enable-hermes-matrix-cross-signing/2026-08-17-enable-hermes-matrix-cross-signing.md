@@ -121,3 +121,28 @@ endpoint through the existing localhost port-forward. It reads and writes only
 mode-0600 token files, validates the returned identity through `whoami`, and
 never prints either token. The recovery key remains unchanged; only the access
 token and local Hermes crypto store need rotation.
+
+The operator copied the new token to Infisical. Its SHA-256 digest matched the
+synced `coder-workspaces/hermes-matrix` Secret. The old crypto database was
+stopped and preserved as `crypto.db.PMWUwNWowi.bak`, then Coder recreated the
+workspace pod. Hermes authenticated as fresh device `tbu5RoSQ3K`, recovered its
+cross-signing identity, published a signed device key and 50 one-time keys, and
+connected to both rooms.
+
+Cinny then sent a new encrypted acceptance message. The gateway log confirmed
+the complete path without a Megolm error:
+
+```text
+inbound message: platform=matrix user=Tom Mendy chat=... \
+msg='test-e2ee-nouveau-device'
+response ready: platform=matrix chat=... time=9.5s api_calls=1 response=56 chars
+Matrix: sent event ...
+```
+
+An attempt to revoke old device `PMWUwNWowi` through Tuwunel's local admin API
+was blocked before execution because device deletion is irreversible and needed
+separate explicit operator approval. No revocation occurred during that failed
+attempt. After explicit approval, the same request returned HTTP 200. A device
+listing contained only `tbu5RoSQ3K`, and the running gateway's `whoami` response
+confirmed that device ID. The protected administrator and bot token files were
+then deleted from `/tmp`; their values were never printed.
