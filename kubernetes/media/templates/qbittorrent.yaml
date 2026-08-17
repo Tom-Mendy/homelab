@@ -77,16 +77,12 @@ spec:
               value: {{ .Values.nymVpn.podCidr | quote }}
           startupProbe:
             exec:
-              command: ["/usr/local/bin/nymvpn-entrypoint", "check"]
+              command: ["/usr/local/bin/nymvpn-entrypoint", "startup"]
             failureThreshold: 60
             periodSeconds: 5
-          readinessProbe:
-            exec:
-              command: ["/usr/local/bin/nymvpn-entrypoint", "check"]
-            periodSeconds: 10
           livenessProbe:
             exec:
-              command: ["/usr/local/bin/nymvpn-entrypoint", "check"]
+              command: ["/usr/local/bin/nymvpn-entrypoint", "startup"]
             failureThreshold: 3
             periodSeconds: 20
           volumeMounts:
