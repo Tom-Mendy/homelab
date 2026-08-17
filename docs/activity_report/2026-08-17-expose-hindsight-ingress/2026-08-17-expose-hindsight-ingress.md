@@ -127,7 +127,7 @@ The chart was extended with that Control Plane, keeping the API as an internal
 ClusterIP service:
 
 ```yaml
-image: ghcr.io/vectorize-io/hindsight-control-plane:0.6.1
+image: ghcr.io/vectorize-io/hindsight-control-plane:0.7.0
 HINDSIGHT_CP_DATAPLANE_API_URL: http://hindsight.agent.svc.cluster.local:8888
 ```
 
@@ -148,3 +148,20 @@ OK
 $ ./scripts/check-storage-policy.sh
 storage policy ok
 ```
+
+Traefik later returned `no available server`. Cluster inspection showed that
+the Control Plane image was downloaded, but Kubernetes refused to start it:
+
+```console
+$ kubectl get pods,svc,endpoints -n agent
+pod/hindsight-control-plane-...   0/1   CreateContainerConfigError
+service/hindsight-control-plane   ClusterIP   9999/TCP
+endpoints/hindsight-control-plane  <none>
+
+$ kubectl get events -n agent --sort-by=.lastTimestamp
+Warning  Failed  Error: container has runAsNonRoot and image will run as root
+```
+
+The Control Plane pod security context now sets `runAsUser: 1000` and
+`runAsGroup: 1000`. This preserves non-root execution and allows Kubernetes to
+start the image, so the Service can receive a ready endpoint.
