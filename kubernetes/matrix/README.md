@@ -90,8 +90,26 @@ The Coder template configures Hermes with:
 - User ID: `@hermes-bot:matrix.tom-mendy.com`
 - Access token: `/matrix/HERMES_MATRIX_ACCESS_TOKEN`
 - Allowed users: `/matrix/HERMES_MATRIX_ALLOWED_USERS`
+- Recovery key: `/matrix/HERMES_MATRIX_RECOVERY_KEY`
 
 Restrict Hermes' allowed Matrix users or rooms before starting its gateway.
+
+## Hermes E2EE recovery key
+
+Bootstrap cross-signing once from the Hermes workspace without printing the
+generated recovery key:
+
+```bash
+hermes gateway stop
+MATRIX_RECOVERY_KEY_OUTPUT_FILE=/tmp/hermes-matrix-recovery-key \
+  hermes gateway run
+```
+
+Copy the `0600` file into Infisical as
+`/matrix/HERMES_MATRIX_RECOVERY_KEY`, wait for `hermes-matrix` to synchronize,
+then update the Coder workspace. After confirming that the gateway verifies its
+device, securely delete the temporary file. Never regenerate the key merely to
+recover old room messages; create a new encrypted room session instead.
 
 ## Calls
 
