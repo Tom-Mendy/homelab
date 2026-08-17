@@ -1,0 +1,26 @@
+namespace: agent
+
+image:
+  repository: ghcr.io/vectorize-io/hindsight-api
+  digest: sha256:ba832685d530055ee32c23ee4a02100bf6dc9d932f28b1c4d03c6dd33fbacaef
+  pullPolicy: IfNotPresent
+
+service:
+  port: 8888
+
+persistence:
+  storageClass: nfs-k8s
+  size: 10Gi
+
+ollama:
+  url: http://ollama.ollama.svc.cluster.local:11434/v1
+  model: gemma4:e4b
+  timeout: 600
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 2Gi
+  limits:
+    cpu: "2"
+    memory: 6Gi

@@ -109,6 +109,32 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
+  name: hindsight
+spec:
+  interval: 30m
+  timeout: 15m
+  releaseName: hindsight
+  targetNamespace: agent
+  storageNamespace: agent
+  chart:
+    spec:
+      chart: ./kubernetes/hindsight
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: nfs-provisioner
+    - name: ollama
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
   name: navidrome
 spec:
   interval: 30m

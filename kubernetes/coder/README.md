@@ -89,7 +89,7 @@ No Forgejo token is stored in the template or Kubernetes Secret.
 
 The Hermes template uses the official v0.18.0 image (`v2026.7.1`). In the
 workspace terminal, authenticate Hermes directly with the ChatGPT subscription
-using its device-code flow, then select Hindsight local mode:
+using its device-code flow, then select the external Hindsight service:
 
 ```sh
 hermes auth add openai-codex
@@ -98,10 +98,12 @@ hermes memory setup
 hermes memory status
 ```
 
-Choose `OpenAI Codex` in `hermes model`, and `hindsight` then `local` in the
-memory wizard. Restart the workspace afterward; its startup script launches
-`hermes gateway run` when `/opt/data/config.yaml` exists. Both Hermes state and
-Hindsight's embedded PostgreSQL remain on the 20 GiB `nfs-k8s` PVC.
+Choose `OpenAI Codex` in `hermes model`, then `hindsight` and `Local External`
+in the memory wizard. Use
+`http://hindsight.agent.svc.cluster.local:8888` as the API URL and leave the
+optional API key blank. Restart the workspace afterward; its startup script
+launches `hermes gateway run` when `/opt/data/config.yaml` exists. Hindsight's
+embedded PostgreSQL data remains on its own `nfs-k8s` PVC in `agent`.
 
 ## Recovery check
 
