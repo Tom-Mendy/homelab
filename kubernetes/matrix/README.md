@@ -94,6 +94,24 @@ The Coder template configures Hermes with:
 
 Restrict Hermes' allowed Matrix users or rooms before starting its gateway.
 
+If the bot's local crypto store is lost, do not reuse its access token. Matrix
+clients cache the device keys attached to that token's device ID. Mint a token
+on a fresh device instead, using an administrator token from Cinny and the
+local-only Tuwunel admin API:
+
+```bash
+kubectl port-forward -n matrix svc/tuwunel 8008:8008
+chmod 600 /tmp/matrix-admin-token
+python3 scripts/rotate-hermes-matrix-device.py \
+  /tmp/matrix-admin-token /tmp/hermes-matrix-token
+```
+
+Replace `/matrix/HERMES_MATRIX_ACCESS_TOKEN` in Infisical with the contents of
+`/tmp/hermes-matrix-token`, then remove both temporary token files. Recreate the
+Hermes crypto store only after the Kubernetes secret and Coder workspace have
+received the new token. Keep the recovery key unchanged so the fresh device can
+join the bot account's existing cross-signing identity.
+
 ## Hermes E2EE recovery key
 
 Bootstrap cross-signing once from the Hermes workspace without printing the
