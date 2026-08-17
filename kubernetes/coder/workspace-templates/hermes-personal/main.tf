@@ -127,6 +127,40 @@ resource "kubernetes_deployment_v1" "workspace" {
             name  = "HERMES_HOME"
             value = "/opt/data"
           }
+          env {
+            name  = "MATRIX_HOMESERVER"
+            value = "https://matrix.tom-mendy.com"
+          }
+          env {
+            name  = "MATRIX_USER_ID"
+            value = "@hermes-bot:matrix.tom-mendy.com"
+          }
+          env {
+            name  = "MATRIX_DEVICE_ID"
+            value = "HERMES_BOT"
+          }
+          env {
+            name  = "MATRIX_E2EE_MODE"
+            value = "optional"
+          }
+          env {
+            name = "MATRIX_ACCESS_TOKEN"
+            value_from {
+              secret_key_ref {
+                name = "hermes-matrix"
+                key  = "MATRIX_ACCESS_TOKEN"
+              }
+            }
+          }
+          env {
+            name = "MATRIX_ALLOWED_USERS"
+            value_from {
+              secret_key_ref {
+                name = "hermes-matrix"
+                key  = "MATRIX_ALLOWED_USERS"
+              }
+            }
+          }
           resources {
             requests = { cpu = "750m", memory = "4Gi" }
             limits   = { cpu = "2", memory = "8Gi" }
