@@ -27,4 +27,8 @@ jobs:
       - name: Build and push image
         run: |
           docker build --pull --tag "$IMAGE" kubernetes/media/nymvpn
-          docker push "$IMAGE"
+          for attempt in 1 2 3; do
+            docker push "$IMAGE" && exit 0
+            sleep 15
+          done
+          exit 1
