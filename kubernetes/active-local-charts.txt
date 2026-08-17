@@ -3,7 +3,6 @@ authentik
 authentik-postgres
 blocky
 coder
-endfield
 forgejo
 forgejo-runner
 github-runners-auth
