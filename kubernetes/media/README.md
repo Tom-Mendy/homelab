@@ -37,7 +37,7 @@ The NymVPN sidecar image is built by `.forgejo/workflows/nymvpn-sidecar.yml`
 and published as:
 
 ```text
-forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.10.0-2
+forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.0-1
 ```
 
 Configure these secrets in Infisical project `homelab`, environment `prod`,
@@ -47,10 +47,12 @@ path `/media`:
 
 The access code is mounted as a read-only file. NymVPN configuration and device
 state are stored on `qbittorrent-nymvpn-pvc` with storage class `nfs-k8s`.
-The pod uses the NymVPN DNS resolver on `127.0.0.1` and does not start
-qBittorrent until the VPN startup probe succeeds. The sidecar keeps the cluster
-pod CIDR routed through `eth0` so Traefik can reach the WebUI without bypassing
-NymVPN for Internet traffic.
+The pod uses the NymVPN DNS resolver on `127.0.0.1`. It starts qBittorrent after
+the daemon, LAN policy, kill switch and connection request are initialized. A
+VPN outage keeps the WebUI available while NymVPN blocks Internet traffic and
+reconnects in the background. The sidecar keeps the cluster pod CIDR routed
+through `eth0` so Traefik can reach the WebUI without bypassing NymVPN for
+Internet traffic.
 
 Before publishing the image, add the repository action secret
 `REGISTRY_TOKEN`. It must be a Forgejo personal access token allowed to write
