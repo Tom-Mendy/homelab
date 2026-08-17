@@ -124,6 +124,7 @@ spec:
         kind: GitRepository
         name: flux-system
   dependsOn:
+    - name: authentik-extras
     - name: nfs-provisioner
     - name: ollama
   install:

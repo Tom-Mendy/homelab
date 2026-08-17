@@ -53,6 +53,39 @@ entries:
       name: sonarr-users
 
   - model: authentik_providers_proxy.proxyprovider
+    id: hindsight-provider
+    identifiers:
+      name: Hindsight
+    attrs:
+      authentication_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-authentication-flow]
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+      external_host: https://hindsight.home.tom-mendy.com
+      mode: forward_single
+  - model: authentik_core.application
+    id: hindsight-application
+    identifiers:
+      slug: hindsight
+    attrs:
+      name: Hindsight
+      provider: !KeyOf hindsight-provider
+      meta_launch_url: https://hindsight.home.tom-mendy.com/
+      policy_engine_mode: any
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf hindsight-application
+      group: !KeyOf homelab-admins
+      order: 0
+    attrs:
+      enabled: true
+
+  - model: authentik_providers_proxy.proxyprovider
     id: radarr-provider
     identifiers:
       name: Radarr
@@ -140,6 +173,7 @@ entries:
       providers:
         - !KeyOf radarr-provider
         - !KeyOf sonarr-provider
+        - !KeyOf hindsight-provider
 
   - model: authentik_providers_oauth2.scopemapping
     id: openwebui-roles-scope

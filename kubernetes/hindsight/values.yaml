@@ -11,7 +11,7 @@ service:
 controlPlane:
   image:
     repository: ghcr.io/vectorize-io/hindsight-control-plane
-    tag: "0.6.1"
+    tag: "0.7.0"
     pullPolicy: IfNotPresent
   service:
     port: 9999
@@ -31,6 +31,7 @@ ingress:
     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    traefik.ingress.kubernetes.io/router.middlewares: agent-authentik-hindsight@kubernetescrd
 
 persistence:
   storageClass: nfs-k8s
