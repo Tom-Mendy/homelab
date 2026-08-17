@@ -98,6 +98,26 @@ signatures on device `PMWUwNWowi`. Neither start logged a cross-signing warning,
 
 Four messages from the previous Megolm session remain undecryptable, as
 expected: Cinny created that session before trusting the corrected bot device.
-The remaining acceptance step is to create a fresh encrypted private room with
-`@hermes-bot:matrix.tom-mendy.com`, send a new message, and confirm that Hermes
-decrypts and answers it.
+
+## Follow-up: stale device identity
+
+A message sent from Cinny in a newly created encrypted room still failed with a
+new Megolm session:
+
+```text
+Failed to decrypt megolm event: no session with given ID
+Jp85MVjei+Wb15qYs/9h0ScPqPeN3A3HSMob/ze14J4 found
+```
+
+The server had 50 signed Curve25519 one-time keys for the bot, so key exhaustion
+was excluded. The local crypto database had previously been deleted while the
+access token, and therefore its Matrix device ID, was retained. Other Matrix
+clients can cache the old keys for that device ID and refuse to establish the
+new Olm session.
+
+Tuwunel's native admin-login endpoint creates a fresh visible device while
+minting an access token. `scripts/rotate-hermes-matrix-device.py` wraps that
+endpoint through the existing localhost port-forward. It reads and writes only
+mode-0600 token files, validates the returned identity through `whoami`, and
+never prints either token. The recovery key remains unchanged; only the access
+token and local Hermes crypto store need rotation.
