@@ -66,6 +66,10 @@
         description: Music player
 
 - Developer:
+    - Matrix:
+        icon: matrix-light.svg
+        href: https://chat.tom-mendy.com/
+        description: Federated chat and calls
     - Coder:
         icon: coder.svg
         href: https://coder.home.tom-mendy.com/

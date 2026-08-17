@@ -1,0 +1,116 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: matrix
+  namespace: {{ .Values.namespace }}
+  annotations:
+{{ toYaml .Values.ingress.annotations | nindent 4 }}
+spec:
+  tls:
+    - hosts: [{{ .Values.tuwunel.host }}]
+  rules:
+    - host: {{ .Values.tuwunel.host }}
+      http:
+        paths:
+          - path: /_matrix
+            pathType: Prefix
+            backend:
+              service:
+                name: tuwunel
+                port:
+                  name: http
+          - path: /_tuwunel
+            pathType: Prefix
+            backend:
+              service:
+                name: tuwunel
+                port:
+                  name: http
+          - path: /.well-known/matrix
+            pathType: Prefix
+            backend:
+              service:
+                name: tuwunel
+                port:
+                  name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cinny
+  namespace: {{ .Values.namespace }}
+  annotations:
+{{ toYaml .Values.ingress.annotations | nindent 4 }}
+spec:
+  tls:
+    - hosts: [{{ .Values.cinny.host }}]
+  rules:
+    - host: {{ .Values.cinny.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cinny
+                port:
+                  name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: matrix-rtc-jwt
+  namespace: {{ .Values.namespace }}
+  annotations:
+{{ toYaml .Values.ingress.annotations | nindent 4 }}
+    traefik.ingress.kubernetes.io/router.priority: "100"
+spec:
+  tls:
+    - hosts: [{{ .Values.rtc.host }}]
+  rules:
+    - host: {{ .Values.rtc.host }}
+      http:
+        paths:
+          - path: /sfu/get
+            pathType: Prefix
+            backend:
+              service:
+                name: matrix-rtc-jwt
+                port:
+                  name: jwt
+          - path: /get_token
+            pathType: Prefix
+            backend:
+              service:
+                name: matrix-rtc-jwt
+                port:
+                  name: jwt
+          - path: /healthz
+            pathType: Prefix
+            backend:
+              service:
+                name: matrix-rtc-jwt
+                port:
+                  name: jwt
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: matrix-rtc
+  namespace: {{ .Values.namespace }}
+  annotations:
+{{ toYaml .Values.ingress.annotations | nindent 4 }}
+spec:
+  tls:
+    - hosts: [{{ .Values.rtc.host }}]
+  rules:
+    - host: {{ .Values.rtc.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: matrix-rtc
+                port:
+                  name: websocket
