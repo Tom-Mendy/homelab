@@ -80,6 +80,10 @@ spec:
               command: ["/usr/local/bin/nymvpn-entrypoint", "startup"]
             failureThreshold: 60
             periodSeconds: 5
+          readinessProbe:
+            exec:
+              command: ["/usr/local/bin/nymvpn-entrypoint", "startup"]
+            periodSeconds: 10
           livenessProbe:
             exec:
               command: ["/usr/local/bin/nymvpn-entrypoint", "startup"]
