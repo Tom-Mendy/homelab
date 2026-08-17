@@ -28,6 +28,10 @@
          icon: kubernetes.svg
          href: https://keel.home.tom-mendy.com
          description: Kubernetes deployment automation
+    - Hindsight:
+        icon: kubernetes.svg
+        href: https://hindsight.home.tom-mendy.com
+        description: Agent memory API
     - NAS Synology:
         icon: synology.svg
         href: https://10.0.0.11:5001/
