@@ -37,7 +37,7 @@ The NymVPN sidecar image is built by `.forgejo/workflows/nymvpn-sidecar.yml`
 and published as:
 
 ```text
-forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.0-1
+forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.3-1
 ```
 
 Configure these secrets in Infisical project `homelab`, environment `prod`,
@@ -53,6 +53,9 @@ VPN outage keeps the WebUI available while NymVPN blocks Internet traffic and
 reconnects in the background. The sidecar keeps the cluster pod CIDR routed
 through `eth0` so Traefik can reach the WebUI without bypassing NymVPN for
 Internet traffic.
+If a connection attempt remains non-Connected for 60 seconds, the sidecar
+selects a different WireGuard exit gateway in the configured exit country and
+retries indefinitely. The kill switch remains active during each rotation.
 
 Before publishing the image, add the repository action secret
 `REGISTRY_TOKEN`. It must be a Forgejo personal access token allowed to write
