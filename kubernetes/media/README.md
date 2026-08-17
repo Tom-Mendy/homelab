@@ -37,7 +37,7 @@ The NymVPN sidecar image is built by `.forgejo/workflows/nymvpn-sidecar.yml`
 and published as:
 
 ```text
-forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.3-1
+forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.3-2
 ```
 
 Configure these secrets in Infisical project `homelab`, environment `prod`,
