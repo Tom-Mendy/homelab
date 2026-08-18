@@ -41,6 +41,19 @@ if ! command -v t3 >/dev/null 2>&1 || ! command -v codex >/dev/null 2>&1; then
 fi
 ```
 
+T3 tentait aussi d'activer `systemd linger` pour démarrer son serveur en
+arrière-plan. Cette fonctionnalité n'est pas disponible dans le Pod Kubernetes
+du workspace. Le startup script lance donc directement `t3 serve`, conserve son
+PID et écrit ses logs dans le PVC :
+
+```sh
+server_pid="$HOME/.local/share/t3/serve.pid"
+if [ ! -f "$server_pid" ] || ! kill -0 "$(cat "$server_pid")" 2>/dev/null; then
+  nohup t3 serve >"$HOME/.local/share/t3/serve.log" 2>&1 &
+  echo $! >"$server_pid"
+fi
+```
+
 ## Vérifications
 
 La première validation Terraform a échoué car les providers n'étaient pas
@@ -97,7 +110,8 @@ storage policy ok
 Le PVC existant `nfs-k8s` couvre déjà la configuration T3, la configuration et
 l'authentification Codex, les clés SSH et le projet. T3 et Codex sont maintenant
 aussi installés dans ce PVC et ne sont installés qu'une seule fois par
-workspace.
+workspace. Le serveur T3 démarre automatiquement avec le Pod, sans dépendre de
+`systemd linger`.
 
 Après cette modification, republier le template :
 

@@ -28,6 +28,12 @@ resource "coder_agent" "main" {
     if ! command -v t3 >/dev/null 2>&1 || ! command -v codex >/dev/null 2>&1; then
       npm install --global t3@latest @openai/codex
     fi
+    mkdir -p "$HOME/.local/share/t3"
+    server_pid="$HOME/.local/share/t3/serve.pid"
+    if [ ! -f "$server_pid" ] || ! kill -0 "$(cat "$server_pid")" 2>/dev/null; then
+      nohup t3 serve >"$HOME/.local/share/t3/serve.log" 2>&1 &
+      echo $! >"$server_pid"
+    fi
     mkdir -p "$HOME/project" "$HOME/.ssh"
     chmod 700 "$HOME/.ssh"
     ssh-keyscan -H forgejo.forgejo.svc.cluster.local >> "$HOME/.ssh/known_hosts" 2>/dev/null || true
