@@ -28,6 +28,10 @@ resource "coder_agent" "main" {
     if ! command -v t3 >/dev/null 2>&1 || ! command -v codex >/dev/null 2>&1; then
       npm install --global t3@latest @openai/codex
     fi
+    if ! command -v gh >/dev/null 2>&1; then
+      sudo apt-get update
+      sudo apt-get install --yes gh
+    fi
     mkdir -p "$HOME/.local/share/t3"
     server_pid="$HOME/.local/share/t3/serve.pid"
     if [ ! -f "$server_pid" ] || ! kill -0 "$(cat "$server_pid")" 2>/dev/null; then
@@ -49,6 +53,14 @@ resource "coder_agent" "main" {
     display_name = "Codex version"
     key          = "codex-version"
     script       = "codex --version"
+    interval     = 300
+    timeout      = 5
+  }
+
+  metadata {
+    display_name = "GitHub CLI version"
+    key          = "gh-version"
+    script       = "gh --version | head -1"
     interval     = 300
     timeout      = 5
   }
