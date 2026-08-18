@@ -38,15 +38,6 @@ resource "coder_agent" "main" {
       nohup t3 serve >"$HOME/.local/share/t3/serve.log" 2>&1 &
       echo $! >"$server_pid"
     fi
-    mkdir -p "$HOME/project" "$HOME/.ssh"
-    chmod 700 "$HOME/.ssh"
-    ssh-keyscan -H forgejo.forgejo.svc.cluster.local >> "$HOME/.ssh/known_hosts" 2>/dev/null || true
-    sort -u "$HOME/.ssh/known_hosts" -o "$HOME/.ssh/known_hosts"
-    if [ ! -d "$HOME/project/.git" ]; then
-      GIT_SSH_COMMAND="coder gitssh" git clone ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git "$HOME/project" || {
-        echo "Forgejo has not accepted the Coder-managed SSH key yet. Add the public key printed by coder gitssh above, then clone again."
-      }
-    fi
   EOT
 
   metadata {
