@@ -17,48 +17,35 @@ provider "kubernetes" {}
 data "coder_workspace" "me" {}
 data "coder_workspace_owner" "me" {}
 
-data "coder_parameter" "repository_url" {
-  name         = "repository_url"
-  display_name = "Forgejo repository"
-  type         = "string"
-  mutable      = false
-  default      = "ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git"
-
-  validation {
-    regex = "^ssh://git@forgejo\\.forgejo\\.svc\\.cluster\\.local/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+\\.git$"
-    error = "Use an SSH URL hosted by the in-cluster Forgejo service."
-  }
-}
-
-data "coder_parameter" "branch" {
-  name         = "branch"
-  display_name = "Git branch"
-  type         = "string"
-  mutable      = false
-  default      = "main"
-
-  validation {
-    regex = "^[A-Za-z0-9._/-]+$"
-    error = "Use a valid Git branch name."
-  }
-}
-
 resource "coder_agent" "main" {
   os   = "linux"
   arch = "amd64"
 
   startup_script = <<-EOT
     set -eu
-    mkdir -p "$HOME/.ssh" "$HOME/project"
+    if ! command -v t3 >/dev/null 2>&1 || ! (cd "$(npm root --global)/t3" && node -e "require('node-pty')"); then
+      npm_config_build_from_source=true npm install --global t3
+    fi
+    cd "$(npm root --global)/t3"
+    node -e "const p=require('node-pty'); const t=p.spawn('sh', [], {cols:80, rows:24}); t.kill()"
+    mkdir -p "$HOME/project" "$HOME/.ssh"
     chmod 700 "$HOME/.ssh"
     ssh-keyscan -H forgejo.forgejo.svc.cluster.local >> "$HOME/.ssh/known_hosts" 2>/dev/null || true
     sort -u "$HOME/.ssh/known_hosts" -o "$HOME/.ssh/known_hosts"
     if [ ! -d "$HOME/project/.git" ]; then
-      GIT_SSH_COMMAND="coder gitssh" git clone --branch "$REPOSITORY_BRANCH" "$REPOSITORY_URL" "$HOME/project" || {
+      GIT_SSH_COMMAND="coder gitssh" git clone ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git "$HOME/project" || {
         echo "Forgejo has not accepted the Coder-managed SSH key yet. Add the public key printed by coder gitssh above, then clone again."
       }
     fi
   EOT
+
+  metadata {
+    display_name = "T3 version"
+    key          = "t3-version"
+    script       = "t3 --version"
+    interval     = 300
+    timeout      = 5
+  }
 
   metadata {
     display_name = "CPU Usage"
@@ -77,24 +64,12 @@ resource "coder_agent" "main" {
   }
 }
 
-resource "coder_env" "repository_url" {
-  agent_id = coder_agent.main.id
-  name     = "REPOSITORY_URL"
-  value    = data.coder_parameter.repository_url.value
-}
-
-resource "coder_env" "repository_branch" {
-  agent_id = coder_agent.main.id
-  name     = "REPOSITORY_BRANCH"
-  value    = data.coder_parameter.branch.value
-}
-
 resource "kubernetes_persistent_volume_claim_v1" "home" {
   metadata {
-    name      = "coder-${data.coder_workspace.me.id}-home"
+    name      = "coder-${data.coder_workspace.me.id}-t3"
     namespace = "coder-workspaces"
     labels = {
-      "app.kubernetes.io/name"   = "coder-workspace"
+      "app.kubernetes.io/name"   = "t3code-workspace"
       "com.coder.workspace.id"   = data.coder_workspace.me.id
       "com.coder.workspace.name" = data.coder_workspace.me.name
       "com.coder.user.id"        = data.coder_workspace_owner.me.id
@@ -116,10 +91,10 @@ resource "kubernetes_deployment_v1" "workspace" {
   depends_on       = [kubernetes_persistent_volume_claim_v1.home]
 
   metadata {
-    name      = "coder-${data.coder_workspace.me.id}"
+    name      = "t3-${data.coder_workspace.me.id}"
     namespace = "coder-workspaces"
     labels = {
-      "app.kubernetes.io/name" = "coder-workspace"
+      "app.kubernetes.io/name" = "t3code-workspace"
       "com.coder.workspace.id" = data.coder_workspace.me.id
     }
   }
@@ -133,7 +108,7 @@ resource "kubernetes_deployment_v1" "workspace" {
     template {
       metadata {
         labels = {
-          "app.kubernetes.io/name" = "coder-workspace"
+          "app.kubernetes.io/name" = "t3code-workspace"
           "com.coder.workspace.id" = data.coder_workspace.me.id
         }
       }

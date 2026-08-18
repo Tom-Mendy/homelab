@@ -57,9 +57,14 @@ Install and authenticate the matching Coder CLI, then push each directory:
 coder login https://coder.home.tom-mendy.com
 coder templates push agent-workspace \
   --directory kubernetes/coder/workspace-templates/agent-workspace
+coder templates push t3code \
+  --directory kubernetes/coder/workspace-templates/t3code
 coder templates push hermes-personal \
   --directory kubernetes/coder/workspace-templates/hermes-personal
 ```
+
+The `t3code` template is separate from `agent-workspace`. It installs T3 in the
+workspace and compiles its Linux `node-pty` native module during first startup.
 
 Create only one `hermes-personal` workspace and disable its automatic stop in
 the Coder schedule. The namespace quota permits Hermes plus two standard
@@ -73,17 +78,19 @@ workspace PVC.
 
 ## Forgejo access
 
-Each standard workspace creates an Ed25519 key in its persistent home. On its
-first start, copy the public key printed in the startup log and add it to the
-Forgejo account, then run:
+Each workspace uses Coder's managed SSH key through `coder gitssh`. On its first
+start, copy the public key printed in the startup log and add it to the Forgejo
+account, then rerun the clone:
 
 ```sh
-git clone --branch main \
+GIT_SSH_COMMAND="coder gitssh" git clone --branch main \
   ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git \
   ~/project
 ```
 
-No Forgejo token is stored in the template or Kubernetes Secret.
+The templates set `GIT_SSH_COMMAND="coder gitssh"` for the initial clone. No
+local private key or Forgejo token is stored in the workspace PVC or a
+Kubernetes Secret.
 
 ## Hermes first-time setup
 
