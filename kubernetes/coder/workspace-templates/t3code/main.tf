@@ -23,11 +23,11 @@ resource "coder_agent" "main" {
 
   startup_script = <<-EOT
     set -eu
-    if ! command -v t3 >/dev/null 2>&1 || ! (cd "$(npm root --global)/t3" && node -e "require('node-pty')"); then
-      npm_config_build_from_source=true npm install --global t3
+    export npm_config_prefix="$HOME/.local"
+    export PATH="$HOME/.local/bin:$PATH"
+    if ! command -v t3 >/dev/null 2>&1 || ! command -v codex >/dev/null 2>&1; then
+      npm install --global t3@latest @openai/codex
     fi
-    cd "$(npm root --global)/t3"
-    node -e "const p=require('node-pty'); const t=p.spawn('sh', [], {cols:80, rows:24}); t.kill()"
     mkdir -p "$HOME/project" "$HOME/.ssh"
     chmod 700 "$HOME/.ssh"
     ssh-keyscan -H forgejo.forgejo.svc.cluster.local >> "$HOME/.ssh/known_hosts" 2>/dev/null || true
@@ -38,6 +38,14 @@ resource "coder_agent" "main" {
       }
     fi
   EOT
+
+  metadata {
+    display_name = "Codex version"
+    key          = "codex-version"
+    script       = "codex --version"
+    interval     = 300
+    timeout      = 5
+  }
 
   metadata {
     display_name = "T3 version"
