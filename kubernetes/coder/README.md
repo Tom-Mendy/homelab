@@ -82,6 +82,20 @@ container runs as an unprivileged user whose image-level login shell is
 executes Bash for interactive SSH sessions. Non-interactive startup commands
 continue to run through their explicitly selected interpreter.
 
+## Hermes workspace image
+
+The custom workspace image is built by Forgejo Actions from
+`kubernetes/coder/workspace-images/hermes/Dockerfile`. It installs the stable
+Debian system dependencies used for development and infrastructure work while
+keeping the runtime user non-root. The repository's Forgejo Actions settings
+must contain a `REGISTRY_TOKEN` secret with package-write permission before the
+image workflow can publish to `forgejo.tom-mendy.com`.
+
+The image is intentionally built separately from the Terraform template. Push
+and verify the image publication before changing the template's image digest;
+this prevents a missing registry secret or failed build from breaking the
+running workspace.
+
 ## Forgejo access
 
 Each workspace uses Coder's managed SSH key through `coder gitssh`. On its first
