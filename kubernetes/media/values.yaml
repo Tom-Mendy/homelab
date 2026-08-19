@@ -71,6 +71,7 @@ apps:
     host: qbittorrent.home.tom-mendy.com
     vpn: true
     vpnProvider: nymvpn
+    ssoAuthWhitelist: 10.233.64.0/18
     mounts:
       downloads: true
       movies: false

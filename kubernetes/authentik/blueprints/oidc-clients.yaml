@@ -51,6 +51,10 @@ entries:
     id: sonarr-users
     identifiers:
       name: sonarr-users
+  - model: authentik_core.group
+    id: qbittorrent-users
+    identifiers:
+      name: qbittorrent-users
 
   - model: authentik_providers_proxy.proxyprovider
     id: hindsight-provider
@@ -166,6 +170,46 @@ entries:
       order: 1
     attrs:
       enabled: true
+  - model: authentik_providers_proxy.proxyprovider
+    id: qbittorrent-provider
+    identifiers:
+      name: qBittorrent
+    attrs:
+      authentication_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-authentication-flow]
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+      external_host: https://qbittorrent.home.tom-mendy.com
+      mode: forward_single
+  - model: authentik_core.application
+    id: qbittorrent-application
+    identifiers:
+      slug: qbittorrent
+    attrs:
+      name: qBittorrent
+      provider: !KeyOf qbittorrent-provider
+      meta_launch_url: https://qbittorrent.home.tom-mendy.com/
+      meta_icon: https://raw.githubusercontent.com/qbittorrent/qBittorrent/master/dist/logo/qbittorrent.png
+      policy_engine_mode: any
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf qbittorrent-application
+      group: !KeyOf homelab-admins
+      order: 0
+    attrs:
+      enabled: true
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf qbittorrent-application
+      group: !KeyOf qbittorrent-users
+      order: 1
+    attrs:
+      enabled: true
   - model: authentik_outposts.outpost
     identifiers:
       name: authentik Embedded Outpost
@@ -174,6 +218,7 @@ entries:
         - !KeyOf radarr-provider
         - !KeyOf sonarr-provider
         - !KeyOf hindsight-provider
+        - !KeyOf qbittorrent-provider
 
   - model: authentik_providers_oauth2.scopemapping
     id: openwebui-roles-scope
