@@ -1,5 +1,42 @@
 {{- $app := .Values.apps.qbittorrent }}
 {{- $vpnProvider := default "protonvpn" $app.vpnProvider }}
+{{- if $app.ssoAuthWhitelist }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qbittorrent-sso
+  namespace: {{ .Values.namespace }}
+data:
+  ensure-sso-auth.sh: |
+    #!/bin/bash
+    set -e
+
+    CONF=/config/qBittorrent/qBittorrent.conf
+    mkdir -p /config/qBittorrent
+    touch "$CONF"
+
+    set_key() {
+      key="$1"
+      value="$2"
+      export KEY="$key" VALUE="$value"
+      if awk 'index($0, ENVIRON["KEY"] "=") == 1 { found=1; exit } END { exit !found }' "$CONF"; then
+        awk 'index($0, ENVIRON["KEY"] "=") == 1 { print ENVIRON["KEY"] "=" ENVIRON["VALUE"]; next } { print }' "$CONF" > "$CONF.tmp" && mv "$CONF.tmp" "$CONF"
+      elif grep -q '^\[Preferences\]' "$CONF"; then
+        awk '
+          /^\[/ { if (in_prefs && !inserted) { print ENVIRON["KEY"] "=" ENVIRON["VALUE"]; inserted=1 } in_prefs=0 }
+          /^\[Preferences\]/ { in_prefs=1 }
+          { print }
+          END { if (!inserted) print ENVIRON["KEY"] "=" ENVIRON["VALUE"] }
+        ' "$CONF" > "$CONF.tmp" && mv "$CONF.tmp" "$CONF"
+      else
+        printf '\n[Preferences]\n%s=%s\n' "$key" "$value" >> "$CONF"
+      fi
+    }
+
+    set_key 'WebUI\AuthSubnetWhitelistEnabled' 'true'
+    set_key 'WebUI\AuthSubnetWhitelist' "$SSO_AUTH_WHITELIST"
+---
+{{- end }}
 {{- if and .Values.vpn.enabled $app.vpn (eq $vpnProvider "nymvpn") }}
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -102,6 +139,20 @@ spec:
               mountPath: /run/secrets/nymvpn
               readOnly: true
       {{- end }}
+        {{- if $app.ssoAuthWhitelist }}
+        - name: sso-config
+          image: {{ $app.image | quote }}
+          command: ["/bin/bash", "/scripts/ensure-sso-auth.sh"]
+          env:
+            - name: SSO_AUTH_WHITELIST
+              value: {{ $app.ssoAuthWhitelist | quote }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: sso-script
+              mountPath: /scripts
+              readOnly: true
+        {{- end }}
       containers:
         {{- if and .Values.vpn.enabled $app.vpn (eq $vpnProvider "protonvpn") }}
         - name: gluetun
@@ -195,6 +246,12 @@ spec:
               - key: NYM_ACCESS_CODE
                 path: access-code
         {{- end }}
+        {{- if $app.ssoAuthWhitelist }}
+        - name: sso-script
+          configMap:
+            name: qbittorrent-sso
+            defaultMode: 0555
+        {{- end }}
 ---
 apiVersion: v1
 kind: Service
@@ -218,6 +275,9 @@ metadata:
   namespace: {{ .Values.namespace }}
   annotations:
 {{ toYaml .Values.ingress.annotations | nindent 4 }}
+{{- if $app.ssoAuthWhitelist }}
+    traefik.ingress.kubernetes.io/router.middlewares: {{ printf "%s-authentik-media@kubernetescrd" .Values.namespace | quote }}
+{{- end }}
 spec:
   rules:
     - host: {{ $app.host }}
