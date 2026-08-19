@@ -76,6 +76,12 @@ synchronizes it and `HERMES_MATRIX_ACCESS_TOKEN` into the `coder-workspaces`
 namespace. The template injects those values without writing the token to the
 workspace PVC.
 
+The Hermes workspace advertises `/usr/bin/bash` as its shell. Because the
+container runs as an unprivileged user whose image-level login shell is
+`/bin/sh`, its startup script also installs a small `~/.profile` fallback that
+executes Bash for interactive SSH sessions. Non-interactive startup commands
+continue to run through their explicitly selected interpreter.
+
 ## Forgejo access
 
 Each workspace uses Coder's managed SSH key through `coder gitssh`. On its first
