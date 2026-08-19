@@ -27,7 +27,7 @@ resource "coder_agent" "main" {
     [ ! -f "$HOME/.profile" ] || sed -i '\|runtime-venv-v2026.7.1|d' "$HOME/.profile"
     profile_line='export PATH="/opt/hermes/bin:/opt/hermes/.venv/bin:$HOME/.local/bin:$PATH"'
     grep -qxF "$profile_line" "$HOME/.profile" 2>/dev/null || printf '\n%s\n' "$profile_line" >> "$HOME/.profile"
-    bash_login_line='if [ -x /usr/bin/bash ] && [ -z "${BASH_VERSION:-}" ] && [ -n "${SSH_TTY:-}" ]; then exec /usr/bin/bash -l; fi'
+    bash_login_line='if [ -x /usr/bin/bash ] && [ -z "$${BASH_VERSION:-}" ] && [ -n "$${SSH_TTY:-}" ]; then exec /usr/bin/bash -l; fi'
     grep -qxF "$bash_login_line" "$HOME/.profile" 2>/dev/null || printf '%s\n' "$bash_login_line" >> "$HOME/.profile"
     mkdir -p "$HERMES_HOME/logs"
     if [ -f "$HERMES_HOME/config.yaml" ]; then
