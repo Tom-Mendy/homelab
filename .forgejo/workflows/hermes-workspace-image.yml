@@ -1,50 +1,34 @@
-name: publish-hermes-workspace-image
+name: hermes-workspace-image
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "kubernetes/coder/workspace-images/hermes/**"
-      - ".forgejo/workflows/hermes-workspace-image.yml"
   workflow_dispatch:
-
-permissions:
-  contents: read
-
-concurrency:
-  group: hermes-workspace-image
-  cancel-in-progress: true
-
-env:
-  REGISTRY: forgejo.tom-mendy.com
-  IMAGE_NAME: forgejo.tom-mendy.com/tom-mendy/hermes-workspace
-  IMAGE_TAG: v2026.7.1-apt1
+  push:
+    branches:
+      - main
+    paths:
+      - kubernetes/coder/workspace-images/hermes/**
+      - .forgejo/workflows/hermes-workspace-image.yml
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    env:
+      IMAGE: forgejo.tom-mendy.com/tom-mendy/hermes-workspace:v2026.7.1-apt1
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Log in to Forgejo registry
-        shell: bash
+        run: echo "$REGISTRY_TOKEN" | docker login forgejo.tom-mendy.com --username "$REGISTRY_USERNAME" --password-stdin
         env:
           REGISTRY_USERNAME: ${{ forgejo.repository_owner }}
           REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
-        run: |
-          set -euo pipefail
-          test -n "$REGISTRY_TOKEN"
-          printf '%s' "$REGISTRY_TOKEN" | docker login "$REGISTRY" \
-            --username "$REGISTRY_USERNAME" --password-stdin
 
       - name: Build and push image
-        shell: bash
         run: |
-          set -euo pipefail
-          docker build --pull \
-            --file kubernetes/coder/workspace-images/hermes/Dockerfile \
-            --tag "$IMAGE_NAME:$IMAGE_TAG" \
-            kubernetes/coder/workspace-images/hermes
-          docker push "$IMAGE_NAME:$IMAGE_TAG"
+          docker build --pull --tag "$IMAGE" kubernetes/coder/workspace-images/hermes
+          for attempt in 1 2 3; do
+            docker push "$IMAGE" && exit 0
+            sleep 15
+          done
+          exit 1
