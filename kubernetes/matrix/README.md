@@ -16,7 +16,7 @@ authenticate through Authentik; `hermes-bot` is the only local account.
    `/matrix`. The existing Authentik identity only distributes the OIDC secret
    from `/oidc`.
 3. Add public DNS records for `matrix.tom-mendy.com`, `chat.tom-mendy.com`, and
-   `rtc.tom-mendy.com`, all pointing to the Pangolin VPS (`72.61.113.235`).
+   `rtc.tom-mendy.com`, all pointing to the Pangolin VPS (`92.222.90.223`).
 4. In Pangolin, create HTTPS resources for those three hostnames and forward
    them through Newt to Traefik. Do not add an internal Blocky override for
    `rtc.tom-mendy.com`: clients must resolve its public media IP.
