@@ -4,5 +4,7 @@ metadata:
   name: {{ .Values.oidc.blueprintConfigMapName }}
   namespace: {{ .Values.namespace }}
 data:
-  oidc-clients.yaml: |
-{{ .Files.Get "blueprints/oidc-clients.yaml" | nindent 4 }}
+{{- range $path, $_ := .Files.Glob "blueprints/*.yaml" }}
+  {{ base $path }}: |
+{{ $.Files.Get $path | nindent 4 }}
+{{- end }}

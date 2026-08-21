@@ -1,0 +1,57 @@
+version: 1
+metadata:
+  name: Homelab groups
+entries:
+  - model: authentik_core.group
+    id: homelab-admins
+    identifiers:
+      name: homelab-admins
+    attrs:
+      is_superuser: true
+  - model: authentik_core.group
+    id: homelab-guests
+    identifiers:
+      name: homelab-guests
+  - model: authentik_core.group
+    id: forgejo-users
+    identifiers:
+      name: forgejo-users
+  - model: authentik_core.group
+    id: grafana-users
+    identifiers:
+      name: grafana-users
+  - model: authentik_core.group
+    id: flux-viewers
+    identifiers:
+      name: flux-viewers
+  - model: authentik_core.group
+    id: coder-users
+    identifiers:
+      name: coder-users
+  - model: authentik_core.group
+    id: matrix-users
+    identifiers:
+      name: matrix-users
+
+  - model: authentik_core.group
+    id: openwebui-users
+    identifiers:
+      name: openwebui-users
+
+  - model: authentik_core.group
+    id: media-users
+    identifiers:
+      name: media-users
+
+  - model: authentik_core.group
+    id: radarr-users
+    identifiers:
+      name: radarr-users
+  - model: authentik_core.group
+    id: sonarr-users
+    identifiers:
+      name: sonarr-users
+  - model: authentik_core.group
+    id: qbittorrent-users
+    identifiers:
+      name: qbittorrent-users

@@ -1,0 +1,171 @@
+version: 1
+metadata:
+  name: Proxy applications
+entries:
+  - model: authentik_providers_proxy.proxyprovider
+    id: hindsight-provider
+    identifiers:
+      name: Hindsight
+    attrs:
+      authentication_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-authentication-flow]
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+      external_host: https://hindsight.home.tom-mendy.com
+      mode: forward_single
+  - model: authentik_core.application
+    id: hindsight-application
+    identifiers:
+      slug: hindsight
+    attrs:
+      name: Hindsight
+      provider: !KeyOf hindsight-provider
+      meta_launch_url: https://hindsight.home.tom-mendy.com/
+      open_in_new_tab: true
+      policy_engine_mode: any
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf hindsight-application
+      group: !Find [authentik_core.group, [name, homelab-admins]]
+      order: 0
+    attrs:
+      enabled: true
+
+  - model: authentik_providers_proxy.proxyprovider
+    id: radarr-provider
+    identifiers:
+      name: Radarr
+    attrs:
+      authentication_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-authentication-flow]
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+      external_host: https://radarr.home.tom-mendy.com
+      mode: forward_single
+  - model: authentik_core.application
+    id: radarr-application
+    identifiers:
+      slug: radarr
+    attrs:
+      name: Radarr
+      provider: !KeyOf radarr-provider
+      meta_launch_url: https://radarr.home.tom-mendy.com/
+      meta_icon: https://raw.githubusercontent.com/Radarr/Radarr/develop/Logo/64.png
+      open_in_new_tab: true
+      policy_engine_mode: any
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf radarr-application
+      group: !Find [authentik_core.group, [name, homelab-admins]]
+      order: 0
+    attrs:
+      enabled: true
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf radarr-application
+      group: !Find [authentik_core.group, [name, radarr-users]]
+      order: 1
+    attrs:
+      enabled: true
+
+  - model: authentik_providers_proxy.proxyprovider
+    id: sonarr-provider
+    identifiers:
+      name: Sonarr
+    attrs:
+      authentication_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-authentication-flow]
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+      external_host: https://sonarr.home.tom-mendy.com
+      mode: forward_single
+  - model: authentik_core.application
+    id: sonarr-application
+    identifiers:
+      slug: sonarr
+    attrs:
+      name: Sonarr
+      provider: !KeyOf sonarr-provider
+      meta_launch_url: https://sonarr.home.tom-mendy.com/
+      meta_icon: https://raw.githubusercontent.com/Sonarr/Sonarr/develop/Logo/64.png
+      open_in_new_tab: true
+      policy_engine_mode: any
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf sonarr-application
+      group: !Find [authentik_core.group, [name, homelab-admins]]
+      order: 0
+    attrs:
+      enabled: true
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf sonarr-application
+      group: !Find [authentik_core.group, [name, sonarr-users]]
+      order: 1
+    attrs:
+      enabled: true
+  - model: authentik_providers_proxy.proxyprovider
+    id: qbittorrent-provider
+    identifiers:
+      name: qBittorrent
+    attrs:
+      authentication_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-authentication-flow]
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+      external_host: https://qbittorrent.home.tom-mendy.com
+      mode: forward_single
+  - model: authentik_core.application
+    id: qbittorrent-application
+    identifiers:
+      slug: qbittorrent
+    attrs:
+      name: qBittorrent
+      provider: !KeyOf qbittorrent-provider
+      meta_launch_url: https://qbittorrent.home.tom-mendy.com/
+      meta_icon: https://raw.githubusercontent.com/qbittorrent/qBittorrent/master/src/webui/www/private/images/qbittorrent32.png
+      open_in_new_tab: true
+      policy_engine_mode: any
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf qbittorrent-application
+      group: !Find [authentik_core.group, [name, homelab-admins]]
+      order: 0
+    attrs:
+      enabled: true
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf qbittorrent-application
+      group: !Find [authentik_core.group, [name, qbittorrent-users]]
+      order: 1
+    attrs:
+      enabled: true
+  - model: authentik_outposts.outpost
+    identifiers:
+      name: authentik Embedded Outpost
+    attrs:
+      providers:
+        - !KeyOf radarr-provider
+        - !KeyOf sonarr-provider
+        - !KeyOf hindsight-provider
+        - !KeyOf qbittorrent-provider
