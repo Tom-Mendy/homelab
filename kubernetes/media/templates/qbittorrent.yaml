@@ -35,6 +35,12 @@ data:
 
     set_key 'WebUI\AuthSubnetWhitelistEnabled' 'true'
     set_key 'WebUI\AuthSubnetWhitelist' "$SSO_AUTH_WHITELIST"
+    # qBittorrent must use the proxy address when evaluating the whitelist.
+    # Otherwise it can ignore the forwarded client address and keep its own
+    # authentication challenge in front of the Authentik session.
+    set_key 'WebUI\LocalHostAuth' 'false'
+    set_key 'WebUI\ReverseProxySupportEnabled' 'true'
+    set_key 'WebUI\TrustedReverseProxiesList' "$SSO_AUTH_WHITELIST"
 ---
 {{- end }}
 {{- if and .Values.vpn.enabled $app.vpn (eq $vpnProvider "nymvpn") }}
