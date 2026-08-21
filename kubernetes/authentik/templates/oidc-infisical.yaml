@@ -66,7 +66,7 @@ spec:
         engineVersion: v1
         data:
           FORGEJO_OIDC_CLIENT_SECRET: "{{`{{ .FORGEJO_OIDC_CLIENT_SECRET.Value }}`}}"
-          GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "{{`{{ .GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET.Value }}`}}"
+          GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "{{`{{ .GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET.Value | trim }}`}}"
           FLUX_WEB_CLIENT_SECRET: "{{`{{ .FLUX_WEB_CLIENT_SECRET.Value }}`}}"
           OPENWEBUI_OIDC_CLIENT_SECRET: "{{`{{ .OPENWEBUI_OIDC_CLIENT_SECRET.Value }}`}}"
           CODER_OIDC_CLIENT_SECRET: "{{`{{ .CODER_OIDC_CLIENT_SECRET.Value }}`}}"
@@ -88,7 +88,7 @@ spec:
       template:
         engineVersion: v1
         data:
-          GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "{{`{{ .GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET.Value }}`}}"
+          GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "{{`{{ .GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET.Value | trim }}`}}"
     - name: flux-web-client
       namespace: flux-system
       kind: Secret
