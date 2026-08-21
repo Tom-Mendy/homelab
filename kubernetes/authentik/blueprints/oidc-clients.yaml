@@ -80,6 +80,7 @@ entries:
       name: Hindsight
       provider: !KeyOf hindsight-provider
       meta_launch_url: https://hindsight.home.tom-mendy.com/
+      open_in_new_tab: true
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
@@ -114,6 +115,7 @@ entries:
       provider: !KeyOf radarr-provider
       meta_launch_url: https://radarr.home.tom-mendy.com/
       meta_icon: https://raw.githubusercontent.com/Radarr/Radarr/develop/Logo/64.png
+      open_in_new_tab: true
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
@@ -155,6 +157,7 @@ entries:
       provider: !KeyOf sonarr-provider
       meta_launch_url: https://sonarr.home.tom-mendy.com/
       meta_icon: https://raw.githubusercontent.com/Sonarr/Sonarr/develop/Logo/64.png
+      open_in_new_tab: true
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
@@ -194,7 +197,8 @@ entries:
       name: qBittorrent
       provider: !KeyOf qbittorrent-provider
       meta_launch_url: https://qbittorrent.home.tom-mendy.com/
-      meta_icon: https://raw.githubusercontent.com/qbittorrent/qBittorrent/master/dist/logo/qbittorrent.png
+      meta_icon: https://raw.githubusercontent.com/qbittorrent/qBittorrent/master/src/webui/www/private/images/qbittorrent32.png
+      open_in_new_tab: true
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
@@ -280,6 +284,7 @@ entries:
       provider: !KeyOf openwebui-provider
       meta_launch_url: https://openwebui.home.tom-mendy.com/
       meta_icon: https://openwebui.home.tom-mendy.com/static/favicon.png
+      open_in_new_tab: true
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
@@ -343,6 +348,7 @@ entries:
       provider: !KeyOf forgejo-provider
       meta_launch_url: https://forgejo.tom-mendy.com/user/oauth2/authentik
       meta_icon: https://forgejo.tom-mendy.com/assets/img/logo.svg
+      open_in_new_tab: true
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
@@ -406,6 +412,7 @@ entries:
       provider: !KeyOf grafana-provider
       meta_launch_url: https://grafana.home.tom-mendy.com/
       meta_icon: https://grafana.home.tom-mendy.com/public/img/grafana_icon.svg
+      open_in_new_tab: true
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
@@ -469,6 +476,7 @@ entries:
       provider: !KeyOf flux-provider
       meta_launch_url: https://flux.home.tom-mendy.com/
       meta_icon: https://flux.home.tom-mendy.com/favicon.svg
+      open_in_new_tab: true
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
@@ -532,6 +540,7 @@ entries:
       provider: !KeyOf coder-provider
       meta_launch_url: https://coder.home.tom-mendy.com/
       meta_icon: https://coder.home.tom-mendy.com/favicon.ico
+      open_in_new_tab: true
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
@@ -591,7 +600,8 @@ entries:
       name: Matrix
       provider: !KeyOf matrix-provider
       meta_launch_url: https://chat.tom-mendy.com/
-      meta_icon: https://chat.tom-mendy.com/assets/favicon.ico
+      meta_icon: https://chat.tom-mendy.com/favicon.ico
+      open_in_new_tab: true
       policy_engine_mode: any
   - model: authentik_policies.policybinding
     identifiers:
