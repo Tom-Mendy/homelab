@@ -43,6 +43,7 @@ grafana.ini:
     enabled: true
     name: Authentik
     allow_sign_up: true
+    auto_login: true
     client_id: grafana
     client_secret: $__env{GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}
     scopes: openid profile email offline_access
