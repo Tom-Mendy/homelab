@@ -22,7 +22,6 @@ spec:
     - name: nfs-provisioner
   driftDetection:
     mode: enabled
-
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -49,7 +48,6 @@ spec:
     - name: traefik
   driftDetection:
     mode: enabled
-
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -348,6 +346,24 @@ spec:
     disableSchemaValidation: true
   driftDetection:
     mode: enabled
+  postRenderers:
+    - kustomize:
+        patches:
+          - patch: |
+              - op: add
+                path: /spec/template/spec/containers/0/startupProbe
+                value:
+                  exec:
+                    command:
+                      - test
+                      - -f
+                      - /tmp/healthy
+                  failureThreshold: 12
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+            target:
+              kind: Deployment
+              name: newt-newt-main-tunnel
 
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
