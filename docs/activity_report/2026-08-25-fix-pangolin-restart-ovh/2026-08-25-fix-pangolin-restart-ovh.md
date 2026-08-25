@@ -103,3 +103,29 @@ Final validation returned HTTP 200 for Pangolin, Authentik, and Forgejo.
 Newt was recreated once after the OVH stack was healthy and reached `1/1
 Running`; its logs showed a successful tunnel and all configured targets
 healthy. The storage policy check continued to pass.
+
+## Newt probe fix
+
+The live Newt Deployment used file probes with only 5 to 10 seconds of initial
+delay. Kubernetes killed the process after the tunnel took longer than the
+default failure window to create `/tmp/healthy`. Chart 1.1.0 does not expose
+the probe delays as values, so the Flux `HelmRelease` now applies a Kustomize
+post-renderer to the Newt Deployment. It adds a 120-second startup window and
+relaxes the normal probes to allow a slow reconnect:
+
+```text
+startupProbe: failureThreshold=12, periodSeconds=10
+livenessProbe: initialDelaySeconds=60, failureThreshold=8
+readinessProbe: initialDelaySeconds=30, failureThreshold=6
+```
+
+The live rollout succeeded with `Helm upgrade succeeded` and the rendered
+Deployment contained the new probe settings. A deliberate pod deletion was
+used as the regression test:
+
+```text
+kubectl delete pod ... -n newt-system
+deployment "newt-newt-main-tunnel" successfully rolled out
+newt-newt-main-tunnel-...  1/1  Running  0  ...
+storage policy ok
+```
