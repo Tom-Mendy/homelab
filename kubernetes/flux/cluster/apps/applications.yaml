@@ -350,6 +350,18 @@ spec:
     - kustomize:
         patches:
           - patch: |
+              - op: replace
+                path: /spec/template/spec/containers/0/livenessProbe/initialDelaySeconds
+                value: 60
+              - op: replace
+                path: /spec/template/spec/containers/0/livenessProbe/failureThreshold
+                value: 8
+              - op: replace
+                path: /spec/template/spec/containers/0/readinessProbe/initialDelaySeconds
+                value: 30
+              - op: replace
+                path: /spec/template/spec/containers/0/readinessProbe/failureThreshold
+                value: 6
               - op: add
                 path: /spec/template/spec/containers/0/startupProbe
                 value:
