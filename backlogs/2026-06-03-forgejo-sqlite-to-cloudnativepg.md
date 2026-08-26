@@ -1,5 +1,12 @@
 # Forgejo SQLite To CloudNativePG Migration Backlog
 
+## Implementation status
+
+The non-disruptive preparation is complete. The repository now renders a
+dedicated CloudNativePG cluster and Forgejo can select PostgreSQL through the
+`database.type` value. The live cutover remains pending because it requires a
+published GitOps change, a maintenance window, and a verified SQLite backup.
+
 ## Goal
 
 Plan the future migration of Forgejo from the current SQLite database on
@@ -16,7 +23,7 @@ change.
 - CloudNativePG is already used by `infisical-postgres` and
   `authentik-postgres`.
 - Existing CNPG app clusters use:
-  - PostgreSQL image `ghcr.io/cloudnative-pg/postgresql:18`
+  - PostgreSQL image `ghcr.io/cloudnative-pg/postgresql:17`
   - storage class `nfs-k8s`
   - one instance
   - CNPG-generated application secret
@@ -32,7 +39,7 @@ namespace: forgejo
 cluster:
   name: forgejo-postgres
   instances: 1
-  imageName: ghcr.io/cloudnative-pg/postgresql:18
+  imageName: ghcr.io/cloudnative-pg/postgresql:17
   storage:
     size: 20Gi
     storageClass: nfs-k8s

@@ -17,6 +17,13 @@ user:
 
 rootUrl: https://forgejo.tom-mendy.com/
 
+database:
+  type: sqlite3
+  host: forgejo-postgres-rw.forgejo.svc.cluster.local:5432
+  name: forgejo
+  sslMode: disable
+  secretName: forgejo-postgres-app
+
 oauth2Client:
   enableAutoRegistration: true
   username: nickname

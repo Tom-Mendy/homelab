@@ -37,6 +37,26 @@ spec:
               value: {{ .Values.user.gid | quote }}
             - name: FORGEJO__server__ROOT_URL
               value: {{ .Values.rootUrl | quote }}
+            {{- if eq .Values.database.type "postgres" }}
+            - name: FORGEJO__database__DB_TYPE
+              value: postgres
+            - name: FORGEJO__database__HOST
+              value: {{ .Values.database.host | quote }}
+            - name: FORGEJO__database__NAME
+              value: {{ .Values.database.name | quote }}
+            - name: FORGEJO__database__SSL_MODE
+              value: {{ .Values.database.sslMode | quote }}
+            - name: FORGEJO__database__USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.secretName }}
+                  key: username
+            - name: FORGEJO__database__PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.secretName }}
+                  key: password
+            {{- end }}
             - name: FORGEJO__oauth2_client__ENABLE_AUTO_REGISTRATION
               value: {{ .Values.oauth2Client.enableAutoRegistration | quote }}
             - name: FORGEJO__oauth2_client__USERNAME

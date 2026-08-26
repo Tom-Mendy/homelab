@@ -1,0 +1,6 @@
+apiVersion: v2
+name: forgejo-postgres-local
+description: Local Helm chart for the Forgejo CloudNativePG cluster
+type: application
+version: 0.1.0
+appVersion: "17"

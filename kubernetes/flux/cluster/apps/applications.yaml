@@ -239,6 +239,32 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
+  name: forgejo-postgres
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: forgejo-postgres
+  targetNamespace: forgejo
+  storageNamespace: forgejo
+  chart:
+    spec:
+      chart: ./kubernetes/forgejo-postgres
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: cloudnative-pg
+    - name: nfs-provisioner
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
   name: forgejo
 spec:
   interval: 30m
@@ -255,6 +281,7 @@ spec:
         name: flux-system
   dependsOn:
     - name: authentik-extras
+    - name: forgejo-postgres
     - name: nfs-provisioner
     - name: traefik
   install:

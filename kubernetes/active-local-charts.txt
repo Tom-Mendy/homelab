@@ -4,6 +4,7 @@ authentik-postgres
 blocky
 coder
 forgejo
+forgejo-postgres
 forgejo-runner
 github-runners-auth
 grafana
