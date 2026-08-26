@@ -35,7 +35,7 @@ kubectl annotate cluster forgejo-postgres -n forgejo \
   meta.helm.sh/release-namespace=forgejo --overwrite
 kubectl label cluster forgejo-postgres -n forgejo \
   app.kubernetes.io/managed-by=Helm --overwrite
-flux reconcile kustomization apps -n flux-system --with-source
+flux reconcile kustomization flux-system -n flux-system --with-source
 ```
 
 The first inspection used the wrong namespace for the HelmReleases:
