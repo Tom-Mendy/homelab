@@ -24,6 +24,16 @@ database:
   sslMode: disable
   secretName: forgejo-postgres-app
 
+cluster:
+  name: forgejo-postgres
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17
+  storage:
+    size: 20Gi
+    storageClass: nfs-k8s
+  database: forgejo
+  owner: forgejo
+
 oauth2Client:
   enableAutoRegistration: true
   username: nickname
