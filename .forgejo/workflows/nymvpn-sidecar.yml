@@ -16,7 +16,9 @@ jobs:
       IMAGE: forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.3-3
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
+        with:
+          clean: true
 
       - name: Log in to Forgejo registry
         run: echo "$REGISTRY_TOKEN" | docker login forgejo.tom-mendy.com --username "$REGISTRY_USERNAME" --password-stdin

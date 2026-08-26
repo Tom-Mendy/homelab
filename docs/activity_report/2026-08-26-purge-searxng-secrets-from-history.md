@@ -146,13 +146,73 @@ The storage policy check passed:
 storage policy ok
 ```
 
+## Validation job 91
+
+Validation job 91 still found the same two commits after `main` had been
+rewritten. The runner reported 330 commits scanned. The current local `main`
+was clean, so the published branch heads were checked:
+
+```sh
+git ls-remote origin 'refs/heads/main' 'refs/heads/wakapi' 'refs/tags/*'
+```
+
+Before the update, Forgejo reported:
+
+```text
+50362beb7f476ab3fa2cce1176a82237c853399a refs/heads/main
+77ba42ab95c85709f5c0bd136d73f9cdfe9a228b refs/heads/wakapi
+```
+
+`main` already used the rewritten history. `wakapi` still pointed to the old
+history and was the cause of the full-history scan finding the leaked commits.
+
+Force-update the stale branch with lease protection:
+
+```sh
+tip=77ba42ab95c85709f5c0bd136d73f9cdfe9a228b
+git push origin \
+  refs/heads/main:refs/heads/main \
+  refs/remotes/origin/wakapi:refs/heads/wakapi \
+  --force-with-lease=refs/heads/main:50362beb7f476ab3fa2cce1176a82237c853399a \
+  --force-with-lease=refs/heads/wakapi:"$tip"
+```
+
+Forgejo accepted the update:
+
+```text
++ 77ba42a...313f8d9 origin/wakapi -> wakapi (forced update)
+```
+
+The remote branches now report the rewritten heads:
+
+```text
+50362beb7f476ab3fa2cce1176a82237c853399a refs/heads/main
+313f8d9b7a7db87f215dfed456c2a71a05185b62 refs/heads/wakapi
+```
+
+Verify all published branches from a fresh clone:
+
+```sh
+git clone --no-tags git@forgejo.tom-mendy.com:Tom-Mendy/homelab.git /tmp/homelab-remote-validation
+gitleaks detect --source /tmp/homelab-remote-validation --redact --no-banner --verbose
+```
+
+Result:
+
+```text
+274 commits scanned.
+scanned ~2409627 bytes (2.41 MB) in 236ms
+no leaks found
+```
+
 ## Final outcome
 
 The published branch history now has the two SearXNG values removed while the
 CI workflow continues to scan full history. The local recovery bundle is at
 `/tmp/homelab-before-searxng-history-rewrite.bundle`.
 
-The rewritten `main` and `wakapi` refs still need an authorized force-push to
-Forgejo. Existing clones must be discarded or recloned afterward. The two
-affected credentials must also be rotated or revoked in Infisical because the
-old values were exposed in Git history.
+The rewritten `main` and `wakapi` refs are now published in Forgejo, and a
+fresh clone passes the full-history Gitleaks scan. Existing clones must be
+discarded or recloned afterward. The two affected credentials must also be
+rotated or revoked in Infisical because the old values were exposed in Git
+history.
