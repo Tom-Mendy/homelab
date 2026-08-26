@@ -29,7 +29,7 @@ done
 
 if [ "${auth_list+x}" != x ]; then
   echo "Forgejo did not become ready for OIDC configuration" >&2
-  exit 1
+  exit 0
 fi
 
 auth_id="$(printf '%s\n' "$auth_list" | find_auth_id)"
@@ -50,7 +50,11 @@ set -- \
   --admin-group homelab-admins
 
 if [ -n "$auth_id" ]; then
-  forgejo_admin update-oauth --id "$auth_id" "$@"
+  if ! forgejo_admin update-oauth --id "$auth_id" "$@"; then
+    echo "Forgejo OIDC update failed; keeping the existing configuration" >&2
+  fi
 else
-  forgejo_admin add-oauth "$@"
+  if ! forgejo_admin add-oauth "$@"; then
+    echo "Forgejo OIDC creation failed; Forgejo will continue without changing authentication" >&2
+  fi
 fi
