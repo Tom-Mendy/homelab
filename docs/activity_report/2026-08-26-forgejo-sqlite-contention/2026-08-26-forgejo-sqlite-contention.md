@@ -224,3 +224,49 @@ The database is no longer the SQLite writer bottleneck. Package files, Actions
 logs, repositories, and other Forgejo storage still use NFS, so moving
 high-volume object storage to an S3-compatible backend remains a separate
 follow-up.
+
+## Follow-up PostgreSQL type correction
+
+The first migration left 56 Forgejo boolean columns as `BIGINT`. This caused
+the Authentik callback to fail in `UpdateUser` when Forgejo tried to encode a
+boolean value for the user permissions update. The initial inventory found the
+same issue across users, Actions, repositories, packages, webhooks, and
+authentication tables.
+
+The values were checked before conversion:
+
+```console
+$ psql ...
+NOTICE:  all candidate boolean columns contain only 0, 1, or NULL
+```
+
+A PostgreSQL custom-format backup was created before the correction:
+
+```console
+$ pg_dump -U postgres -Fc forgejo > /tmp/forgejo-postgres-pre-bool-fix.dump
+$ ls -lh /tmp/forgejo-postgres-pre-bool-fix.dump
+-rw-r--r-- 1 tmendy users 694K ... /tmp/forgejo-postgres-pre-bool-fix.dump
+```
+
+Flux and the Forgejo workloads were suspended, the remaining columns were
+converted transactionally with `USING column <> 0`, and the transaction
+returned `COMMIT`. A post-conversion inventory returned `0` remaining
+non-boolean candidate columns.
+
+The recovery checks succeeded:
+
+```console
+$ kubectl get pods -n forgejo
+forgejo-85c85458f4-z78bt   1/1   Running   0
+forgejo-postgres-1         1/1   Running   0
+
+$ kubectl get pods -n forgejo-runner
+forgejo-runner-homelab-7b99c78864-c9szq   2/2   Running   0
+
+$ wget http://127.0.0.1:3000/
+HTTP/1.1 200 OK
+```
+
+The recent Forgejo log contains no `UpdateUser`, `failed to encode`, or SQL
+query errors. The remaining validation is a real browser login through
+Authentik, because the OAuth callback requires a live provider session.
