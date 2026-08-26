@@ -7,8 +7,8 @@ minutes. During the same period, the web interface, Actions pages, and Git
 operations became slow or returned HTTP 500 responses.
 
 The suspected migration to PostgreSQL had not happened yet. The goal was to
-identify the cause and prepare a safe CloudNativePG migration without changing
-the live database during the investigation.
+identify the cause and complete a safe CloudNativePG migration without losing
+Forgejo data.
 
 ## Reasoning path
 
@@ -126,13 +126,30 @@ environment variables.
 
 A new `forgejo-postgres` local chart creates a one-instance CloudNativePG
 cluster with a 20 GiB `nfs-k8s` volume. Flux deploys that release before
-Forgejo, and Forgejo depends on the PostgreSQL release. The default remains
-`database.type: sqlite3` so this change is non-disruptive until the migration
-procedure is run.
+Forgejo, and Forgejo depends on the PostgreSQL release. The live value is now
+`database.type: postgres`.
 
-The live cutover was not run. The repository is GitOps-managed, and applying a
-different database configuration directly to the cluster would create drift
-before the change was published.
+The live cutover was performed after the change was pushed. Flux, Forgejo, and
+the runner were suspended, workloads were scaled to zero, and the SQLite file
+was backed up and checked before import:
+
+```console
+$ sqlite3 -readonly /data/gitea/gitea.db 'PRAGMA quick_check;'
+ok
+$ sqlite3 -readonly /data/gitea/gitea.db.pre-postgres-20260826-142006 'PRAGMA quick_check;'
+ok
+```
+
+`pgloader` imported 2,796 rows, 528 indexes, and 17 foreign keys with zero
+errors in 8.951 seconds. PostgreSQL verification reported 3 repositories, 173
+Actions runs, 25 package uploads, and Forgejo schema version 44.
+
+The first startup exposed pgloader compatibility details: SQLite auto-index
+names had become PostgreSQL constraint names, and SQLite boolean columns had
+become `BIGINT`. The affected indexes were converted to unique indexes, and
+only boolean columns named by observed Forgejo errors were converted to
+PostgreSQL `boolean`. The OIDC post-start hook was made non-fatal and now uses
+the configured UID.
 
 ## Validation results
 
@@ -160,6 +177,23 @@ FORGEJO__database__DB_TYPE=postgres
 FORGEJO__database__HOST=forgejo-postgres-rw.forgejo.svc.cluster.local:5432
 FORGEJO__database__USER from forgejo-postgres-app/username
 FORGEJO__database__PASSWD from forgejo-postgres-app/password
+
+$ kubectl get cluster -n forgejo forgejo-postgres
+forgejo-postgres   Cluster in healthy state   1   1
+
+$ kubectl get pods -n forgejo
+forgejo-85c85458f4-hfjdt   1/1   Running   0
+forgejo-postgres-1         1/1   Running   0
+
+$ kubectl get pods -n forgejo-runner
+forgejo-runner-homelab-7b99c78864-nlrkh   2/2   Running   0
+
+$ kubectl exec -n forgejo forgejo-85c85458f4-hfjdt -- \
+    wget -q -S -O /dev/null http://127.0.0.1:3000/
+HTTP response: 200 OK
+
+$ kubectl get kustomization -n flux-system flux-system
+READY=True  refs/heads/main@sha1:51bb0230cd93c644d00cddf4fc1d40f1f73ad140
 ```
 
 The client-side Kubernetes dry run could not validate the Flux resources because
@@ -180,7 +214,13 @@ storage used the same NFS export. PostgreSQL should remove the database-wide
 SQLite writer bottleneck, but package and Actions file traffic can still put
 load on NFS.
 
-The repository is ready for the controlled migration described in the backlog.
-That migration still needs a published change, a verified SQLite backup, a
-temporary write freeze, `pgloader` output, and post-cutover checks for web,
-Git, LFS, Actions, and runner registration.
+Forgejo now runs on the CloudNativePG PostgreSQL service. The application,
+PostgreSQL cluster, runner, Flux reconciliation, and HTTP endpoint are healthy;
+the recent Forgejo log contains no SQL encoding errors. The verified SQLite
+backup remains on the Forgejo NFS volume at
+`/data/gitea/gitea.db.pre-postgres-20260826-142006`.
+
+The database is no longer the SQLite writer bottleneck. Package files, Actions
+logs, repositories, and other Forgejo storage still use NFS, so moving
+high-volume object storage to an S3-compatible backend remains a separate
+follow-up.
