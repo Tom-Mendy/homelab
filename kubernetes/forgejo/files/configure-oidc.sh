@@ -6,7 +6,7 @@ find_auth_id() {
 }
 
 forgejo_admin() {
-  su-exec git forgejo --config /data/gitea/conf/app.ini admin auth "$@"
+  su-exec "${USER_UID:-1023}:${USER_GID:-100}" forgejo --config /data/gitea/conf/app.ini admin auth "$@"
 }
 
 if [ "${1:-}" = "--self-test" ]; then
