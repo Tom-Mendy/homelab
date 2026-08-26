@@ -42,7 +42,8 @@ The first inspection used the wrong namespace for the HelmReleases:
 
 ```text
 $ kubectl get helmrelease -n forgejo forgejo forgejo-postgres
-Error from server (NotFound): helmreleases.helm.toolkit.fluxcd.io "forgejo" not found
+Error from server (NotFound):
+helmreleases.helm.toolkit.fluxcd.io "forgejo" not found
 ```
 
 The HelmReleases are managed in `flux-system`, while their workloads target
