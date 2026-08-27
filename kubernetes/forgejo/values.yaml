@@ -5,7 +5,7 @@ replicaCount: 1
 
 image:
   repository: codeberg.org/forgejo/forgejo
-  tag: "15"
+  tag: 15.0.7@sha256:1f9c1a9880425614267832ce437f8ae5f5b69e1f3219f38fc468fc37e48c1919
   pullPolicy: IfNotPresent
 
 user:

@@ -9,7 +9,7 @@ forgejo:
 runner:
   image:
     repository: data.forgejo.org/forgejo/runner
-    tag: "12"
+    tag: 12.13.2@sha256:eb6e7bc21973382d261e6eb883dbd27b8cb56939d33a3bfd79a1352b7f9a33a0
     pullPolicy: IfNotPresent
   secretName: forgejo-runner-homelab
   logLevel: info
@@ -32,7 +32,7 @@ docker:
   containerOptions: --add-host=dind.docker.internal:host-gateway
   image:
     repository: docker
-    tag: dind
+    tag: dind@sha256:12e683a161823b2a839aeea999b9d960e6e1f9a97b1679ad6b441982e2d9cf07
     pullPolicy: IfNotPresent
   resources:
     requests:

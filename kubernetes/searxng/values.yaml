@@ -6,7 +6,7 @@ replicaCount: 1
 image:
   repository: searxng/searxng
   tag: ""
-  digest: sha256:a7f9188cc7fa8b6b037e0d85709c0dced8f05d0eba84145eb7fe7027a4c00850
+  digest: sha256:11a9b34cdc0b1ec2b991470a2762ecb5a1a531898289fb51dcd015260450729e
   pullPolicy: IfNotPresent
 
 service:

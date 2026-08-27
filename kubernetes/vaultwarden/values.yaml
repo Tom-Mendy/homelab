@@ -5,7 +5,7 @@ replicaCount: 1
 
 image:
   repository: vaultwarden/server
-  tag: 1.37.0-alpine@sha256:88b74551f5d79fd43f897c23bd74d5295a6e1fafb5d1ec23a1da92e7a0f06767
+  tag: 1.37.2-alpine@sha256:d16a304c2476fd787634ddde2c00be8fdfa1a72539438c626ece3686b5b88ab4
   pullPolicy: IfNotPresent
 
 domain: https://vaultwarden.home.tom-mendy.com

@@ -2,7 +2,7 @@ namespace: ollama
 
 image:
   repository: ollama/ollama
-  tag: 0.30.11@sha256:c484b703176aa19dfc0a54cbfb60ab8094b38faa04283fb77eba1d33319e5eca
+  tag: 0.33.1@sha256:075246f72d4109385b4a01c3ac8e9cbd26a0bcb21cd7aa30edbccd24e1b3180c
   pullPolicy: IfNotPresent
 
 deployment:
@@ -56,7 +56,7 @@ gpu:
   devicePlugin:
     enabled: true
     namespace: kube-system
-    image: nvcr.io/nvidia/k8s-device-plugin:v0.17.1
+    image: nvcr.io/nvidia/k8s-device-plugin:v0.20.0@sha256:a61ba9fd8efb82f3a79f877f7580e02c1e8e7593f62473644bc9c79e315c3312
     nodeSelector:
       gpu: "true"
     tolerations:
