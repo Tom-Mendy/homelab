@@ -230,6 +230,41 @@ assuming an older container can read the new data.
 The Keel removal is recorded in the repository and must be merged before Flux
 prunes the live releases. Renovate installation remains a separate change.
 
+## Local image update check
+
+The repository includes `scripts/check-image-updates.py` for a read-only check
+of image references under `kubernetes/`:
+
+```sh
+./scripts/check-image-updates.py
+```
+
+The script uses `crane` to list registry tags and resolve their digests. It
+prints only outdated images by default and shows the exact reference to copy
+into the values file:
+
+```text
+[outdated] ghcr.io/example/application:1.2.3@sha256:old...
+  latest: ghcr.io/example/application:1.9.4@sha256:new...
+```
+
+Use `--all` to include images that are already current, `--allow-major` to
+consider a newer major version, and `--json` for a scheduled job or CI parser:
+
+```sh
+./scripts/check-image-updates.py --all --json
+```
+
+The exit status is `0` when every checked image is current, `1` when at least
+one image needs an update, and `2` when the scan cannot complete. A missing
+`crane` executable is an error. Install it separately or pass its path with
+`--crane /path/to/crane`.
+
+The script does not edit files, create pull requests, or apply Kubernetes
+changes. Use its output as input to a reviewed Git change. For automation, run
+it daily and send status `1` to a notification or dependency workflow. Keep
+major upgrades behind explicit review.
+
 ## Security boundary
 
 A digest proves image identity, not trust. It does not show that the publisher
