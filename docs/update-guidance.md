@@ -248,8 +248,21 @@ into the values file:
   latest: ghcr.io/example/application:1.9.4@sha256:new...
 ```
 
+Some external Helm charts provide the repository as a chart default. Newt is
+one example: the local file sets `global.image.tag`, while the upstream chart
+defaults to `docker.io/fosrl/newt`. These mappings live in
+`scripts/image-update-overrides.json`. The report includes both the complete
+image and the value to copy into the local Helm key:
+
+```text
+latest image: docker.io/fosrl/newt:1.13.0@sha256:new...
+replacement value: 1.13.0@sha256:new...
+source key: global.image.tag
+```
+
 Use `--all` to include images that are already current, `--allow-major` to
-consider a newer major version, and `--json` for a scheduled job or CI parser:
+consider a newer major version, `--config` to provide additional external-chart
+repository mappings, and `--json` for a scheduled job or CI parser:
 
 ```sh
 ./scripts/check-image-updates.py --all --json

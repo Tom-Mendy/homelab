@@ -24,6 +24,7 @@ DIGEST_RE = re.compile(
     r"^\s*digest:\s*[\"']?(?P<digest>sha256:[a-f0-9]{64})[\"']?\s*$",
     re.IGNORECASE,
 )
+KEY_RE = re.compile(r"^(?P<indent>\s*)(?P<key>[A-Za-z0-9_.-]+):(?:\s|$)")
 IMAGE_RE = re.compile(
     r"^(?P<repository>(?:[a-z0-9.-]+(?::[0-9]+)?/)?[a-z0-9._-]+(?:/[a-z0-9._-]+)*?)"
     r"(?::(?P<tag>[^@]+))?(?:@(?P<digest>sha256:[a-f0-9]{64}))?$",
@@ -63,6 +64,15 @@ class ImageReference:
 class ImageUse:
     reference: ImageReference
     locations: list[Location]
+    value_kind: str
+    source_key: str | None
+
+
+@dataclass(frozen=True)
+class RepositoryOverride:
+    file: str
+    key: str
+    repository: str
 
 
 def parse_reference(value: str) -> ImageReference | None:
@@ -92,15 +102,43 @@ def iter_yaml_files(root: Path) -> list[Path]:
     )
 
 
-def collect_images(root: Path) -> list[ImageUse]:
-    found: dict[str, ImageUse] = {}
+def yaml_key_path(line: str, stack: list[tuple[int, str]]) -> str | None:
+    match = KEY_RE.match(line)
+    if match is None or line.lstrip().startswith("#"):
+        return None
 
-    def add(value: str, path: Path, line_number: int) -> None:
+    indent = len(match.group("indent"))
+    while stack and stack[-1][0] >= indent:
+        stack.pop()
+    stack.append((indent, match.group("key")))
+    return ".".join(key for _, key in stack)
+
+
+def collect_images(
+    root: Path,
+    overrides: list[RepositoryOverride] | None = None,
+    base_dir: Path | None = None,
+) -> list[ImageUse]:
+    found: dict[str, ImageUse] = {}
+    overrides = overrides or []
+    base_dir = base_dir or root
+
+    override_map = {(item.file, item.key): item.repository for item in overrides}
+
+    def add(
+        value: str,
+        path: Path,
+        line_number: int,
+        value_kind: str = "image",
+        source_key: str | None = None,
+    ) -> None:
         reference = parse_reference(value)
         if reference is None:
             return
         key = reference.full_reference
-        use = found.setdefault(key, ImageUse(reference, []))
+        use = found.setdefault(
+            key, ImageUse(reference, [], value_kind, source_key)
+        )
         location = Location(str(path), line_number)
         if location not in use.locations:
             use.locations.append(location)
@@ -108,8 +146,11 @@ def collect_images(root: Path) -> list[ImageUse]:
     for path in iter_yaml_files(root):
         lines = path.read_text(encoding="utf-8").splitlines()
         pending_repository: tuple[str, int, int] | None = None
+        key_stack: list[tuple[int, str]] = []
+        relative_path = path.relative_to(base_dir).as_posix()
 
         for index, line in enumerate(lines, start=1):
+            key_path = yaml_key_path(line, key_stack)
             image_match = IMAGE_VALUE_RE.search(line)
             if image_match:
                 add(image_match.group("image"), path, index)
@@ -124,13 +165,31 @@ def collect_images(root: Path) -> list[ImageUse]:
                 continue
 
             tag_match = TAG_RE.match(line)
+            if tag_match:
+                tag = tag_match.group("tag")
+                override_repository = override_map.get((relative_path, key_path or ""))
+                if override_repository and tag:
+                    add(
+                        f"{override_repository}:{tag}",
+                        path,
+                        index,
+                        value_kind="tag",
+                        source_key=key_path,
+                    )
+                    continue
+
             if tag_match and pending_repository is not None:
                 repository, repository_indent, repository_line = pending_repository
                 tag_indent = len(line) - len(line.lstrip())
                 if tag_indent == repository_indent:
-                    tag = tag_match.group("tag")
                     if tag:
-                        add(f"{repository}:{tag}", path, repository_line)
+                        add(
+                            f"{repository}:{tag}",
+                            path,
+                            repository_line,
+                            value_kind="tag",
+                            source_key=key_path,
+                        )
                         pending_repository = None
                     continue
 
@@ -143,6 +202,8 @@ def collect_images(root: Path) -> list[ImageUse]:
                         f"{repository}:latest@{digest_match.group('digest')}",
                         path,
                         repository_line,
+                        value_kind="digest",
+                        source_key=key_path,
                     )
                     pending_repository = None
                     continue
@@ -153,6 +214,24 @@ def collect_images(root: Path) -> list[ImageUse]:
                     pending_repository = None
 
     return sorted(found.values(), key=lambda use: use.reference.full_reference)
+
+
+def load_overrides(path: Path) -> list[RepositoryOverride]:
+    if not path.is_file():
+        raise RuntimeError(f"override file does not exist: {path}")
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        entries = data["overrides"]
+        return [
+            RepositoryOverride(
+                file=str(entry["file"]),
+                key=str(entry["key"]),
+                repository=str(entry["repository"]),
+            )
+            for entry in entries
+        ]
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError) as error:
+        raise RuntimeError(f"invalid override file: {path}: {error}") from error
 
 
 class Crane:
@@ -229,11 +308,20 @@ def check_image(use: ImageUse, crane: Crane, allow_major: bool) -> dict[str, obj
         status = "current"
         reason = "tag and digest match the registry"
 
+    if use.value_kind == "tag":
+        replacement = f"{selected_tag}@{selected_digest}"
+    elif use.value_kind == "digest":
+        replacement = selected_digest
+    else:
+        replacement = f"{selected_reference}@{selected_digest}"
+
     return {
         "status": status,
         "reason": reason,
         "current": reference.full_reference,
         "latest": f"{selected_reference}@{selected_digest}",
+        "replacement": replacement,
+        "source_key": use.source_key,
         "locations": [f"{location.path}:{location.line}" for location in use.locations],
     }
 
@@ -268,12 +356,19 @@ def build_parser() -> argparse.ArgumentParser:
         default=shutil.which("crane") or "/tmp/crane",
         help="Path to the crane executable (default: crane or /tmp/crane).",
     )
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=Path(__file__).with_name("image-update-overrides.json"),
+        help="Repository override configuration file.",
+    )
     return parser
 
 
 def main() -> int:
     args = build_parser().parse_args()
-    if not args.path.is_dir():
+    scan_path = args.path.resolve()
+    if not scan_path.is_dir():
         print(f"error: scan path does not exist: {args.path}", file=sys.stderr)
         return 2
     if not Path(args.crane).exists() and shutil.which(args.crane) is None:
@@ -283,7 +378,18 @@ def main() -> int:
         )
         return 2
 
-    uses = collect_images(args.path)
+    try:
+        overrides = load_overrides(args.config)
+    except RuntimeError as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 2
+
+    repo_root = Path(__file__).resolve().parent.parent
+    try:
+        uses = collect_images(scan_path, overrides, repo_root)
+    except ValueError as error:
+        print(f"error: scan path must be inside the repository: {error}", file=sys.stderr)
+        return 2
     if not uses:
         print(f"No image references found under {args.path}")
         return 0
@@ -313,8 +419,11 @@ def main() -> int:
             if result["status"] == "current" and not args.all:
                 continue
             print(f"[{result['status']}] {result['current']}")
-            print(f"  latest: {result['latest']}")
+            print(f"  latest image: {result['latest']}")
+            print(f"  replacement value: {result['replacement']}")
             print(f"  reason: {result['reason']}")
+            if result["source_key"]:
+                print(f"  source key: {result['source_key']}")
             print(f"  used at: {', '.join(result['locations'])}")
         for error in errors:
             print(f"[error] {error['current']}: {error['error']}", file=sys.stderr)

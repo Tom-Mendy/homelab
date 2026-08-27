@@ -37,6 +37,8 @@ Added:
 
 ```text
 scripts/check-image-updates.py
+scripts/image-update-overrides.json
+scripts/test-check-image-updates.py
 ```
 
 The command supports:
@@ -45,7 +47,8 @@ The command supports:
 - `--all` to print current images as well as outdated images;
 - `--allow-major` to include newer major versions;
 - `--json` for CI or scheduled-job output;
-- `--crane` to select the registry client executable.
+- `--crane` to select the registry client executable;
+- `--config` to select external-chart repository overrides.
 
 The exit statuses are suitable for automation:
 
@@ -63,6 +66,7 @@ Git change before Flux deploys an image.
 ```sh
 chmod +x scripts/check-image-updates.py
 python3 -m py_compile scripts/check-image-updates.py
+python3 scripts/test-check-image-updates.py
 python3 scripts/check-image-updates.py --help
 python3 scripts/check-image-updates.py --path /does/not/exist
 ```
@@ -89,8 +93,59 @@ git diff --check
 The image scan itself could not query registries in this environment because
 `crane` is not installed. Install `crane` before scheduling the command.
 
+## Follow-up: external Helm image defaults
+
+The first check did not report Newt because `kubernetes/newt/values.yaml` sets
+only `global.image.tag`. The repository name is supplied by the external Newt
+Helm chart, so there is no local `repository:` or complete `image:` field for a
+generic YAML scanner to discover.
+
+The investigation used:
+
+```sh
+sed -n '1,120p' kubernetes/newt/values.yaml
+rg -n 'global:|image:|repository:|tag:' kubernetes/newt kubernetes/flux
+```
+
+The fix adds an explicit mapping in
+`scripts/image-update-overrides.json`:
+
+```json
+{
+  "file": "kubernetes/newt/values.yaml",
+  "key": "global.image.tag",
+  "repository": "docker.io/fosrl/newt"
+}
+```
+
+The script now reports both the complete registry reference and the value to
+copy into the Helm key. The real repository scan resolved Newt as:
+
+```text
+docker.io/fosrl/newt:1.12.5@sha256:3c009663332145cae39b940b07857469038d5e9d71aacb1497e78795ba4e3b9b
+value kind: tag
+source key: global.image.tag
+location: kubernetes/newt/values.yaml:21
+```
+
+The regression tests cover the external repository mapping, replacement-value
+generation, and major-version filtering:
+
+```sh
+python3 scripts/test-check-image-updates.py
+```
+
+Result:
+
+```text
+Ran 4 tests in 0.001s
+OK
+```
+
 ## Outcome
 
-The repository now has a read-only command that reports stale tags or digests
-and prints the exact replacement reference. It can run daily from a scheduler,
-while Git review and Flux remain the deployment gate.
+The repository now has a read-only command that reports stale tags or digests,
+including images whose repository is provided by an external Helm chart. It
+prints both the complete image reference and the exact replacement value for
+the source Helm key. It can run daily from a scheduler, while Git review and
+Flux remain the deployment gate.

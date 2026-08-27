@@ -1,0 +1,9 @@
+{
+  "overrides": [
+    {
+      "file": "kubernetes/newt/values.yaml",
+      "key": "global.image.tag",
+      "repository": "docker.io/fosrl/newt"
+    }
+  ]
+}

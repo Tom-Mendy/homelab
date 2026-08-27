@@ -18,7 +18,7 @@ infisicalSecret:
 
 global:
   image:
-    tag: 1.12.5@sha256:3c009663332145cae39b940b07857469038d5e9d71aacb1497e78795ba4e3b9b
+    tag: 1.16.0@sha256:345fdeb369be6608d82c41d70637636c78b2c04a6112ff6ec20fc21c48afc899
 
 newtInstances:
   - name: main-tunnel
