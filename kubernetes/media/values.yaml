@@ -66,7 +66,7 @@ ingress:
 
 apps:
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:5.2.2@sha256:abbf2aeeb58b641977a012d0ab69939eb277cb827078450b142f782b1cd6893c
+    image: lscr.io/linuxserver/qbittorrent:5.2.3@sha256:304b19cf94bf4fda534e0b086cab9c5f1a9e139a8180c05c0ad7d2ba1526fa99
     port: 8080
     host: qbittorrent.home.tom-mendy.com
     vpn: true
@@ -80,7 +80,7 @@ apps:
       WEBUI_PORT: "8080"
 
   nzbget:
-    image: lscr.io/linuxserver/nzbget:26.1.20260529@sha256:1fd6f36c5856d7e3d7d3f792912d805e123dc0003e028edda4f3f7405d7bc80b
+    image: lscr.io/linuxserver/nzbget:26.2.20260821@sha256:1dca6a4407e08313919d2780bf2a6bc17e21b947a6e8e34624b9e115795fcf8c
     port: 6789
     host: nzbget.home.tom-mendy.com
     vpn: true
@@ -90,7 +90,7 @@ apps:
       series: false
 
   sonarr:
-    image: lscr.io/linuxserver/sonarr:4.0.17@sha256:0b5c4803f92456fb9b65bae8375716ea120b4ea17b3cced7da32b63f0085782b
+    image: lscr.io/linuxserver/sonarr:4.0.19@sha256:c19aa4ecdf03d73e1d5c901da33744cb7eb4d921f89bafed1ca264601d7fa224
     port: 8989
     host: sonarr.home.tom-mendy.com
     vpn: false
@@ -100,7 +100,7 @@ apps:
       series: true
 
   radarr:
-    image: lscr.io/linuxserver/radarr:6.1.1@sha256:079e48870584baf2a3e7e43e7ba6d3c834555931851a59c82c51cc792d285caf
+    image: lscr.io/linuxserver/radarr:6.3.0@sha256:119aaa4a4f7349bcd2a136c5373a0d7925b5479915c7dfe0c0ad352db2a6d438
     port: 7878
     host: radarr.home.tom-mendy.com
     vpn: false
@@ -110,7 +110,7 @@ apps:
       series: false
 
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:2.3.5@sha256:c9fe528f34b1fd3715438b6f6d6991d64e2965f2c055db36398bc66a0e7eab01
+    image: lscr.io/linuxserver/prowlarr:2.5.2@sha256:ab91301778251f82a31bbfc87f0497376d59e84439d9a1ceff6a61d594d1e3d7
     port: 9696
     host: prowlarr.home.tom-mendy.com
     vpn: false
@@ -120,7 +120,7 @@ apps:
       series: false
 
   bazarr:
-    image: lscr.io/linuxserver/bazarr:v1.5.6-ls349@sha256:95f27692c3de6dbe130cd035d342d8138ec74ade7b62cfc52e11ae222c52c855
+    image: lscr.io/linuxserver/bazarr:1.6.0@sha256:3a820372f19fcb2981ea19fe4b5382934d67414afaba974bce831ddda0a64a02
     port: 6767
     host: bazarr.home.tom-mendy.com
     vpn: false
@@ -130,7 +130,7 @@ apps:
       series: true
 
   autobrr:
-    image: ghcr.io/autobrr/autobrr:v1.79.0@sha256:5b8c29a86598907496af01ec75ef21f9c0e4e28ce9d6ae6496ef91c71543ec20
+    image: ghcr.io/autobrr/autobrr:v1.84.0@sha256:f4792e86b79965eadb2b24ad290ab46d21cab7ae6c18002ce2d18275fa54a4d0
     port: 7474
     host: autobrr.home.tom-mendy.com
     vpn: false
