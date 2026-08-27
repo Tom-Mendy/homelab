@@ -1,5 +1,16 @@
 # Agent Instructions
 
+## language
+
+code & docs in english always
+
+## script creation
+
+prefer python (uv if usable), else use
+
+- bash for linux specific
+- powershell for windows specific
+
 ## Storage policy
 
 `local-path` is forbidden for Kubernetes workloads in this repository.
