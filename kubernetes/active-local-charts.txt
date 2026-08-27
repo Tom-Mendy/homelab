@@ -10,7 +10,6 @@ grafana
 hindsight
 homepage
 infisical-postgres
-keel
 media
 matrix
 navidrome

@@ -514,61 +514,6 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: keel
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: keel
-  targetNamespace: keel
-  storageNamespace: keel
-  chart:
-    spec:
-      chart: keel
-      version: 1.2.0
-      sourceRef:
-        kind: HelmRepository
-        name: keel
-  valuesFrom:
-    - kind: ConfigMap
-      name: keel-values
-  dependsOn:
-    - name: traefik
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
-
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: keel-extras
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: keel-extras
-  targetNamespace: keel
-  storageNamespace: keel
-  chart:
-    spec:
-      chart: ./kubernetes/keel
-      reconcileStrategy: Revision
-      sourceRef:
-        kind: GitRepository
-        name: flux-system
-  dependsOn:
-    - name: infisical
-    - name: infisical-operator
-    - name: keel
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
-
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
   name: prometheus
 spec:
   interval: 30m

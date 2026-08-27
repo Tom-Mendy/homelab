@@ -50,5 +50,3 @@ been stopped as described in that runbook.
 - [`docs/kubernetes-storage.md`](docs/kubernetes-storage.md)
 - [`docs/backup-procedures.md`](docs/backup-procedures.md)
 - [`docs/disaster-recovery.md`](docs/disaster-recovery.md)
-
-![Keel dashboard](./docs/images/keel.png)

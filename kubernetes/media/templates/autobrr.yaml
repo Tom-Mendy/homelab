@@ -17,8 +17,6 @@ kind: Deployment
 metadata:
   name: autobrr
   namespace: {{ .Values.namespace }}
-  annotations:
-    keel.sh/policy: all
 spec:
   replicas: 1
   selector:

@@ -9,9 +9,6 @@ image:
 
 allowedHosts: homepage.home.tom-mendy.com
 
-deploymentAnnotations:
-  keel.sh/policy: all
-
 service:
   type: ClusterIP
   port: 3000

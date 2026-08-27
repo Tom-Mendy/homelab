@@ -37,9 +37,6 @@ configMapGenerator:
   - name: infisical-operator-values
     files:
       - values.yaml=../../../infisical/operator/values.yaml
-  - name: keel-values
-    files:
-      - values.yaml=../../../keel/values.yaml
   - name: newt-values
     files:
       - values.yaml=../../../newt/values.yaml

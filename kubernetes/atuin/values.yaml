@@ -44,9 +44,6 @@ postgres:
     nfsServer: ""
     nfsPath: ""
 
-deploymentAnnotations:
-  keel.sh/policy: all
-
 service:
   type: ClusterIP
 

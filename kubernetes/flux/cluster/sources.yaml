@@ -46,15 +46,6 @@ spec:
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
-  name: keel
-  namespace: flux-system
-spec:
-  interval: 30m
-  url: https://charts.keel.sh
----
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
-metadata:
   name: newt
   namespace: flux-system
 spec:

@@ -6,8 +6,6 @@ image:
   pullPolicy: IfNotPresent
 
 deployment:
-  annotations:
-    keel.sh/policy: all
   strategy: Recreate
 
 models:
@@ -79,9 +77,6 @@ openwebui:
     - http://ollama:11434
 
   deployment:
-    podAnnotations:
-      keel.sh/policy: all
-
   service:
     type: ClusterIP
     port: 8080

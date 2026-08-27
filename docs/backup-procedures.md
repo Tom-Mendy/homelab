@@ -52,7 +52,7 @@ Use this to capture current cluster object state (useful before upgrades).
 mkdir -p backups/k8s-$(date +%F)
 kubectl get ns -o yaml > backups/k8s-$(date +%F)/namespaces.yaml
 
-for ns in flux-system traefik blocky homepage keel prometheus grafana \
+for ns in flux-system traefik blocky homepage prometheus grafana \
   navidrome vaultwarden forgejo matrix default; do
  kubectl get all,cm,secret,ing,pvc -n "$ns" -o yaml \
   > backups/k8s-$(date +%F)/${ns}.yaml || true

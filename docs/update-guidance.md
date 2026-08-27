@@ -5,14 +5,13 @@
 Keep application images pinned in Git by tag and digest. Use an updater to
 propose a new pin in Git, then let Flux deploy the merged change.
 
-For this repository, Renovate in pull-request-only mode is the best general
-replacement for Keel. It can update container images, image digests, Helm
-values, and Flux `HelmRelease` chart versions. Flux remains the only component
-that changes workloads in the cluster.
+Keel has been removed from this cluster. Renovate in pull-request-only mode is
+the best general update tool for this repository. It can update container
+images, image digests, Helm values, and Flux `HelmRelease` chart versions. Flux
+remains the only component that changes workloads in the cluster.
 
-Keel should not update workloads that Flux manages. Start removing its workload
-annotations after Renovate covers the corresponding files, then retire Keel.
-Do not disable Flux drift correction to make room for Keel.
+Do not add another live updater that edits workloads managed by Flux. Keep
+updates in Git and let Flux reconcile the merged state.
 
 The intended path is:
 
@@ -56,9 +55,9 @@ same content. The policy does not watch registries or edit workload specs.
 
 See the Kubernetes documentation on [image names, tags, and digests](https://kubernetes.io/docs/concepts/containers/images/).
 
-## What is running today
+## What was running before removal
 
-The repository currently has the following update model:
+Before this change, the repository had the following update model:
 
 - Flux reads `main` from the in-cluster Forgejo repository and reconciles the
   cluster.
@@ -75,7 +74,7 @@ The repository currently has the following update model:
 - Forgejo validates secrets, local Helm charts, rendered Kubernetes resources,
   and the storage policy. It does not run application smoke tests.
 
-That leaves two controllers with different desired states. Keel edits a live
+That left two controllers with different desired states. Keel edited a live
 Deployment when it finds an update. Git still contains the old image, and Flux
 then sees Keel's edit as drift. With drift correction enabled, Flux can restore
 the Git-pinned image. The exact timing depends on reconciliation, but the design
@@ -101,7 +100,7 @@ and the inspected [Kubernetes provider update path](https://github.com/keel-hq/k
 
 | Tool | Where it changes state | Audit and rollback | Fit here |
 | --- | --- | --- | --- |
-| Keel | Live Kubernetes objects | Change is absent from Git and Flux may revert it | Retire for Flux-managed workloads |
+| Keel | Live Kubernetes objects | Change is absent from Git and Flux may revert it | Removed from this cluster |
 | Flux image automation | Commits image changes to Git | Strong Git audit trail | Good for selected first-party images that need fast delivery |
 | Renovate | Opens pull requests or commits in Git | Strong review and rollback path | Best default for images and Helm charts |
 
@@ -212,29 +211,24 @@ previous tag and digest. Let Flux apply that Git state. If the release performed
 an irreversible data migration, restore the documented backup instead of
 assuming an older container can read the new data.
 
-## Migration plan
+## Next steps after removal
 
-1. Stop adding Keel annotations to new workloads.
-2. Deploy Renovate against Forgejo in pull-request-only mode. Limit the first
+1. Deploy Renovate against Forgejo in pull-request-only mode. Limit the first
    run to a few conventional Helm values files and set dependency concurrency
    low enough to keep reviews readable.
-3. Enable digest pinning and verify that a pull request updates both the tag and
+2. Enable digest pinning and verify that a pull request updates both the tag and
    digest where appropriate.
-4. Configure Renovate's Flux file matching for `kubernetes/flux/cluster/`.
+3. Configure Renovate's Flux file matching for `kubernetes/flux/cluster/`.
    Address missing release or source namespaces where the Flux manager requires
    them.
-5. Add custom regex managers for full-string image fields that the Helm values
+4. Add custom regex managers for full-string image fields that the Helm values
    manager does not detect. Test each expression against this repository before
    widening it.
-6. Remove `keel.sh/*` annotations from a workload only after Renovate detects
-   all of its images. Migrate in small groups.
-7. Remove the Keel Helm releases, values, ingress, and credentials after no
-   workloads depend on it.
-8. Consider Flux image automation later for a small set of first-party images.
+5. Consider Flux image automation later for a small set of first-party images.
    Keep its commits visible in the same Git history.
 
-The migration should be a separate implementation change. This review does not
-install Renovate, remove Keel, edit workloads, or alter the live cluster.
+The Keel removal is recorded in the repository and must be merged before Flux
+prunes the live releases. Renovate installation remains a separate change.
 
 ## Security boundary
 

@@ -8,9 +8,6 @@ image:
   tag: "15"
   pullPolicy: IfNotPresent
 
-deploymentAnnotations:
-  keel.sh/policy: all
-
 user:
   uid: "1023"
   gid: "100"

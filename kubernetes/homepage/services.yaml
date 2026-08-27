@@ -24,10 +24,6 @@
         icon: flux-cd.svg
         href: https://flux.home.tom-mendy.com
         description: GitOps status
-    - Keel:
-         icon: kubernetes.svg
-         href: https://keel.home.tom-mendy.com
-         description: Kubernetes deployment automation
     - Hindsight:
         icon: kubernetes.svg
         href: https://hindsight.home.tom-mendy.com
