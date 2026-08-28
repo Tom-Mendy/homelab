@@ -1,4 +1,21 @@
 {{- $app := .Values.apps.nzbget }}
+{{- if $app.vpn }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nzbget-nymvpn-pvc
+  namespace: {{ .Values.namespace }}
+  annotations:
+    helm.sh/resource-policy: keep
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.nymVpn.stateStorage.size }}
+  storageClassName: {{ .Values.nymVpn.stateStorage.className }}
+---
+{{- end }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -27,47 +44,62 @@ spec:
       labels:
         app: nzbget
     spec:
-      containers:
-        {{- if and .Values.vpn.enabled $app.vpn }}
-        - name: gluetun
-          image: qmcgaw/gluetun:v3.41.3@sha256:fa19cc76b2af13d57a8d3dc3066f2ada061b1c761b8aecf989b3877c0486e027
+      {{- if $app.vpn }}
+      dnsPolicy: None
+      dnsConfig:
+        nameservers:
+          - 127.0.0.1
+      initContainers:
+        - name: nymvpn-state-init
+          image: {{ .Values.nymVpn.image | quote }}
+          imagePullPolicy: {{ .Values.nymVpn.pullPolicy }}
+          command: ["/bin/sh", "-c", "mkdir -p /nym/config /nym/state"]
+          volumeMounts:
+            - name: nymvpn-state
+              mountPath: /nym
+        - name: nymvpn
+          image: {{ .Values.nymVpn.image | quote }}
+          imagePullPolicy: {{ .Values.nymVpn.pullPolicy }}
+          restartPolicy: Always
           securityContext:
             capabilities:
               add:
                 - NET_ADMIN
           env:
-            - name: VPN_SERVICE_PROVIDER
-              value: {{ .Values.vpn.serviceProvider | quote }}
-            - name: VPN_TYPE
-              value: {{ .Values.vpn.type | quote }}
-            {{- if eq (lower .Values.vpn.type) "wireguard" }}
-            - name: WIREGUARD_PRIVATE_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.vpn.secretName }}
-                  key: WIREGUARD_PRIVATE_KEY
-            {{- else }}
-            - name: OPENVPN_USER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.vpn.secretName }}
-                  key: OPENVPN_USER
-            - name: OPENVPN_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.vpn.secretName }}
-                  key: OPENVPN_PASSWORD
-            {{- end }}
-            - name: FIREWALL
-              value: {{ .Values.vpn.firewall | quote }}
-            - name: FIREWALL_INPUT_PORTS
-              value: {{ $app.port | quote }}
-            - name: SERVER_COUNTRIES
-              value: {{ .Values.vpn.serverCountries | quote }}
+            - name: NYMVPN_ENTRY_COUNTRY
+              value: {{ .Values.nymVpn.entryCountry | quote }}
+            - name: NYMVPN_EXIT_COUNTRY
+              value: {{ .Values.nymVpn.exitCountry | quote }}
+            - name: NYMVPN_POD_CIDR
+              value: {{ .Values.nymVpn.podCidr | quote }}
+          startupProbe:
+            exec:
+              command: ["/usr/local/bin/nymvpn-entrypoint", "startup"]
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            exec:
+              command: ["/usr/local/bin/nymvpn-entrypoint", "startup"]
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["/usr/local/bin/nymvpn-entrypoint", "startup"]
+            failureThreshold: 3
+            periodSeconds: 20
           volumeMounts:
             - name: tun
               mountPath: /dev/net/tun
-        {{- end }}
+            - name: nymvpn-state
+              mountPath: /etc/nym
+              subPath: config
+            - name: nymvpn-state
+              mountPath: /var/lib/nym-vpnd
+              subPath: state
+            - name: nymvpn-access-code
+              mountPath: /run/secrets/nymvpn
+              readOnly: true
+      {{- end }}
+      containers:
         - name: nzbget
           image: {{ $app.image | quote }}
           env:
@@ -96,11 +128,23 @@ spec:
           persistentVolumeClaim:
             claimName: media-downloads-pvc
         {{- end }}
-        {{- if and .Values.vpn.enabled $app.vpn }}
+        {{- if $app.vpn }}
         - name: tun
           hostPath:
             path: /dev/net/tun
             type: CharDevice
+        {{- end }}
+        {{- if $app.vpn }}
+        - name: nymvpn-state
+          persistentVolumeClaim:
+            claimName: nzbget-nymvpn-pvc
+        - name: nymvpn-access-code
+          secret:
+            secretName: {{ .Values.nymVpn.secretName }}
+            defaultMode: 0400
+            items:
+              - key: NYM_ACCESS_CODE
+                path: access-code
         {{- end }}
 ---
 apiVersion: v1

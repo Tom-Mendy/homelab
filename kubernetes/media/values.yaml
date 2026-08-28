@@ -6,19 +6,8 @@ securityContext:
   puid: 1023
   pgid: 100
 
-vpn:
-  enabled: true
-  createSecret: false
-  secretName: protonvpn-credentials
-  serviceProvider: protonvpn
-  type: wireguard
-  firewall: "on"
-  serverCountries: Switzerland
-  credentials:
-    wireguardPrivateKey: ""
-
 nymVpn:
-  image: forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.3-3@sha256:0728350cf1d4012b09a8674f58d6ad4290da11cf8db115ceb051fe91dfba25d6
+  image: forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.3-4@sha256:72c9d5a0574ed7fb960b5c9266d3f9f03a41f2faa251231cb9f81f3b98e01266
   pullPolicy: IfNotPresent
   secretName: nymvpn-credentials
   entryCountry: FR
@@ -30,7 +19,7 @@ nymVpn:
 
 infisicalSecret:
   enabled: true
-  name: protonvpn-credentials
+  name: media-secrets
   serviceAccountName: media-infisical-sync
   connectionName: media-infisical
   authName: media-infisical
@@ -70,7 +59,6 @@ apps:
     port: 8080
     host: qbittorrent.home.tom-mendy.com
     vpn: true
-    vpnProvider: nymvpn
     ssoAuthWhitelist: 10.233.64.0/18
     mounts:
       downloads: true

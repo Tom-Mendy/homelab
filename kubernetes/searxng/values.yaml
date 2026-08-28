@@ -32,18 +32,16 @@ secret:
   create: false
   serverSecretKey: ""
 
-vpn:
-  enabled: true
-  createSecret: false
-  secretName: searxng-vpn-secret
-  serviceProvider: protonvpn
-  type: wireguard
-  firewall: "on"
-  serverCountries: "France"
-  credentials:
-    wireguardPrivateKey: ""
-    openvpnUser: "your_openvpn_username"
-    openvpnPassword: "your_openvpn_password"
+nymVpn:
+  image: forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.3-4@sha256:72c9d5a0574ed7fb960b5c9266d3f9f03a41f2faa251231cb9f81f3b98e01266
+  pullPolicy: IfNotPresent
+  secretName: searxng-nymvpn-credentials
+  entryCountry: FR
+  exitCountry: CH
+  podCidr: 10.233.64.0/18
+  stateStorage:
+    className: nfs-k8s
+    size: 1Gi
 
 infisicalSecret:
   enabled: true

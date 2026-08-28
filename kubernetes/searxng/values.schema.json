@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft-07/schema#",
   "type": "object",
   "additionalProperties": false,
-  "required": ["namespace", "createNamespace", "replicaCount", "image", "service", "ingress", "env", "secret", "infisicalSecret"],
+  "required": ["namespace", "createNamespace", "replicaCount", "image", "service", "ingress", "env", "secret", "nymVpn", "infisicalSecret"],
   "properties": {
     "namespace": { "type": "string", "minLength": 1 },
     "createNamespace": { "type": "boolean" },
@@ -62,35 +62,32 @@
         "serverSecretKey": { "type": "string" }
       }
     },
-    "vpn": {
+    "nymVpn": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "enabled",
-        "createSecret",
+        "image",
+        "pullPolicy",
         "secretName",
-        "serviceProvider",
-        "type",
-        "firewall",
-        "serverCountries",
-        "credentials"
+        "entryCountry",
+        "exitCountry",
+        "podCidr",
+        "stateStorage"
       ],
       "properties": {
-        "enabled": { "type": "boolean" },
-        "createSecret": { "type": "boolean" },
+        "image": { "type": "string", "minLength": 1 },
+        "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] },
         "secretName": { "type": "string", "minLength": 1 },
-        "serviceProvider": { "type": "string", "minLength": 1 },
-        "type": { "type": "string", "minLength": 1 },
-        "firewall": { "type": "string", "minLength": 1 },
-        "serverCountries": { "type": "string" },
-        "credentials": {
+        "entryCountry": { "type": "string", "pattern": "^[A-Z]{2}$" },
+        "exitCountry": { "type": "string", "pattern": "^[A-Z]{2}$" },
+        "podCidr": { "type": "string", "pattern": "^[0-9.]+/[0-9]+$" },
+        "stateStorage": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["wireguardPrivateKey", "openvpnUser", "openvpnPassword"],
+          "required": ["className", "size"],
           "properties": {
-            "wireguardPrivateKey": { "type": "string" },
-            "openvpnUser": { "type": "string" },
-            "openvpnPassword": { "type": "string" }
+            "className": { "type": "string", "const": "nfs-k8s" },
+            "size": { "type": "string", "minLength": 1 }
           }
         }
       }
