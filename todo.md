@@ -54,10 +54,9 @@
 
 ## Phase P2 - Operations
 
-- [ ] Update README/app inventory after secret and version changes.
+- [x] Update the README and portfolio summary after secret and version changes.
 - [ ] Document cluster rebuild from scratch.
-- [ ] Add markdown lint CI or document the required `rumdl check --fix .`
-  workflow.
+- [x] Document the required `rumdl check --fix .` workflow.
 - [ ] Add a new-app checklist covering storage, secrets, probes, resources,
   ingress auth, backups, and alerts.
 - [ ] Review single-replica critical services and choose explicit accepted risk
@@ -65,6 +64,17 @@
 - [ ] Review Synology NFS as central dependency and document recovery path.
 - [ ] Document RTO/RPO for accepted single control-plane and NFS dependency
   risks.
+
+## Phase P2 - Public repository cleanup
+
+- [x] Remove personal activity reports, backlogs, Hermes planning material, and
+  the network migration scratchpad from the current tree.
+- [x] Remove the unused public export and anonymization workflow.
+- [x] Remove the duplicate GitHub validation workflow and keep Forgejo Actions
+  as the repository CI.
+- [x] Keep intentionally public service domains and live architecture values.
+- [x] Decide not to rewrite Git history. Removed files remain available in old
+  commits.
 
 ## Phase P3 - Later
 
