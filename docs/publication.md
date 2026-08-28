@@ -1,53 +1,41 @@
 # Public publication procedure
 
-The live repository contains environment-specific values used by the homelab.
-Publish a sanitized export instead of copying the live working tree directly.
+This repository is published as a direct mirror of the operational Forgejo
+repository. The live domains, network values, Helm charts, scripts, and Flux
+resources are intentionally preserved.
 
-## Create the export
+## Before publishing
 
-Run this command from the repository root and choose a new output directory
-outside the repository:
-
-```bash
-uv run python scripts/export-public-repo.py /tmp/homelab-public
-```
-
-The exporter removes private Forgejo workflows, backlogs, detailed activity
-reports, internal Hermes reports, network migration notes, and cluster access
-instructions. It replaces private hostnames, addresses, registry endpoints,
-and storage paths with documentation values.
-
-The exporter refuses to overwrite an existing directory and fails if known
-private identifiers remain in the result.
-
-## Audit the history
-
-The exporter handles the current tree only. Before publishing history, create a
-recoverable backup and run a full-history secret scan:
+Check the working tree and scan the full history:
 
 ```bash
-git bundle create /tmp/homelab-private-backup.bundle --all
+git status --short
 gitleaks git --redact --verbose
 ```
 
-If the audit finds a secret or a private identifier that was removed from the
-public tree, rewrite the public clone with `git-filter-repo`. Keep the original
-bundle private and never force-push rewritten history to the live operational
-repository without a separate maintenance decision.
+Do not publish credentials, tokens, private keys, kubeconfig files, or rendered
+runtime secrets. Public service endpoints may remain when they are intentional,
+reachable, and protected by their normal authentication controls.
 
-## Final checks
+## Files removed from the public tree
 
-From the exported directory:
+The repository no longer tracks the personal activity journal, temporary
+backlogs, Hermes planning material, or the network migration scratchpad. Keep
+those materials outside the public repository if they are still useful for
+private learning.
+
+## Validation
+
+Run the same checks used by Forgejo Actions:
 
 ```bash
-git diff --check
 ./scripts/check-storage-policy.sh
 ./scripts/test-helm-chart.sh
 ./scripts/render-local-charts-for-kubeconform.sh
-rumdl check README.md CONTRIBUTING.md SECURITY.md \
-  docs/architecture.md docs/portfolio-summary.md docs/publication.md
+kubeconform -strict -summary -ignore-missing-schemas .forgejo-rendered
+rumdl check --fix .
 ```
 
-Run `gitleaks dir` against the exported repository and inspect the file list
-before creating the GitHub repository. Do not copy `.env` files, kubeconfig files,
-tokens, private keys, rendered runtime secrets, or cluster credentials.
+The mirror should contain the resulting working tree and the same commit history
+as the Forgejo repository. This cleanup does not rewrite older commits, so files
+removed from the current tree remain available in historical revisions.

@@ -19,7 +19,7 @@ managed through pinned chart versions and reviewed Git changes.
 - PostgreSQL workloads managed with CloudNativePG.
 - CI checks for secrets, Helm rendering, Kubernetes schemas, Markdown, and the
   repository storage policy.
-- Incident reports and recovery runbooks based on real maintenance work.
+- Recovery runbooks based on real maintenance work.
 
 ## Architecture
 
@@ -35,9 +35,8 @@ short project description used on a CV.
 - **GitOps**: Flux Operator, Flux controllers, and native Flux resources
 - **Git source**: the in-cluster Forgejo `homelab` repository
 
-The public documentation uses example hostnames and network values. The live
-cluster has environment-specific values and secrets that must not be copied
-into a public repository.
+The domains and network values in this repository describe the live homelab.
+Runtime secrets are kept outside Git and injected by Infisical.
 
 ## Repository layout
 
@@ -83,8 +82,7 @@ rumdl check README.md CONTRIBUTING.md SECURITY.md \
   docs/architecture.md docs/portfolio-summary.md docs/publication.md
 ```
 
-The CI workflow also runs Gitleaks against the repository. Runtime secrets are
-managed outside Git and injected by Infisical.
+The Forgejo Actions workflow also runs Gitleaks against the repository.
 
 ## Scope and limitations
 

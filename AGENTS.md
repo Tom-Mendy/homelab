@@ -58,28 +58,14 @@ Before finishing Kubernetes changes:
 - Prefer S3-compatible storage only for object data, artifacts, and backups. Do
   not use S3 as a general POSIX PVC replacement.
 
-## Learning and Kubernetes activity reports
+## Documentation quality
 
-The repository owner is currently learning Kubernetes and homelab operations.
-For every significant activity performed through Kubernetes, write an activity
-english report under `docs/activity_report/[YYYY-MM-DD-[modification global task]]/*.md`.
+Keep operational documentation concise and useful to the next operator. Record
+important recovery, storage, security, and migration decisions in the relevant
+runbook or design document.
 
-to check markdown quality use:
+To check Markdown quality, run:
 
 ```sh
 rumdl check --fix .
 ```
-
-Use one Markdown file per activity, with a dated and descriptive name such as
-`2026-05-14-migrate-grafana-pvc.md`.
-
-Each report must include:
-
-1. The problem that had to be solved.
-2. The reasoning path used to solve it, including the commands to run.
-3. The command results, including commands that failed but helped move the
-   investigation forward.
-4. The final outcome and what had to be changed.
-
-Prefer concrete command transcripts and observed outputs over summaries when the
-details are useful for learning later.

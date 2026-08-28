@@ -13,14 +13,14 @@ schemas, and storage policy violations.
 ## Technologies
 
 Kubernetes, Flux, Helm, Kustomize, CloudNativePG, Infisical, Authentik,
-Traefik, NFS, Grafana, GitHub Actions, Forgejo, Python, Bash.
+Traefik, NFS, Grafana, Forgejo Actions, Python, Bash.
 
 ## What to discuss in an interview
 
 - How GitOps ownership prevents live image updates from conflicting with Git.
 - Why worker-local persistent storage was replaced with NFS-backed PVCs.
 - How OIDC clients and runtime credentials are kept outside Git.
-- How incident reports turned operational failures into repeatable runbooks.
+- How operational failures were turned into repeatable runbooks.
 - Which risks remain accepted in a homelab and what evidence is still missing.
 
 ## CV version
