@@ -106,19 +106,28 @@ spec:
             - containerPort: {{ .Values.service.port }}
               name: http
           readinessProbe:
-            httpGet:
-              path: /healthz
-              port: http
+            exec:
+              command:
+                - python
+                - -c
+                - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=5)"
+            timeoutSeconds: 5
           livenessProbe:
-            httpGet:
-              path: /healthz
-              port: http
+            exec:
+              command:
+                - python
+                - -c
+                - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=5)"
+            timeoutSeconds: 5
           startupProbe:
-            httpGet:
-              path: /healthz
-              port: http
+            exec:
+              command:
+                - python
+                - -c
+                - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=5)"
             failureThreshold: 30
             periodSeconds: 10
+            timeoutSeconds: 5
       volumes:
         - name: tun
           hostPath:
