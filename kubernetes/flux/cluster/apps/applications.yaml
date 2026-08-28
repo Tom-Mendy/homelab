@@ -288,10 +288,10 @@ spec:
     - name: traefik
   install:
     createNamespace: true
-  # Temporary migration: replace the legacy Deployment and its old container list.
+  # Temporary migration: use Helm's non-destructive patch strategy for bound PVCs.
   upgrade:
     serverSideApply: disabled
-    force: true
+    force: false
   driftDetection:
     mode: enabled
 
@@ -592,9 +592,9 @@ spec:
     - name: traefik
   install:
     createNamespace: true
-  # Temporary migration: replace the legacy Deployment and its old container list.
+  # Temporary migration: use Helm's non-destructive patch strategy for bound PVCs.
   upgrade:
     serverSideApply: disabled
-    force: true
+    force: false
   driftDetection:
     mode: enabled
