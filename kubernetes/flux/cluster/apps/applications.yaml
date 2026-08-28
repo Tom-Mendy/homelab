@@ -288,6 +288,10 @@ spec:
     - name: traefik
   install:
     createNamespace: true
+  # Temporary migration: replace the legacy Deployment and its old container list.
+  upgrade:
+    serverSideApply: disabled
+    force: true
   driftDetection:
     mode: enabled
 
@@ -588,5 +592,9 @@ spec:
     - name: traefik
   install:
     createNamespace: true
+  # Temporary migration: replace the legacy Deployment and its old container list.
+  upgrade:
+    serverSideApply: disabled
+    force: true
   driftDetection:
     mode: enabled
