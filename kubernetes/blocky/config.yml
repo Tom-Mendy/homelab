@@ -13,6 +13,7 @@ upstreams:
       - 192.168.1.254
 customDNS:
   mapping:
+    tom-mendy.com: 10.0.0.60
     prowlarr.home.tom-mendy.com: 10.0.0.60
     sonarr.home.tom-mendy.com: 10.0.0.60
     radarr.home.tom-mendy.com: 10.0.0.60
