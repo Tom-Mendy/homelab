@@ -27,7 +27,7 @@ projects:
     passwordKey: GHCR_PASSWORD
   - name: proxy-quay
     registryName: Quay
-    registryType: quay
+    registryType: docker-registry
     registryUrl: https://quay.io
     storageLimit: 21474836480
     usernameKey: QUAY_USERNAME
