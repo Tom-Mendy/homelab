@@ -1,4 +1,5 @@
 name: publish-hermes-workspace-image
+# Build and publish through the rootless BuildKit runner.
 
 on:
   push:

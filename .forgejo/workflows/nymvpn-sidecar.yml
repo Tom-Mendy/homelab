@@ -1,4 +1,5 @@
 name: nymvpn-sidecar
+# Build and publish through the rootless BuildKit runner.
 
 on:
   workflow_dispatch:
