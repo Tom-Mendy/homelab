@@ -20,6 +20,11 @@ The runner process runs `forgejo-runner one-job --wait` in a container-local
 loop. Each completed job gets a fresh poller without restarting the pod; failed
 polls retry after five seconds instead of entering a tight loop.
 
+The repository also contains a suspended `forgejo-runner-buildkit` release. It
+uses a custom BuildKit rootless job image and retains DinD only as the job
+container backend. Follow `docs/forgejo-buildkit.md` to publish the image,
+configure the Infisical identity and activate the release.
+
 ## Secret
 
 The runner registration secret is not stored in Git. Create it from the UUID

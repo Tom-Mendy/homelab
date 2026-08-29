@@ -11,6 +11,10 @@ image:
   tag: 3.13.7-alpine
 
 projects:
+  - name: homelab
+    projectType: local
+    public: false
+    storageLimit: 107374182400
   - name: proxy-dockerhub
     registryName: Docker Hub
     registryType: docker-hub

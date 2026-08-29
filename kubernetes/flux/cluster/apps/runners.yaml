@@ -27,6 +27,37 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
+  name: forgejo-runner-buildkit
+spec:
+  interval: 30m
+  timeout: 10m
+  suspend: true
+  releaseName: forgejo-runner-buildkit
+  targetNamespace: forgejo-runner
+  storageNamespace: forgejo-runner
+  chart:
+    spec:
+      chart: ./kubernetes/forgejo-runner
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  valuesFrom:
+    - kind: ConfigMap
+      name: forgejo-buildkit-values
+  dependsOn:
+    - name: forgejo-runner-homelab
+    - name: infisical
+    - name: infisical-operator
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
   name: github-runners-auth
 spec:
   interval: 30m

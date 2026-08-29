@@ -16,13 +16,13 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  REGISTRY: forgejo.tom-mendy.com
-  IMAGE_NAME: forgejo.tom-mendy.com/tom-mendy/hermes-workspace
+  REGISTRY: harbor.home.tom-mendy.com
+  IMAGE_NAME: harbor.home.tom-mendy.com/homelab/hermes-workspace
   IMAGE_TAG: v2026.7.1-apt1
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: buildkit
     timeout-minutes: 30
     steps:
       - name: Checkout
@@ -30,23 +30,28 @@ jobs:
         with:
           clean: true
 
-      - name: Log in to Forgejo registry
+      - name: Configure Harbor authentication
         shell: bash
         env:
-          REGISTRY_USERNAME: ${{ forgejo.repository_owner }}
-          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+          REGISTRY_USERNAME: ${{ secrets.HARBOR_REGISTRY_USER }}
+          REGISTRY_TOKEN: ${{ secrets.HARBOR_REGISTRY_TOKEN }}
         run: |
           set -euo pipefail
+          test -n "$REGISTRY_USERNAME"
           test -n "$REGISTRY_TOKEN"
-          printf '%s' "$REGISTRY_TOKEN" | docker login "$REGISTRY" \
-            --username "$REGISTRY_USERNAME" --password-stdin
+          mkdir -p "$HOME/.docker"
+          auth="$(printf '%s:%s' "$REGISTRY_USERNAME" "$REGISTRY_TOKEN" | base64 | tr -d '\\n')"
+          printf '{"auths":{"%s":{"auth":"%s"}}}\n' "$REGISTRY" "$auth" > "$HOME/.docker/config.json"
 
-      - name: Build and push image
+      - name: Build and publish image
         shell: bash
         run: |
           set -euo pipefail
-          docker build --pull \
-            --file kubernetes/coder/workspace-images/hermes/Dockerfile \
-            --tag "$IMAGE_NAME:$IMAGE_TAG" \
-            kubernetes/coder/workspace-images/hermes
-          docker push "$IMAGE_NAME:$IMAGE_TAG"
+          buildctl-daemonless.sh build \
+            --frontend dockerfile.v0 \
+            --local context=kubernetes/coder/workspace-images/hermes \
+            --local dockerfile=kubernetes/coder/workspace-images/hermes \
+            --opt platform=linux/amd64 \
+            --output type=image,name="$IMAGE_NAME:$FORGEJO_SHA",name="$IMAGE_NAME:$IMAGE_TAG",name="$IMAGE_NAME:latest",push=true \
+            --import-cache type=registry,ref="$IMAGE_NAME:buildcache" \
+            --export-cache type=registry,ref="$IMAGE_NAME:buildcache",mode=max

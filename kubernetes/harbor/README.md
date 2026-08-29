@@ -20,6 +20,7 @@ to the path:
 Harbor's OIDC provider is declared in the Authentik blueprint. The live Harbor
 configuration is managed once by the `harbor-config` HelmRelease.
 
-Proxy-cache projects and their scanner policies are also managed by
-`harbor-config`; see `docs/harbor-proxy-cache.md` for upstream credentials,
-containerd mirror setup, and rollback instructions.
+Proxy-cache projects, the private `homelab` project and their scanner policies
+are managed by `harbor-config`; see `docs/harbor-proxy-cache.md` for upstream
+credentials, containerd mirror setup, and rollback instructions. Forgejo
+BuildKit CI is documented in `docs/forgejo-buildkit.md`.

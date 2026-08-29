@@ -26,8 +26,29 @@ spec:
           env:
             - name: DOCKER_TLS_CERTDIR
               value: ""
+            {{- if .Values.registryAuth.enabled }}
+            - name: HARBOR_CI_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.registryAuth.secretName }}
+                  key: {{ .Values.registryAuth.usernameKey }}
+            - name: HARBOR_CI_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.registryAuth.secretName }}
+                  key: {{ .Values.registryAuth.tokenKey }}
+            {{- end }}
           command:
-            - dockerd
+            - /bin/sh
+            - -ec
+            - |
+              {{- if .Values.registryAuth.enabled }}
+              mkdir -p /root/.docker
+              auth="$$(printf '%s:%s' "$${HARBOR_CI_USERNAME}" "$${HARBOR_CI_TOKEN}" | base64 | tr -d '\\n')"
+              printf '{"auths":{"harbor.home.tom-mendy.com":{"auth":"%s"}}}\n' "$${auth}" > /root/.docker/config.json
+              {{- end }}
+              exec dockerd "$${@}"
+            - --
           args:
             - -H
             - tcp://0.0.0.0:2375

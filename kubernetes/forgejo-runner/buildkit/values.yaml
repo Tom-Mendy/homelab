@@ -1,0 +1,36 @@
+runner:
+  name: forgejo-runner-buildkit
+  secretName: forgejo-runner-buildkit
+  labels:
+    - buildkit:docker://harbor.home.tom-mendy.com/homelab/ci/buildkit-forgejo@sha256:REPLACE_AFTER_BOOTSTRAP
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+    limits:
+      cpu: "2"
+      memory: "4Gi"
+
+docker:
+  containerOptions: >-
+    --add-host=dind.docker.internal:host-gateway
+    --security-opt seccomp=unconfined
+    --security-opt apparmor=unconfined
+    --security-opt systempaths=unconfined
+
+registryAuth:
+  enabled: true
+  secretName: forgejo-runner-harbor-ci
+
+infisicalSecret:
+  enabled: true
+  name: forgejo-runner-harbor-ci
+  serviceAccountName: forgejo-runner-harbor-ci-sync
+  connectionName: forgejo-runner-harbor-ci
+  authName: forgejo-runner-harbor-ci
+  identitySecretName: forgejo-runner-harbor-ci-identity
+  address: https://infisical.home.tom-mendy.com
+  identityID: "REPLACE_WITH_FORGEJO_RUNNER_HARBOR_IDENTITY_ID"
+  projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+  envSlug: prod
+  secretsPath: /harbor/ci

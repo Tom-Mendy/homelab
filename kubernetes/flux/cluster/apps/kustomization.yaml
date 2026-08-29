@@ -22,6 +22,9 @@ configMapGenerator:
   - name: forgejo-portfolio-values
     files:
       - values.yaml=../../../forgejo-runner/portfolio/values.yaml
+  - name: forgejo-buildkit-values
+    files:
+      - values.yaml=../../../forgejo-runner/buildkit/values.yaml
   - name: authentik-values
     files:
       - values.yaml=../../../authentik/values.yaml

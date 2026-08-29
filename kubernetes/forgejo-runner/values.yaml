@@ -47,3 +47,12 @@ securityContext:
   runAsUser: 1000
   runAsGroup: 1000
   fsGroup: 1000
+
+registryAuth:
+  enabled: false
+  secretName: forgejo-runner-harbor-ci
+  usernameKey: HARBOR_CI_USERNAME
+  tokenKey: HARBOR_CI_TOKEN
+
+infisicalSecret:
+  enabled: false

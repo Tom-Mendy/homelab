@@ -11,26 +11,35 @@ on:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: buildkit
     env:
-      IMAGE: forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.3-4
+      REGISTRY: harbor.home.tom-mendy.com
+      IMAGE: harbor.home.tom-mendy.com/homelab/nymvpn-sidecar
+      IMAGE_TAG: 2026.11.3-4
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
           clean: true
 
-      - name: Log in to Forgejo registry
-        run: echo "$REGISTRY_TOKEN" | docker login forgejo.tom-mendy.com --username "$REGISTRY_USERNAME" --password-stdin
-        env:
-          REGISTRY_USERNAME: ${{ forgejo.repository_owner }}
-          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
-
-      - name: Build and push image
+      - name: Configure Harbor authentication
         run: |
-          docker build --pull --tag "$IMAGE" kubernetes/media/nymvpn
-          for attempt in 1 2 3; do
-            docker push "$IMAGE" && exit 0
-            sleep 15
-          done
-          exit 1
+          set -euo pipefail
+          mkdir -p "$HOME/.docker"
+          auth="$(printf '%s:%s' "$HARBOR_USER" "$HARBOR_TOKEN" | base64 | tr -d '\\n')"
+          printf '{"auths":{"%s":{"auth":"%s"}}}\n' "$REGISTRY" "$auth" > "$HOME/.docker/config.json"
+        env:
+          HARBOR_USER: ${{ secrets.HARBOR_REGISTRY_USER }}
+          HARBOR_TOKEN: ${{ secrets.HARBOR_REGISTRY_TOKEN }}
+
+      - name: Build and publish image
+        run: |
+          set -euo pipefail
+          buildctl-daemonless.sh build \
+            --frontend dockerfile.v0 \
+            --local context=kubernetes/media/nymvpn \
+            --local dockerfile=kubernetes/media/nymvpn \
+            --opt platform=linux/amd64 \
+            --output type=image,name="$IMAGE:$FORGEJO_SHA",name="$IMAGE:$IMAGE_TAG",name="$IMAGE:latest",push=true \
+            --import-cache type=registry,ref="$IMAGE:buildcache" \
+            --export-cache type=registry,ref="$IMAGE:buildcache",mode=max

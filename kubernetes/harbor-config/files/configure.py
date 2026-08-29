@@ -94,7 +94,7 @@ def configure_project(project, registry_id):
     payload = {
         "project_name": name,
         "metadata": {
-            "public": "true",
+            "public": "true" if project.get("public", True) else "false",
             "auto_scan": "true",
             "auto_sbom_generation": "true",
             "prevent_vul": "true",
@@ -102,8 +102,9 @@ def configure_project(project, registry_id):
             "reuse_sys_cve_allowlist": "true",
         },
         "storage_limit": project["storageLimit"],
-        "registry_id": registry_id,
     }
+    if registry_id is not None:
+        payload["registry_id"] = registry_id
     existing = project_by_name(name)
     if existing is None:
         request("POST", "/api/v2.0/projects", payload, expected=(201, 409))
@@ -115,6 +116,6 @@ def configure_project(project, registry_id):
 wait_for_harbor()
 projects = json.loads(os.environ["HARBOR_PROXY_PROJECTS"])
 for project in projects:
-    registry_id = configure_registry(project)
+    registry_id = None if project.get("projectType") == "local" else configure_registry(project)
     configure_project(project, registry_id)
-print(f"Configured {len(projects)} Harbor proxy-cache projects")
+print(f"Configured {len(projects)} Harbor projects")

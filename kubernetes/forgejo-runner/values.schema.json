@@ -58,6 +58,21 @@
         "resources": { "type": "object" }
       }
     },
+    "registryAuth": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "secretName": { "type": "string", "minLength": 1 },
+        "usernameKey": { "type": "string", "minLength": 1 },
+        "tokenKey": { "type": "string", "minLength": 1 }
+      }
+    },
+    "infisicalSecret": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
     "securityContext": {
       "type": "object",
       "required": ["runAsUser", "runAsGroup", "fsGroup"],

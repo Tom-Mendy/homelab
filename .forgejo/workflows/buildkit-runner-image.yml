@@ -1,0 +1,44 @@
+name: build-buildkit-runner-image
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - kubernetes/forgejo-runner/buildkit/Dockerfile
+      - .forgejo/workflows/buildkit-runner-image.yml
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      REGISTRY: harbor.home.tom-mendy.com
+      IMAGE: harbor.home.tom-mendy.com/homelab/ci/buildkit-forgejo
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Log in to Harbor
+        env:
+          HARBOR_USER: ${{ secrets.HARBOR_REGISTRY_USER }}
+          HARBOR_TOKEN: ${{ secrets.HARBOR_REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$HARBOR_USER"
+          test -n "$HARBOR_TOKEN"
+          printf '%s' "$HARBOR_TOKEN" | docker login "$REGISTRY" \
+            --username "$HARBOR_USER" --password-stdin
+
+      - name: Build and publish
+        run: |
+          set -euo pipefail
+          docker build \
+            --pull \
+            --file kubernetes/forgejo-runner/buildkit/Dockerfile \
+            --tag "$IMAGE:$FORGEJO_SHA" \
+            --tag "$IMAGE:latest" \
+            kubernetes/forgejo-runner/buildkit
+          docker push "$IMAGE:$FORGEJO_SHA"
+          docker push "$IMAGE:latest"
