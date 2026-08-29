@@ -47,7 +47,7 @@ entries:
     attrs:
       name: Harbor
       provider: !KeyOf harbor-provider
-      meta_launch_url: https://harbor.home.tom-mendy.com/
+      meta_launch_url: https://harbor.home.tom-mendy.com/c/oidc/login
       open_in_new_tab: true
       policy_engine_mode: any
   - model: authentik_policies.policybinding
