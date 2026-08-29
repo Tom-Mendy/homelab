@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: forgejo-runner-homelab
+  name: {{ .Values.runner.name }}
   namespace: {{ .Values.namespace }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: forgejo-runner-homelab
+      app: {{ .Values.runner.name }}
   template:
     metadata:
       labels:
-        app: forgejo-runner-homelab
+        app: {{ .Values.runner.name }}
       annotations:
         checksum/runner-config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
@@ -92,7 +92,7 @@ spec:
       volumes:
         - name: runner-config
           configMap:
-            name: forgejo-runner-config
+            name: {{ .Values.runner.name }}-config
         - name: runner-data
           emptyDir: {}
         - name: docker-data

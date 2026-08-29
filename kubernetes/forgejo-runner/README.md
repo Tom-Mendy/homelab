@@ -1,7 +1,7 @@
-# Forgejo Runner for Homelab
+# Forgejo Runners
 
-This chart deploys one Forgejo Actions runner for
-`Tom-Mendy/homelab`.
+This chart deploys Forgejo Actions runners for `Tom-Mendy/homelab` and
+`Tom-Mendy/Portfolio`.
 
 The runner uses:
 
@@ -48,3 +48,7 @@ kubectl --kubeconfig "$HOME/.kube/config-homelab" \
 
 The command prints the UUID. Store the UUID and the same generated secret in the
 `forgejo-runner-homelab` Kubernetes Secret.
+
+Register a second runner for `Tom-Mendy/Portfolio` with the same procedure,
+using the name and secret `forgejo-runner-portfolio` and scope
+`Tom-Mendy/Portfolio`.
