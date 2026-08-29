@@ -38,6 +38,7 @@ customDNS:
     authentik.home.tom-mendy.com: 10.0.0.60
     flux.home.tom-mendy.com: 10.0.0.60
     coder.home.tom-mendy.com: 10.0.0.60
+    harbor.home.tom-mendy.com: 10.0.0.60
 blocking:
   denylists:
     strict:

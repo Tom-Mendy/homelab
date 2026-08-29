@@ -6,6 +6,7 @@ forgejo
 forgejo-runner
 github-runners-auth
 grafana
+harbor
 hindsight
 homepage
 infisical-postgres

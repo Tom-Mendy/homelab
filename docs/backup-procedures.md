@@ -75,6 +75,7 @@ Stateful services in this repo include at least:
 - `navidrome` data PVC
 - `trilium`
 - `matrix` (`tuwunel-data` and `tuwunel-backups`)
+- Harbor registry data, job logs, and Trivy cache
 
 Recommended approach:
 

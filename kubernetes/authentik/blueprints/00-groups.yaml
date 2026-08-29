@@ -60,3 +60,7 @@ entries:
     id: qbittorrent-users
     identifiers:
       name: qbittorrent-users
+  - model: authentik_core.group
+    id: harbor-users
+    identifiers:
+      name: harbor-users

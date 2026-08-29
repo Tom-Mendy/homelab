@@ -34,6 +34,9 @@ configMapGenerator:
   - name: grafana-values
     files:
       - values.yaml=../../../grafana/values.yaml
+  - name: harbor-values
+    files:
+      - values.yaml=../../../harbor/values-external.yaml
   - name: infisical-values
     files:
       - values.yaml=../../../infisical/values.yaml

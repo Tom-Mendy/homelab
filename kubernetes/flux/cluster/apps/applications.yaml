@@ -2,6 +2,61 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
+  name: harbor-extras
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: harbor-extras
+  targetNamespace: harbor
+  storageNamespace: harbor
+  chart:
+    spec:
+      chart: ./kubernetes/harbor
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: infisical
+    - name: infisical-operator
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: harbor
+spec:
+  interval: 30m
+  timeout: 20m
+  releaseName: harbor
+  targetNamespace: harbor
+  storageNamespace: harbor
+  chart:
+    spec:
+      chart: harbor
+      version: 1.19.0
+      sourceRef:
+        kind: HelmRepository
+        name: harbor
+  valuesFrom:
+    - kind: ConfigMap
+      name: harbor-values
+  dependsOn:
+    - name: harbor-extras
+    - name: authentik
+    - name: nfs-provisioner
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
   name: coder-extras
 spec:
   interval: 30m

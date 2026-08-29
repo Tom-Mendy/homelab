@@ -1,0 +1,14 @@
+namespace: harbor
+
+infisicalSecret:
+  enabled: true
+  name: harbor-secrets
+  serviceAccountName: harbor-infisical-sync
+  connectionName: harbor-infisical
+  authName: harbor-infisical
+  identitySecretName: harbor-infisical-identity
+  address: https://infisical.home.tom-mendy.com
+  identityID: "600ad8b6-20e3-47c8-9771-3a0fd87afa08"
+  projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+  envSlug: prod
+  secretsPath: /harbor

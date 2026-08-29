@@ -1,0 +1,64 @@
+expose:
+  type: ingress
+  tls:
+    enabled: true
+    certSource: secret
+    secret:
+      secretName: harbor-tls
+  ingress:
+    hosts:
+      core: harbor.home.tom-mendy.com
+    className: traefik
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+
+externalURL: https://harbor.home.tom-mendy.com
+
+persistence:
+  enabled: true
+  resourcePolicy: keep
+  persistentVolumeClaim:
+    registry:
+      storageClass: nfs-k8s
+      accessMode: ReadWriteMany
+      size: 100Gi
+    jobservice:
+      jobLog:
+        storageClass: nfs-k8s
+        accessMode: ReadWriteMany
+        size: 5Gi
+    database:
+      storageClass: nfs-k8s
+      accessMode: ReadWriteOnce
+      size: 5Gi
+    redis:
+      storageClass: nfs-k8s
+      accessMode: ReadWriteOnce
+      size: 1Gi
+    trivy:
+      storageClass: nfs-k8s
+      accessMode: ReadWriteMany
+      size: 5Gi
+
+existingSecretAdminPassword: harbor-secrets
+existingSecretAdminPasswordKey: HARBOR_ADMIN_PASSWORD
+existingSecretSecretKey: harbor-secrets
+
+core:
+  existingSecret: harbor-secrets
+  existingSecretKey: secret
+
+jobservice:
+  existingSecret: harbor-secrets
+  existingSecretKey: JOBSERVICE_SECRET
+
+registry:
+  existingSecret: harbor-secrets
+  existingSecretKey: REGISTRY_HTTP_SECRET
+  credentials:
+    existingSecret: harbor-secrets
+
+metrics:
+  enabled: true

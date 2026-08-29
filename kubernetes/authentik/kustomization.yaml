@@ -18,5 +18,6 @@ configMapGenerator:
       - 60-coder.yaml=blueprints/60-coder.yaml
       - 70-matrix.yaml=blueprints/70-matrix.yaml
       - 80-infisical.yaml=blueprints/80-infisical.yaml
+      - 90-harbor.yaml=blueprints/90-harbor.yaml
 generatorOptions:
   disableNameSuffixHash: true

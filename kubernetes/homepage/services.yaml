@@ -82,6 +82,10 @@
         icon: atuin.svg
         href: https://atuin.home.tom-mendy.com/
         description: Shell history sync and search
+    - Harbor:
+        icon: harbor.svg
+        href: https://harbor.home.tom-mendy.com/
+        description: Container image registry
 
 - Arr Apps:
     - Prowlarr:
