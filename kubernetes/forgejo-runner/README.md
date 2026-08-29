@@ -52,3 +52,34 @@ The command prints the UUID. Store the UUID and the same generated secret in the
 Register a second runner for `Tom-Mendy/Portfolio` with the same procedure,
 using the name and secret `forgejo-runner-portfolio` and scope
 `Tom-Mendy/Portfolio`.
+
+```sh
+secret="$(openssl rand -hex 20)"
+kubectl --kubeconfig "$HOME/.kube/config-homelab" \
+  -n forgejo exec deploy/forgejo -- \
+  su git -c "forgejo forgejo-cli actions register \
+    --name forgejo-runner-portfolio \
+    --scope Tom-Mendy/Portfolio \
+    --secret $secret"
+
+kubectl --kubeconfig "$HOME/.kube/config-homelab" \
+  -n forgejo-runner create secret generic forgejo-runner-portfolio \
+  --from-literal=uuid='<RUNNER_UUID>' \
+  --from-literal=token="$secret"
+unset secret
+```
+
+## Verification
+
+Reconcile the release, then confirm that the deployment is available and the
+runner is polling Forgejo:
+
+```sh
+flux reconcile helmrelease forgejo-runner-portfolio \
+  --namespace flux-system --reset
+kubectl --kubeconfig "$HOME/.kube/config-homelab" \
+  -n forgejo-runner rollout status deployment/forgejo-runner-portfolio
+kubectl --kubeconfig "$HOME/.kube/config-homelab" \
+  -n forgejo-runner logs deployment/forgejo-runner-portfolio \
+  --container runner --tail=20
+```
