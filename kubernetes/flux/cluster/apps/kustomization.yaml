@@ -13,12 +13,15 @@ configMapGenerator:
   - name: arc-dotfiles-values
     files:
       - values.yaml=../../../github-runners/dotfiles/values.yaml
-  - name: arc-portfolio-values
-    files:
-      - values.yaml=../../../github-runners/portfolio/values.yaml
   - name: arc-sumfeet-values
     files:
       - values.yaml=../../../github-runners/sumfeet/values.yaml
+  - name: forgejo-homelab-values
+    files:
+      - values.yaml=../../../forgejo-runner/homelab/values.yaml
+  - name: forgejo-portfolio-values
+    files:
+      - values.yaml=../../../forgejo-runner/portfolio/values.yaml
   - name: authentik-values
     files:
       - values.yaml=../../../authentik/values.yaml

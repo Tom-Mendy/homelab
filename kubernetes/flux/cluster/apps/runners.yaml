@@ -79,31 +79,6 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: github-runners-portfolio
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: arc-runner-set-portfolio
-  targetNamespace: arc-runners
-  storageNamespace: arc-runners
-  chartRef:
-    kind: OCIRepository
-    name: arc-runner-set
-  valuesFrom:
-    - kind: ConfigMap
-      name: arc-portfolio-values
-  dependsOn:
-    - name: arc-controller
-    - name: github-runners-auth
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
-
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
   name: github-runners-sumfeet
 spec:
   interval: 30m
@@ -143,6 +118,9 @@ spec:
       sourceRef:
         kind: GitRepository
         name: flux-system
+  valuesFrom:
+    - kind: ConfigMap
+      name: forgejo-homelab-values
   dependsOn:
     - name: forgejo
   install:
@@ -150,3 +128,30 @@ spec:
   driftDetection:
     mode: enabled
 
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo-runner-portfolio
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: forgejo-runner-portfolio
+  targetNamespace: forgejo-runner
+  storageNamespace: forgejo-runner
+  chart:
+    spec:
+      chart: ./kubernetes/forgejo-runner
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  valuesFrom:
+    - kind: ConfigMap
+      name: forgejo-portfolio-values
+  dependsOn:
+    - name: forgejo-runner-homelab
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled

@@ -15,8 +15,9 @@
     },
     "runner": {
       "type": "object",
-      "required": ["image", "secretName", "logLevel", "capacity", "timeout", "labels", "resources"],
+      "required": ["name", "image", "secretName", "logLevel", "capacity", "timeout", "labels", "resources"],
       "properties": {
+        "name": { "type": "string", "minLength": 1 },
         "image": {
           "type": "object",
           "required": ["repository", "tag", "pullPolicy"],

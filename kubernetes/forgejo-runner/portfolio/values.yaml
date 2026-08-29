@@ -1,0 +1,5 @@
+createNamespace: false
+
+runner:
+  name: forgejo-runner-portfolio
+  secretName: forgejo-runner-portfolio

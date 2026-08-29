@@ -4,7 +4,6 @@ This directory configures GitHub Actions Runner Controller (ARC) 0.14.2 with
 Flux HelmReleases:
 
 - `actions-runner-controller` (namespace: `arc-systems`)
-- `github-runners-portfolio` (namespace: `arc-runners`)
 - `github-runners-dotfiles` (namespace: `arc-runners`)
 - `github-runners-sumfeet` (namespace: `arc-runners`)
 
@@ -12,7 +11,6 @@ Flux HelmReleases:
 
 The runner scale sets read the secret referenced by `githubConfigSecret` in:
 
-- `portfolio/values.yaml`
 - `dotfiles/values.yaml`
 - `sumfeet/values.yaml`
 
@@ -104,12 +102,10 @@ Recommended recovery order:
 
 1. Reconcile `arc-controller`, which installs the ARC CRDs and controller.
 2. Restart the controller pod in `arc-systems` if CRD discovery was stale.
-3. Reconcile `github-runners-portfolio`, `github-runners-dotfiles`, and
-   `github-runners-sumfeet`
+3. Reconcile `github-runners-dotfiles` and `github-runners-sumfeet`
 
 Use these labels in workflows:
 
-- `runs-on: arc-runner-set-portfolio` for `Tom-Mendy/Portfolio`
 - `runs-on: arc-runner-set-dotfiles` for `Tom-Mendy/dotfiles`
 - `runs-on: self-hosted` for `MrAmarok/sumfeet` through the scale set
   `arc-runner-set-sumfleet-tom`
