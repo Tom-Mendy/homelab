@@ -1,0 +1,26 @@
+replicaCount: 2
+
+image:
+  repository: forgejo.tom-mendy.com/tom-mendy/portfolio
+  tag: latest@sha256:8e040ccc39e34084264a2996c0c9db2f26e9e92c96009047a14ae6ef8fc22b06
+  pullPolicy: IfNotPresent
+
+service:
+  port: 80
+  targetPort: 8080
+
+ingress:
+  host: tom-mendy.com
+  className: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 16Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi

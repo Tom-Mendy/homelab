@@ -468,6 +468,31 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
+  name: portfolio
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: portfolio
+  targetNamespace: portfolio
+  storageNamespace: portfolio
+  chart:
+    spec:
+      chart: ./kubernetes/portfolio
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
   name: blocky
 spec:
   interval: 30m
