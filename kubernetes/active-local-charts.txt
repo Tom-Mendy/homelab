@@ -1,6 +1,5 @@
 atuin
 authentik
-authentik-postgres
 blocky
 coder
 forgejo

@@ -35,7 +35,7 @@ Commit and push the repository changes, then reconcile Flux:
 
 ```bash
 flux reconcile source git flux-system
-flux reconcile helmrelease authentik-extras -n flux-system --with-source
+flux reconcile helmrelease authentik -n flux-system --with-source
 flux reconcile helmrelease matrix -n flux-system --with-source
 kubectl get pods,pvc,ingress -n matrix
 kubectl get infisicalstaticsecret -n authentik matrix-runtime

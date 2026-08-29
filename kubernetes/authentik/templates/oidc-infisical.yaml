@@ -45,7 +45,7 @@ spec:
       recursive: false
   targets:
     - name: authentik-secrets
-      namespace: authentik
+      namespace: {{ .Values.namespace }}
       kind: Secret
       creationPolicy: Orphan
       secretType: Opaque
@@ -58,7 +58,7 @@ spec:
           AUTHENTIK_SECRET_KEY: "{{`{{ .AUTHENTIK_SECRET_KEY.Value | trim }}`}}"
           AUTHENTIK_WEB__PATH: "{{`{{ .AUTHENTIK_WEB__PATH.Value }}`}}"
     - name: authentik-oidc
-      namespace: authentik
+      namespace: {{ .Values.namespace }}
       kind: Secret
       creationPolicy: Orphan
       secretType: Opaque

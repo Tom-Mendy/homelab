@@ -17,7 +17,7 @@ spec:
         kind: GitRepository
         name: flux-system
   dependsOn:
-    - name: authentik-extras
+    - name: authentik
     - name: cloudnative-pg
     - name: nfs-provisioner
   driftDetection:
@@ -71,7 +71,7 @@ spec:
       name: grafana-values
   dependsOn:
     - name: grafana-extras
-    - name: authentik-extras
+    - name: authentik
     - name: nfs-provisioner
     - name: prometheus
     - name: traefik
@@ -122,7 +122,7 @@ spec:
         kind: GitRepository
         name: flux-system
   dependsOn:
-    - name: authentik-extras
+    - name: authentik
     - name: nfs-provisioner
     - name: ollama
   install:
@@ -254,7 +254,7 @@ spec:
         kind: GitRepository
         name: flux-system
   dependsOn:
-    - name: authentik-extras
+    - name: authentik
     - name: cloudnative-pg
     - name: nfs-provisioner
     - name: traefik
@@ -314,7 +314,7 @@ spec:
         kind: GitRepository
         name: flux-system
   dependsOn:
-    - name: authentik-extras
+    - name: authentik
     - name: infisical-operator
     - name: nfs-provisioner
     - name: traefik

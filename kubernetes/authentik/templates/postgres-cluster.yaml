@@ -3,6 +3,8 @@ kind: Cluster
 metadata:
   name: {{ .Values.cluster.name }}
   namespace: {{ .Values.namespace }}
+  annotations:
+    helm.sh/resource-policy: keep
 spec:
   instances: {{ .Values.cluster.instances }}
   imageName: {{ .Values.cluster.imageName }}

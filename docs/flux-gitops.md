@@ -50,12 +50,13 @@ kubectl -n authentik create secret generic \
 unset INFISICAL_OIDC_ID
 ```
 
-Install the Authentik bootstrap resources and wait for Infisical to distribute
+Install the consolidated Authentik chart and wait for Infisical to distribute
 the scoped Secrets:
 
 ```bash
-helm upgrade --install authentik-extras kubernetes/authentik \
-  --namespace authentik
+helm upgrade --install authentik kubernetes/authentik \
+  --namespace authentik \
+  --create-namespace
 kubectl -n authentik wait infisicalauth/authentik-oidc-infisical \
   --for=condition=Ready --timeout=5m
 kubectl -n authentik wait infisicalstaticsecret/authentik-oidc \
@@ -70,18 +71,52 @@ The Infisical OIDC client is declared in the Authentik blueprint. Its secret is
 distributed to Authentik as `INFISICAL_OIDC_CLIENT_SECRET`; Infisical itself
 stores the client configuration in its organization SSO settings.
 
-Upgrade Authentik so its worker applies the Blueprint, then add the cluster
-administrator to `homelab-admins` in Authentik:
+Wait for Authentik to apply the Blueprint, then add the cluster administrator to
+`homelab-admins` in Authentik:
 
 ```bash
-helm upgrade --install authentik \
-  https://github.com/goauthentik/helm/releases/download/\
-authentik-2026.5.2/authentik-2026.5.2.tgz \
-  --namespace authentik \
-  --values kubernetes/authentik/values.yaml \
-  --wait
 kubectl -n authentik rollout status deployment/authentik-worker
 ```
+
+When migrating an existing cluster, use two Git revisions. The first revision
+adds `helm.sh/resource-policy: keep` to every resource rendered by the old
+`authentik-extras` and `authentik-postgres` charts. Reconcile both releases and
+verify the annotation is present in their stored Helm manifests. This prevents
+their uninstall from deleting the Namespace, database Cluster, or bootstrap
+resources.
+
+Before applying the consolidation revision, suspend the old releases and
+transfer ownership of their Namespace, Cluster, ConfigMap, Ingresses, and
+Infisical resources to the `authentik` release:
+
+```bash
+flux suspend helmrelease authentik -n flux-system
+flux suspend helmrelease authentik-extras -n flux-system
+flux suspend helmrelease authentik-postgres -n flux-system
+
+for resource in \
+  namespace/authentik \
+  cluster.postgresql.cnpg.io/authentik-postgres \
+  configmap/authentik-oidc-blueprint \
+  ingress/hindsight-authentik-outpost \
+  ingress/radarr-authentik-outpost \
+  ingress/sonarr-authentik-outpost \
+  infisicalauth/authentik-oidc-infisical \
+  infisicalconnection/authentik-oidc-infisical \
+  infisicalstaticsecret/authentik-oidc \
+  serviceaccount/authentik-infisical-sync; do
+  kubectl annotate "$resource" -n authentik \
+    meta.helm.sh/release-name=authentik \
+    meta.helm.sh/release-namespace=authentik \
+    --overwrite
+  kubectl label "$resource" -n authentik \
+    app.kubernetes.io/managed-by=Helm --overwrite
+done
+```
+
+Apply the consolidation revision, then verify the PostgreSQL PVC, Authentik
+Deployments, generated Secrets, and OIDC resources before removing the old
+HelmRelease objects from Git.
 
 Install Flux Operator with its TLS ingress and Authentik OIDC login. The client
 secret travels through stdin and is not written to Git or the shell history:

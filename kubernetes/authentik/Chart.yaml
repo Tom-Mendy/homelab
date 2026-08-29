@@ -1,7 +1,10 @@
 apiVersion: v2
 name: authentik-local
-description: Local Helm chart for authentik Infisical secret sync resources
+description: Local Helm chart for Authentik and its CloudNativePG PostgreSQL cluster
 type: application
-version: 0.1.0
-appVersion: "2026.2.3"
-
+version: 0.2.0
+appVersion: "2026.5.6"
+dependencies:
+  - name: authentik
+    version: 2026.5.6
+    repository: https://charts.goauthentik.io/
