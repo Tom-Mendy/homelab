@@ -14,7 +14,7 @@ jobs:
   publish:
     runs-on: buildkit
     container:
-      image: harbor.home.tom-mendy.com/homelab/ci/buildkit-forgejo@sha256:5f3f77b14e015f05906fd86f79adefcb7e8679400ce30ca84f0b8997fd4fa17f
+      image: harbor.home.tom-mendy.com/homelab/ci/buildkit-forgejo@sha256:2974f53f0c1e4fa2486c7b6dd7aacb1bb76bfbda2735744e78143491c71b26e4
       credentials:
         username: ${{ secrets.HARBOR_REGISTRY_USER }}
         password: ${{ secrets.HARBOR_REGISTRY_TOKEN }}
