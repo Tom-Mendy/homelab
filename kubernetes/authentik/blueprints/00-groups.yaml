@@ -34,6 +34,11 @@ entries:
       name: matrix-users
 
   - model: authentik_core.group
+    id: infisical-users
+    identifiers:
+      name: infisical-users
+
+  - model: authentik_core.group
     id: openwebui-users
     identifiers:
       name: openwebui-users

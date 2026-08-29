@@ -71,6 +71,7 @@ spec:
           OPENWEBUI_OIDC_CLIENT_SECRET: "{{`{{ .OPENWEBUI_OIDC_CLIENT_SECRET.Value }}`}}"
           CODER_OIDC_CLIENT_SECRET: "{{`{{ .CODER_OIDC_CLIENT_SECRET.Value }}`}}"
           MATRIX_OIDC_CLIENT_SECRET: "{{`{{ .MATRIX_OIDC_CLIENT_SECRET.Value }}`}}"
+          INFISICAL_OIDC_CLIENT_SECRET: "{{`{{ .INFISICAL_OIDC_CLIENT_SECRET.Value }}`}}"
     - name: forgejo-oidc
       namespace: forgejo
       kind: Secret

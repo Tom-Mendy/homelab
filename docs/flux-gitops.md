@@ -27,13 +27,15 @@ Create a Kubernetes-auth Machine Identity named `authentik-oidc-sync` in
 Infisical. Allow the `authentik/authentik-infisical-sync` ServiceAccount to use
 it and grant read-only recursive access to `/oidc` in `homelab/prod`.
 
-Create three independent 32-byte client secrets in Infisical:
+Create independent client secrets in Infisical. Use a separate value for each
+client:
 
 | Path    | Key                                   |
 | ------- | ------------------------------------- |
 | `/oidc` | `FORGEJO_OIDC_CLIENT_SECRET`          |
 | `/oidc` | `GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET` |
 | `/oidc` | `FLUX_WEB_CLIENT_SECRET`              |
+| `/oidc` | `INFISICAL_OIDC_CLIENT_SECRET`        |
 
 Create the namespace and the non-secret Machine Identity reference. Do not put
 any client secret in this Kubernetes Secret:
@@ -63,6 +65,10 @@ kubectl get secret -n forgejo forgejo-oidc
 kubectl get secret -n grafana grafana-oidc
 kubectl get secret -n flux-system flux-web-client
 ```
+
+The Infisical OIDC client is declared in the Authentik blueprint. Its secret is
+distributed to Authentik as `INFISICAL_OIDC_CLIENT_SECRET`; Infisical itself
+stores the client configuration in its organization SSO settings.
 
 Upgrade Authentik so its worker applies the Blueprint, then add the cluster
 administrator to `homelab-admins` in Authentik:
