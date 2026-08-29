@@ -34,8 +34,10 @@ jobs:
       - name: Build and publish
         run: |
           set -euo pipefail
+          # Harbor rejects the OCI attestation manifest for this bootstrap image.
           docker build \
             --pull \
+            --provenance=false \
             --file kubernetes/forgejo-runner/buildkit/Dockerfile \
             --tag "$IMAGE:$FORGEJO_SHA" \
             kubernetes/forgejo-runner/buildkit

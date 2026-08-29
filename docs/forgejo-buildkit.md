@@ -20,7 +20,9 @@ The Infisical identity configured in
 digest after the bootstrap workflow publishes the image. Then remove
 `spec.suspend: true` from the `forgejo-runner-buildkit` HelmRelease.
 
-The bootstrap workflow builds and publishes an immutable commit-tagged image:
+The bootstrap workflow builds and publishes an immutable commit-tagged image.
+It disables Docker's default OCI provenance attachment because Harbor currently
+returns HTTP 412 when indexing that attachment for this image:
 
 ```text
 harbor.home.tom-mendy.com/homelab/ci/buildkit-forgejo
