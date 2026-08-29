@@ -1,4 +1,4 @@
-FROM node:24-alpine AS node
+FROM node:26-alpine AS node
 
 FROM moby/buildkit:rootless
 
