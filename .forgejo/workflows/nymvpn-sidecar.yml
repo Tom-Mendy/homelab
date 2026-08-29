@@ -13,6 +13,11 @@ on:
 jobs:
   publish:
     runs-on: buildkit
+    container:
+      image: harbor.home.tom-mendy.com/homelab/ci/buildkit-forgejo@sha256:5f3f77b14e015f05906fd86f79adefcb7e8679400ce30ca84f0b8997fd4fa17f
+      credentials:
+        username: ${{ secrets.HARBOR_REGISTRY_USER }}
+        password: ${{ secrets.HARBOR_REGISTRY_TOKEN }}
     env:
       REGISTRY: harbor.home.tom-mendy.com
       IMAGE: harbor.home.tom-mendy.com/homelab/nymvpn-sidecar

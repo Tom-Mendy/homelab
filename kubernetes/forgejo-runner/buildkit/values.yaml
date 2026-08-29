@@ -19,18 +19,7 @@ docker:
     --security-opt systempaths=unconfined
 
 registryAuth:
-  enabled: true
-  secretName: forgejo-runner-harbor-ci
+  enabled: false
 
 infisicalSecret:
-  enabled: true
-  name: forgejo-runner-harbor-ci
-  serviceAccountName: forgejo-runner-harbor-ci-sync
-  connectionName: forgejo-runner-harbor-ci
-  authName: forgejo-runner-harbor-ci
-  identitySecretName: forgejo-runner-harbor-ci-identity
-  address: https://infisical.home.tom-mendy.com
-  identityID: "abc03654-d42c-494b-a7eb-b95d1f53a335"
-  projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
-  envSlug: prod
-  secretsPath: /harbor/ci
+  enabled: false
