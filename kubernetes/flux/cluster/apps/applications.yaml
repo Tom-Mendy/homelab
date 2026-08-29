@@ -51,6 +51,8 @@ spec:
     - name: traefik
   install:
     createNamespace: true
+    remediation:
+      retries: 3
   driftDetection:
     mode: enabled
 ---
