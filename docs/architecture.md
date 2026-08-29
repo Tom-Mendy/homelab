@@ -1,51 +1,100 @@
 # Public architecture overview
 
-This project runs a small Kubernetes platform on three nodes. Flux reads the
-desired state from Git and reconciles the cluster through Helm releases and
-Kustomize resources.
+This project runs a small Kubernetes platform on three nodes. Git is the
+source of truth. Flux reads the repository, applies the cluster resources, and
+reconciles Helm releases until the live state matches the declared state.
+
+## System map
 
 ```mermaid
-flowchart TD
-    Git[Git repository] --> Flux[Flux controllers]
-    Flux --> Helm[Helm releases]
-    Helm --> Platform[Platform services]
-    Helm --> Apps[Application services]
-    Platform --> Ingress[Ingress]
-    Platform --> Identity[Identity and SSO]
-    Platform --> Secrets[External secret sync]
-    Platform --> Database[CloudNativePG]
-    Platform --> Storage[Shared NFS storage]
-    Apps --> Storage
-    Apps --> Identity
+flowchart TB
+    Git[Forgejo Git repository] --> Source[Flux GitRepository]
+    Source --> Kustomization[Flux Kustomization]
+    Kustomization --> Releases[Flux HelmReleases]
+
+    subgraph Platform
+        Ingress[Traefik ingress and TLS]
+        Identity[Authentik and OIDC]
+        Secrets[Infisical Operator]
+        Storage[NFS provisioner and nfs-k8s]
+        Database[CloudNativePG]
+        Metrics[Prometheus and Grafana]
+    end
+
+    subgraph Applications
+        SelfHosted[Forgejo, Matrix, Vaultwarden, Navidrome]
+        Media[Media workloads]
+        AI[Ollama, Open WebUI, Coder, Hindsight]
+        Automation[Forgejo and GitHub Actions runners]
+    end
+
+    Releases --> Platform
+    Releases --> Applications
+    Ingress --> SelfHosted
+    Ingress --> Media
+    Ingress --> AI
+    Identity --> SelfHosted
+    Identity --> AI
+    Secrets --> Platform
+    Secrets --> Applications
+    Storage --> Applications
+    Database --> SelfHosted
+    Database --> AI
+    Metrics --> Platform
+    Metrics --> Applications
 ```
 
-## Main responsibilities
+## Layers and responsibilities
 
-### GitOps
+### Git and reconciliation
 
-Flux owns reconciliation. A change is reviewed in Git, validated in CI, merged,
-and then applied by Flux. Drift detection keeps live Helm releases aligned with
-the repository.
+`kubernetes/flux/bootstrap/` contains the one-time Flux Operator resources.
+`kubernetes/flux/cluster/` contains the steady-state cluster definition:
+namespaces, external chart sources, and HelmReleases.
 
-### Secrets
+The cluster Kustomization applies the resources in `apps/`. Each HelmRelease
+points either to an external chart source or to a local chart in this
+repository. `dependsOn` expresses ordering between platform, identity,
+database, storage, and application releases.
 
-Runtime credentials do not belong in Git. Infisical stores secrets and the
-Infisical operator creates the Kubernetes Secrets consumed by workloads.
+### Platform services
 
-### Persistent data
+- Traefik receives HTTP and TCP traffic and routes it to in-cluster Services.
+- Authentik provides SSO through OIDC clients defined in its blueprints.
+- Infisical supplies runtime credentials through Kubernetes custom resources.
+- The NFS subdir provisioner creates PVC directories below the Synology export.
+- CloudNativePG manages PostgreSQL clusters used by stateful services.
+- Prometheus collects metrics and Grafana presents dashboards.
 
-Standard PVCs use a shared NFS-backed StorageClass. This avoids tying data to a
-worker-local disk and allows workloads to move between workers during planned
-maintenance or a node failure.
+### Applications and developer services
 
-### Reliability
+Local charts describe project-specific resources for self-hosted services, the
+media stack, AI services, Coder workspaces, and CI runners. External charts are
+configured through generated ConfigMaps in
+`kubernetes/flux/cluster/apps/kustomization.yaml`.
 
-The repository contains backup, restore, node-drain, storage, and incident
-runbooks. The platform still has deliberate homelab limitations, including one
-control plane and one central storage backend.
+`kubernetes/active-local-charts.txt` is the validation boundary. A chart listed
+there is linted, rendered, and checked with kubeconform in CI.
 
-## Public configuration rule
+## Persistent data and failure boundaries
 
-The operational repository contains environment-specific values. A public copy
-must replace private hostnames, addresses, identities, registry endpoints, and
-access instructions with examples before publication.
+Standard PVCs use the shared `nfs-k8s` StorageClass. Application data therefore
+does not depend on the disk of `node2` or `node3`, and a workload can move to
+the other worker during maintenance or a worker failure.
+
+The design still has clear limits:
+
+- `node1` is the only control-plane node.
+- Synology NFS is a central storage dependency.
+- Some PostgreSQL clusters and applications intentionally run one replica.
+- Hardware-specific workloads may not be schedulable on every node.
+
+These are accepted homelab trade-offs. Backup, node draining, storage
+migration, and disaster recovery procedures are documented in `docs/`.
+
+## Security and publication
+
+Runtime credentials stay outside Git. Public copies must remove private
+hostnames, addresses, identities, registry endpoints, deploy keys, kubeconfigs,
+and access instructions. See [`publication.md`](publication.md) before
+publishing a repository mirror.
