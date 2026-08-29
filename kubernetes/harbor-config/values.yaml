@@ -20,7 +20,7 @@ projects:
     passwordKey: DOCKERHUB_PASSWORD
   - name: proxy-ghcr
     registryName: GitHub Container Registry
-    registryType: github-package
+    registryType: github-ghcr
     registryUrl: https://ghcr.io
     storageLimit: 32212254720
     usernameKey: GHCR_USERNAME
