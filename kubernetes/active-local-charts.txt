@@ -1,5 +1,4 @@
 atuin
-authentik
 blocky
 coder
 forgejo
