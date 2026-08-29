@@ -14,7 +14,6 @@ infisicalSecret:
   secretsPath: /harbor
 
 proxyCredentials:
-  # Enable after creating the read-only upstream credentials in Infisical.
-  enabled: false
+  enabled: true
   name: harbor-proxy-credentials
   secretsPath: /harbor/proxy
