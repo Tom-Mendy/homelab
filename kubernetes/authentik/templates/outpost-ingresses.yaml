@@ -6,6 +6,7 @@ metadata:
   name: {{ $outpost.name }}-authentik-outpost
   namespace: {{ $.Values.namespace }}
   annotations:
+    helm.sh/resource-policy: keep
 {{ include "authentik-local.outpostAnnotations" $ | nindent 4 }}
 spec:
   tls:

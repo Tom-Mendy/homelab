@@ -3,6 +3,8 @@ kind: InfisicalConnection
 metadata:
   name: {{ .Values.oidc.infisical.connectionName }}
   namespace: {{ .Values.namespace }}
+  annotations:
+    helm.sh/resource-policy: keep
 spec:
   address: {{ .Values.oidc.infisical.address | quote }}
 ---
@@ -11,6 +13,8 @@ kind: Secret
 metadata:
   name: {{ .Values.oidc.infisical.identitySecretName }}
   namespace: {{ .Values.namespace }}
+  annotations:
+    helm.sh/resource-policy: keep
 type: Opaque
 stringData:
   identityId: {{ .Values.oidc.infisical.identityID | quote }}
@@ -20,6 +24,8 @@ kind: InfisicalAuth
 metadata:
   name: {{ .Values.oidc.infisical.authName }}
   namespace: {{ .Values.namespace }}
+  annotations:
+    helm.sh/resource-policy: keep
 spec:
   method: kubernetes
   infisicalConnectionRef:
@@ -39,6 +45,8 @@ kind: InfisicalStaticSecret
 metadata:
   name: {{ .Values.oidc.infisical.secretName }}
   namespace: {{ .Values.namespace }}
+  annotations:
+    helm.sh/resource-policy: keep
 spec:
   infisicalAuthRef:
     name: {{ .Values.oidc.infisical.authName }}

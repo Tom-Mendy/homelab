@@ -3,6 +3,8 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.oidc.blueprintConfigMapName }}
   namespace: {{ .Values.namespace }}
+  annotations:
+    helm.sh/resource-policy: keep
 data:
 {{- range $path, $_ := .Files.Glob "blueprints/*.yaml" }}
   {{ base $path }}: |

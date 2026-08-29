@@ -2,7 +2,7 @@ apiVersion: v2
 name: authentik-local
 description: Local Helm chart for Authentik and its CloudNativePG PostgreSQL cluster
 type: application
-version: 0.3.0
+version: 0.3.1
 appVersion: "2026.8.0"
 dependencies:
   - name: authentik
