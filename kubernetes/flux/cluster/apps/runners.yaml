@@ -31,7 +31,6 @@ metadata:
 spec:
   interval: 30m
   timeout: 10m
-  suspend: true
   releaseName: forgejo-runner-buildkit
   targetNamespace: forgejo-runner
   storageNamespace: forgejo-runner
