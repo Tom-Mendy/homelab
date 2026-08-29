@@ -30,7 +30,7 @@ infisicalSecret:
   authName: forgejo-runner-harbor-ci
   identitySecretName: forgejo-runner-harbor-ci-identity
   address: https://infisical.home.tom-mendy.com
-  identityID: "600ad8b6-20e3-47c8-9771-3a0fd87afa08"
+  identityID: "abc03654-d42c-494b-a7eb-b95d1f53a335"
   projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
   envSlug: prod
   secretsPath: /harbor/ci
