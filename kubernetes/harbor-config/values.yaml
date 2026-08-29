@@ -1,0 +1,49 @@
+namespace: harbor
+
+harbor:
+  url: http://harbor-core.harbor.svc.cluster.local
+  adminSecretName: harbor-secrets
+  adminSecretKey: HARBOR_ADMIN_PASSWORD
+  proxySecretName: harbor-proxy-credentials
+
+image:
+  repository: python
+  tag: 3.13.7-alpine
+
+projects:
+  - name: proxy-dockerhub
+    registryName: Docker Hub
+    registryType: docker-hub
+    registryUrl: https://registry-1.docker.io
+    storageLimit: 42949672960
+    usernameKey: DOCKERHUB_USERNAME
+    passwordKey: DOCKERHUB_PASSWORD
+  - name: proxy-ghcr
+    registryName: GitHub Container Registry
+    registryType: github-package
+    registryUrl: https://ghcr.io
+    storageLimit: 32212254720
+    usernameKey: GHCR_USERNAME
+    passwordKey: GHCR_PASSWORD
+  - name: proxy-quay
+    registryName: Quay
+    registryType: quay
+    registryUrl: https://quay.io
+    storageLimit: 21474836480
+    usernameKey: QUAY_USERNAME
+    passwordKey: QUAY_PASSWORD
+  - name: proxy-k8s
+    registryName: Kubernetes Registry
+    registryType: docker-registry
+    registryUrl: https://registry.k8s.io
+    storageLimit: 10737418240
+  - name: proxy-lscr
+    registryName: LinuxServer Registry
+    registryType: docker-registry
+    registryUrl: https://lscr.io
+    storageLimit: 10737418240
+  - name: proxy-nvcr
+    registryName: NVIDIA Container Registry
+    registryType: docker-registry
+    registryUrl: https://nvcr.io
+    storageLimit: 5368709120

@@ -23,7 +23,7 @@ persistence:
     registry:
       storageClass: nfs-k8s
       accessMode: ReadWriteMany
-      size: 100Gi
+      size: 250Gi
     jobservice:
       jobLog:
         storageClass: nfs-k8s
@@ -62,3 +62,8 @@ registry:
 
 metrics:
   enabled: true
+
+# Cache Harbor metadata in Redis to reduce repeated catalog lookups during pulls.
+cache:
+  enabled: true
+  expireHours: 24

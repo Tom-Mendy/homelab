@@ -12,3 +12,9 @@ infisicalSecret:
   projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
   envSlug: prod
   secretsPath: /harbor
+
+proxyCredentials:
+  # Enable after creating the read-only upstream credentials in Infisical.
+  enabled: false
+  name: harbor-proxy-credentials
+  secretsPath: /harbor/proxy

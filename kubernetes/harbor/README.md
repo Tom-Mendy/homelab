@@ -17,6 +17,9 @@ to the path:
 - `HARBOR_REGISTRY_PASSWORD`
 - `HARBOR_REGISTRY_HTPASSWD` (bcrypt htpasswd entry for the registry user)
 
-Harbor's OIDC provider is declared in the Authentik blueprint. After the first
-deployment, configure OIDC in Harbor's Administration > Configuration page and
-use the redirect URI displayed there.
+Harbor's OIDC provider is declared in the Authentik blueprint. The live Harbor
+configuration is managed once by the `harbor-config` HelmRelease.
+
+Proxy-cache projects and their scanner policies are also managed by
+`harbor-config`; see `docs/harbor-proxy-cache.md` for upstream credentials,
+containerd mirror setup, and rollback instructions.
