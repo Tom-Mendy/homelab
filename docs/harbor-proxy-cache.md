@@ -37,8 +37,8 @@ harbor.home.tom-mendy.com/proxy-dockerhub/library/alpine:latest
 ## Security and lifecycle
 
 Proxy projects automatically scan artifacts with Trivy, generate SPDX SBOMs,
-and prevent pulls at `high` severity or above. Harbor's default seven-day
-proxy retention and per-project quotas limit unbounded growth. Keep workload
+and prevent pulls at `high` severity or above. Harbor's 24-hour proxy cache
+expiry and per-project quotas limit unbounded growth. Keep workload
 references pinned by digest whenever possible.
 
 Harbor supports Cosign and Notation verification, but signature enforcement is
