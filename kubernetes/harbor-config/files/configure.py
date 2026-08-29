@@ -83,6 +83,9 @@ def configure_registry(project):
         existing = registry_by_name(name)
     if not existing:
         raise RuntimeError(f"Registry endpoint {name} was not created")
+    elif existing["type"] != project["registryType"] or existing["url"] != project["registryUrl"]:
+        encoded_id = urllib.parse.quote(str(existing["id"]), safe="")
+        request("PUT", f"/api/v2.0/registries/{encoded_id}", payload, expected=(200,))
     return existing["id"]
 
 
