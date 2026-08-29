@@ -37,18 +37,11 @@ client:
 | `/oidc` | `FLUX_WEB_CLIENT_SECRET`              |
 | `/oidc` | `INFISICAL_OIDC_CLIENT_SECRET`        |
 
-Create the namespace and the non-secret Machine Identity reference. Do not put
-any client secret in this Kubernetes Secret:
-
-```bash
-kubectl apply -f kubernetes/flux/bootstrap/namespace.yaml
-read -r infisical_oidc_id
-kubectl -n authentik create secret generic \
-  authentik-oidc-infisical-identity \
-  --from-literal=identityId="$INFISICAL_OIDC_ID" \
-  --dry-run=client -o yaml | kubectl apply -f -
-unset INFISICAL_OIDC_ID
-```
+Set `oidc.infisical.identityID` in `kubernetes/authentik/values.yaml` to the
+Machine Identity ID. The ID selects an Infisical identity but does not
+authenticate by itself. The chart creates the Kubernetes Secret reference, so
+namespace recovery does not require a manual bootstrap step. Never put an
+Infisical access token or client secret in Git.
 
 Install the consolidated Authentik chart and wait for Infisical to distribute
 the scoped Secrets:
@@ -57,10 +50,14 @@ the scoped Secrets:
 helm upgrade --install authentik kubernetes/authentik \
   --namespace authentik \
   --create-namespace
-kubectl -n authentik wait infisicalauth/authentik-oidc-infisical \
-  --for=condition=Ready --timeout=5m
-kubectl -n authentik wait infisicalstaticsecret/authentik-oidc \
-  --for=condition=Ready --timeout=5m
+kubectl -n authentik wait \
+  infisicalauth/authentik-oidc-infisical \
+  --for=condition=secrets.infisical.com/IsReady \
+  --timeout=5m
+kubectl -n authentik wait \
+  infisicalstaticsecret/authentik-oidc \
+  --for=condition=secrets.infisical.com/LastReconcileStatus \
+  --timeout=5m
 kubectl get secret -n authentik authentik-oidc
 kubectl get secret -n forgejo forgejo-oidc
 kubectl get secret -n grafana grafana-oidc
@@ -104,6 +101,7 @@ for resource in \
   infisicalauth/authentik-oidc-infisical \
   infisicalconnection/authentik-oidc-infisical \
   infisicalstaticsecret/authentik-oidc \
+  secret/authentik-oidc-infisical-identity \
   serviceaccount/authentik-infisical-sync; do
   kubectl annotate "$resource" -n authentik \
     meta.helm.sh/release-name=authentik \
@@ -117,6 +115,14 @@ done
 Apply the consolidation revision, then verify the PostgreSQL PVC, Authentik
 Deployments, generated Secrets, and OIDC resources before removing the old
 HelmRelease objects from Git.
+
+If the old release starts deleting the `authentik` namespace, suspend the new
+release immediately. Do not let CloudNativePG create a fresh database. The
+`Retain` policy preserves the NFS PV, but the replacement
+`authentik-postgres-1` PVC must be bound to the PV that contains
+`pgdata/PG_VERSION` before reconciliation resumes. Check the NFS contents
+rather than choosing a PV by age or name. The chart recreates the Infisical
+identity reference after the namespace returns.
 
 Install Flux Operator with its TLS ingress and Authentik OIDC login. The client
 secret travels through stdin and is not written to Git or the shell history:

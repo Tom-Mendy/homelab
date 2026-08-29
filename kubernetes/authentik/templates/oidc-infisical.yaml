@@ -6,6 +6,15 @@ metadata:
 spec:
   address: {{ .Values.oidc.infisical.address | quote }}
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Values.oidc.infisical.identitySecretName }}
+  namespace: {{ .Values.namespace }}
+type: Opaque
+stringData:
+  identityId: {{ .Values.oidc.infisical.identityID | quote }}
+---
 apiVersion: secrets.infisical.com/v1beta1
 kind: InfisicalAuth
 metadata:

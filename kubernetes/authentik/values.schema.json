@@ -11,7 +11,30 @@
       "required": ["blueprintConfigMapName", "infisical"],
       "properties": {
         "blueprintConfigMapName": { "type": "string", "minLength": 1 },
-        "infisical": { "type": "object", "additionalProperties": true }
+        "infisical": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "connectionName",
+            "authName",
+            "identitySecretName",
+            "identityID",
+            "secretName",
+            "address",
+            "projectId",
+            "envSlug"
+          ],
+          "properties": {
+            "connectionName": { "type": "string", "minLength": 1 },
+            "authName": { "type": "string", "minLength": 1 },
+            "identitySecretName": { "type": "string", "minLength": 1 },
+            "identityID": { "type": "string", "minLength": 1 },
+            "secretName": { "type": "string", "minLength": 1 },
+            "address": { "type": "string", "minLength": 1 },
+            "projectId": { "type": "string", "minLength": 1 },
+            "envSlug": { "type": "string", "minLength": 1 }
+          }
+        }
       }
     },
     "cluster": {

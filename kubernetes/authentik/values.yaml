@@ -6,6 +6,7 @@ oidc:
     connectionName: authentik-oidc-infisical
     authName: authentik-oidc-infisical
     identitySecretName: authentik-oidc-infisical-identity
+    identityID: "74bfb98f-8769-4397-80b1-acd2ca14846f"
     secretName: authentik-oidc
     address: https://infisical.home.tom-mendy.com
     projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
