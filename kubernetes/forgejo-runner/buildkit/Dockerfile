@@ -23,7 +23,7 @@ RUN set -eux; \
 
 FROM node:26-alpine AS node
 FROM alpine:3.23
-RUN apk add --no-cache bash ca-certificates fuse3 fuse-overlayfs git openssh openssl pigz shadow-uidmap runc xz
+RUN apk add --no-cache bash ca-certificates fuse3 fuse-overlayfs git libgcc libstdc++ openssh openssl pigz shadow-uidmap runc xz
 RUN adduser -D -u 1000 user \
     && mkdir -p /run/user/1000 /home/user/.local/tmp /home/user/.local/share/buildkit \
     && chown -R user /run/user/1000 /home/user \
