@@ -111,7 +111,6 @@ kind: HelmRelease
 metadata:
   name: authentik
 spec:
-  suspend: true
   interval: 30m
   timeout: 15m
   releaseName: authentik
