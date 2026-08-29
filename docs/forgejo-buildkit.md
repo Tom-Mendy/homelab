@@ -20,7 +20,7 @@ The Infisical identity configured in
 digest after the bootstrap workflow publishes the image. Then remove
 `spec.suspend: true` from the `forgejo-runner-buildkit` HelmRelease.
 
-The bootstrap workflow builds and publishes:
+The bootstrap workflow builds and publishes an immutable commit-tagged image:
 
 ```text
 harbor.home.tom-mendy.com/homelab/ci/buildkit-forgejo
@@ -29,7 +29,9 @@ harbor.home.tom-mendy.com/homelab/ci/buildkit-forgejo
 ## Image policy
 
 Application workflows publish an immutable commit tag, their release tag,
-`latest`, and a registry-backed `buildcache` tag. Kubernetes references should
+`latest`, and a registry-backed `buildcache` tag. The bootstrap image is
+published only with its commit tag because Harbor may reject overwriting a
+mutable tag while an attestation is being indexed. Kubernetes references should
 be updated to the resulting Harbor digest after a release build.
 
 ## Rollback

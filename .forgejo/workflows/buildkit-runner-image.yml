@@ -38,7 +38,5 @@ jobs:
             --pull \
             --file kubernetes/forgejo-runner/buildkit/Dockerfile \
             --tag "$IMAGE:$FORGEJO_SHA" \
-            --tag "$IMAGE:latest" \
             kubernetes/forgejo-runner/buildkit
           docker push "$IMAGE:$FORGEJO_SHA"
-          docker push "$IMAGE:latest"
