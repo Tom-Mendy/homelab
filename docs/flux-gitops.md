@@ -19,7 +19,8 @@ The Flux source is the private Forgejo repository at
 - A current backup of application data and Kubernetes resources.
 - The Authentik OIDC Infisical identity and secrets described below.
 
-Never commit the private deploy key, kubeconfig, or Secret YAML.
+Never commit the private deploy key, kubeconfig, or credential-bearing Secret
+YAML.
 
 ## Install Flux beside Argo CD
 
@@ -37,19 +38,23 @@ client:
 | `/oidc` | `FLUX_WEB_CLIENT_SECRET`              |
 | `/oidc` | `INFISICAL_OIDC_CLIENT_SECRET`        |
 
-Set `oidc.infisical.identityID` in `kubernetes/authentik/values.yaml` to the
-Machine Identity ID. The ID selects an Infisical identity but does not
-authenticate by itself. The chart creates the Kubernetes Secret reference, so
-namespace recovery does not require a manual bootstrap step. Never put an
-Infisical access token or client secret in Git.
+Set `identityId` in `kubernetes/authentik/oidc-infisical.yaml` to the Machine
+Identity ID. The ID selects an Infisical identity but does not authenticate by
+itself. Never put an Infisical access token or client secret in Git.
 
-Install the consolidated Authentik chart and wait for Infisical to distribute
-the scoped Secrets:
+Flux manages Authentik through three independent lifecycles:
+
+- `HelmRelease/authentik` installs the official remote chart.
+- `HelmRelease/authentik-postgres` owns the CloudNativePG Cluster.
+- The Authentik Kustomization owns the Namespace, blueprints, Infisical
+  resources, and outpost Ingresses.
+
+Reconcile the cluster and wait for Infisical to distribute the scoped Secrets:
 
 ```bash
-helm upgrade --install authentik kubernetes/authentik \
-  --namespace authentik \
-  --create-namespace
+flux reconcile kustomization flux-system -n flux-system --with-source
+flux reconcile helmrelease authentik-postgres -n flux-system --with-source
+flux reconcile helmrelease authentik -n flux-system --with-source
 kubectl -n authentik wait \
   infisicalauth/authentik-oidc-infisical \
   --for=condition=secrets.infisical.com/IsReady \
@@ -75,54 +80,11 @@ Wait for Authentik to apply the Blueprint, then add the cluster administrator to
 kubectl -n authentik rollout status deployment/authentik-worker
 ```
 
-When migrating an existing cluster, use two Git revisions. The first revision
-adds `helm.sh/resource-policy: keep` to every resource rendered by the old
-`authentik-extras` and `authentik-postgres` charts. Reconcile both releases and
-verify the annotation is present in their stored Helm manifests. This prevents
-their uninstall from deleting the Namespace, database Cluster, or bootstrap
-resources.
-
-Before applying the consolidation revision, suspend the old releases and
-transfer ownership of their Namespace, Cluster, ConfigMap, Ingresses, and
-Infisical resources to the `authentik` release:
-
-```bash
-flux suspend helmrelease authentik -n flux-system
-flux suspend helmrelease authentik-extras -n flux-system
-flux suspend helmrelease authentik-postgres -n flux-system
-
-for resource in \
-  namespace/authentik \
-  cluster.postgresql.cnpg.io/authentik-postgres \
-  configmap/authentik-oidc-blueprint \
-  ingress/hindsight-authentik-outpost \
-  ingress/radarr-authentik-outpost \
-  ingress/sonarr-authentik-outpost \
-  infisicalauth/authentik-oidc-infisical \
-  infisicalconnection/authentik-oidc-infisical \
-  infisicalstaticsecret/authentik-oidc \
-  secret/authentik-oidc-infisical-identity \
-  serviceaccount/authentik-infisical-sync; do
-  kubectl annotate "$resource" -n authentik \
-    meta.helm.sh/release-name=authentik \
-    meta.helm.sh/release-namespace=authentik \
-    --overwrite
-  kubectl label "$resource" -n authentik \
-    app.kubernetes.io/managed-by=Helm --overwrite
-done
-```
-
-Apply the consolidation revision, then verify the PostgreSQL PVC, Authentik
-Deployments, generated Secrets, and OIDC resources before removing the old
-HelmRelease objects from Git.
-
-If the old release starts deleting the `authentik` namespace, suspend the new
-release immediately. Do not let CloudNativePG create a fresh database. The
-`Retain` policy preserves the NFS PV, but the replacement
-`authentik-postgres-1` PVC must be bound to the PV that contains
-`pgdata/PG_VERSION` before reconciliation resumes. Check the NFS contents
-rather than choosing a PV by age or name. The chart recreates the Infisical
-identity reference after the namespace returns.
+The Namespace must never be rendered by either Helm release. Its Flux manifest
+disables pruning. The PostgreSQL chart marks the Cluster with
+`helm.sh/resource-policy: keep`, and `nfs-k8s` retains the PV. Before changing
+ownership, record the Cluster UID, PVC UID, PV name, NFS path, and PostgreSQL
+system ID. If any identifier changes, suspend Authentik and stop the migration.
 
 Install Flux Operator with its TLS ingress and Authentik OIDC login. The client
 secret travels through stdin and is not written to Git or the shell history:

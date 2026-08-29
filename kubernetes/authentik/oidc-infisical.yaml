@@ -1,0 +1,136 @@
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalConnection
+metadata:
+  name: authentik-oidc-infisical
+spec:
+  address: https://infisical.home.tom-mendy.com
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: authentik-oidc-infisical-identity
+type: Opaque
+stringData:
+  identityId: 74bfb98f-8769-4397-80b1-acd2ca14846f
+---
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalAuth
+metadata:
+  name: authentik-oidc-infisical
+spec:
+  method: kubernetes
+  infisicalConnectionRef:
+    name: authentik-oidc-infisical
+    namespace: authentik
+  kubernetes:
+    identityIdRef:
+      name: authentik-oidc-infisical-identity
+      namespace: authentik
+      key: identityId
+    serviceAccountRef:
+      name: authentik-infisical-sync
+      namespace: authentik
+---
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalStaticSecret
+metadata:
+  name: authentik-oidc
+spec:
+  infisicalAuthRef:
+    name: authentik-oidc-infisical
+    namespace: authentik
+  sources:
+    - projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+      environmentSlug: prod
+      secretPath: /oidc
+      recursive: false
+    - projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+      environmentSlug: prod
+      secretPath: /authentik
+      recursive: false
+  targets:
+    - name: authentik-secrets
+      namespace: authentik
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          AUTHENTIK_ENABLED: "{{ .AUTHENTIK_ENABLED.Value }}"
+          AUTHENTIK_ERROR_REPORTING__ENABLED: "{{ .AUTHENTIK_ERROR_REPORTING__ENABLED.Value }}"
+          AUTHENTIK_LOG_LEVEL: "{{ .AUTHENTIK_LOG_LEVEL.Value }}"
+          AUTHENTIK_SECRET_KEY: "{{ .AUTHENTIK_SECRET_KEY.Value | trim }}"
+          AUTHENTIK_WEB__PATH: "{{ .AUTHENTIK_WEB__PATH.Value }}"
+    - name: authentik-oidc
+      namespace: authentik
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          FORGEJO_OIDC_CLIENT_SECRET: "{{ .FORGEJO_OIDC_CLIENT_SECRET.Value }}"
+          GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "{{ .GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET.Value | trim }}"
+          FLUX_WEB_CLIENT_SECRET: "{{ .FLUX_WEB_CLIENT_SECRET.Value }}"
+          OPENWEBUI_OIDC_CLIENT_SECRET: "{{ .OPENWEBUI_OIDC_CLIENT_SECRET.Value }}"
+          CODER_OIDC_CLIENT_SECRET: "{{ .CODER_OIDC_CLIENT_SECRET.Value }}"
+          MATRIX_OIDC_CLIENT_SECRET: "{{ .MATRIX_OIDC_CLIENT_SECRET.Value }}"
+          INFISICAL_OIDC_CLIENT_SECRET: "{{ .INFISICAL_OIDC_CLIENT_SECRET.Value }}"
+    - name: forgejo-oidc
+      namespace: forgejo
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          FORGEJO_OIDC_CLIENT_SECRET: "{{ .FORGEJO_OIDC_CLIENT_SECRET.Value }}"
+    - name: grafana-oidc
+      namespace: grafana
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "{{ .GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET.Value | trim }}"
+    - name: flux-web-client
+      namespace: flux-system
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          FLUX_WEB_CLIENT_SECRET: "{{ .FLUX_WEB_CLIENT_SECRET.Value }}"
+    - name: openwebui-oidc
+      namespace: ollama
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          OPENWEBUI_OIDC_CLIENT_SECRET: "{{ .OPENWEBUI_OIDC_CLIENT_SECRET.Value }}"
+    - name: coder-oidc
+      namespace: coder
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          CODER_OIDC_CLIENT_SECRET: "{{ .CODER_OIDC_CLIENT_SECRET.Value }}"
+    - name: matrix-oidc
+      namespace: matrix
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          oidc-client-secret: "{{ .MATRIX_OIDC_CLIENT_SECRET.Value }}"
+  syncOptions:
+    refreshInterval: 1m
+    instantUpdates: false

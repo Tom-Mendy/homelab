@@ -1,0 +1,6 @@
+apiVersion: v2
+name: authentik-postgres-local
+description: CloudNativePG cluster for Authentik
+type: application
+version: 0.2.0
+appVersion: "17"

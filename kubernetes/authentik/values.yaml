@@ -1,93 +1,60 @@
-namespace: authentik
+fullnameOverride: authentik
 
-oidc:
-  blueprintConfigMapName: authentik-oidc-blueprint
-  infisical:
-    connectionName: authentik-oidc-infisical
-    authName: authentik-oidc-infisical
-    identitySecretName: authentik-oidc-infisical-identity
-    identityID: "74bfb98f-8769-4397-80b1-acd2ca14846f"
-    secretName: authentik-oidc
-    address: https://infisical.home.tom-mendy.com
-    projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
-    envSlug: prod
-
-cluster:
-  name: authentik-postgres
-  instances: 1
-  imageName: ghcr.io/cloudnative-pg/postgresql:17
-  storage:
-    size: 10Gi
-    storageClass: nfs-k8s
-  database: authentik
-  owner: authentik
-
-outpostIngresses:
-  - name: hindsight
-    host: hindsight.home.tom-mendy.com
-  - name: radarr
-    host: radarr.home.tom-mendy.com
-  - name: sonarr
-    host: sonarr.home.tom-mendy.com
+global:
+  deploymentAnnotations:
+    secrets.infisical.com/auto-reload: "true"
+  envFrom:
+    - secretRef:
+        name: authentik-oidc
+        optional: true
+  env:
+    - name: AUTHENTIK_POSTGRESQL__HOST
+      value: authentik-postgres-rw.authentik.svc.cluster.local
+    - name: AUTHENTIK_POSTGRESQL__NAME
+      value: authentik
+    - name: AUTHENTIK_POSTGRESQL__USER
+      value: authentik
+    - name: AUTHENTIK_POSTGRESQL__PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: authentik-postgres-app
+          key: password
+    - name: AUTHENTIK_POSTGRESQL__PORT
+      value: "5432"
 
 authentik:
-  fullnameOverride: authentik
-
-  global:
-    deploymentAnnotations:
-      secrets.infisical.com/auto-reload: "true"
-    envFrom:
-      - secretRef:
-          name: authentik-oidc
-          optional: true
-    env:
-      - name: AUTHENTIK_POSTGRESQL__HOST
-        value: authentik-postgres-rw.authentik.svc.cluster.local
-      - name: AUTHENTIK_POSTGRESQL__NAME
-        value: authentik
-      - name: AUTHENTIK_POSTGRESQL__USER
-        value: authentik
-      - name: AUTHENTIK_POSTGRESQL__PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: authentik-postgres-app
-            key: password
-      - name: AUTHENTIK_POSTGRESQL__PORT
-        value: "5432"
-
-  authentik:
-    existingSecret:
-      secretName: authentik-secrets
-    error_reporting:
-      enabled: false
-    postgresql:
-      host: authentik-postgres-rw.authentik.svc.cluster.local
-      name: authentik
-      user: authentik
-      port: 5432
-
-  postgresql:
+  existingSecret:
+    secretName: authentik-secrets
+  error_reporting:
     enabled: false
+  postgresql:
+    host: authentik-postgres-rw.authentik.svc.cluster.local
+    name: authentik
+    user: authentik
+    port: 5432
 
-  blueprints:
-    configMaps:
-      - authentik-oidc-blueprint
+postgresql:
+  enabled: false
 
-  server:
-    replicas: 1
-    ingress:
-      enabled: true
-      annotations:
-        traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
-        traefik.ingress.kubernetes.io/router.tls: "true"
-        traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
-      hosts:
-        - authentik.home.tom-mendy.com
-        - authentik.tom-mendy.com
-      tls:
-        - hosts:
-            - authentik.home.tom-mendy.com
-            - authentik.tom-mendy.com
+blueprints:
+  configMaps:
+    - authentik-oidc-blueprint
 
-  worker:
-    replicas: 1
+server:
+  replicas: 1
+  ingress:
+    enabled: true
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    hosts:
+      - authentik.home.tom-mendy.com
+      - authentik.tom-mendy.com
+    tls:
+      - hosts:
+          - authentik.home.tom-mendy.com
+          - authentik.tom-mendy.com
+
+worker:
+  replicas: 1

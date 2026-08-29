@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: authentik
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - oidc-infisical.yaml
+  - outpost-ingresses.yaml
+configMapGenerator:
+  - name: authentik-oidc-blueprint
+    files:
+      - 00-groups.yaml=blueprints/00-groups.yaml
+      - 10-proxy-applications.yaml=blueprints/10-proxy-applications.yaml
+      - 20-openwebui.yaml=blueprints/20-openwebui.yaml
+      - 30-forgejo.yaml=blueprints/30-forgejo.yaml
+      - 40-grafana.yaml=blueprints/40-grafana.yaml
+      - 50-flux.yaml=blueprints/50-flux.yaml
+      - 60-coder.yaml=blueprints/60-coder.yaml
+      - 70-matrix.yaml=blueprints/70-matrix.yaml
+      - 80-infisical.yaml=blueprints/80-infisical.yaml
+generatorOptions:
+  disableNameSuffixHash: true

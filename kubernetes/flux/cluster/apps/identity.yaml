@@ -85,8 +85,33 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
+  name: authentik-postgres
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: authentik-postgres
+  targetNamespace: authentik
+  storageNamespace: authentik
+  chart:
+    spec:
+      chart: ./kubernetes/authentik-postgres
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: cloudnative-pg
+    - name: nfs-provisioner
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
   name: authentik
 spec:
+  suspend: true
   interval: 30m
   timeout: 15m
   releaseName: authentik
@@ -94,22 +119,18 @@ spec:
   storageNamespace: authentik
   chart:
     spec:
-      chart: ./kubernetes/authentik
-      reconcileStrategy: Revision
+      chart: authentik
+      version: 2026.8.0
       sourceRef:
-        kind: GitRepository
-        name: flux-system
+        kind: HelmRepository
+        name: authentik
   valuesFrom:
     - kind: ConfigMap
       name: authentik-values
   dependsOn:
-    - name: cloudnative-pg
-    - name: nfs-provisioner
+    - name: authentik-postgres
     - name: infisical
     - name: infisical-operator
     - name: traefik
-  install:
-    createNamespace: true
   driftDetection:
     mode: enabled
-
