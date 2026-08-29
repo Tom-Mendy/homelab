@@ -2,7 +2,7 @@ runner:
   name: forgejo-runner-buildkit
   secretName: forgejo-runner-buildkit
   labels:
-    - buildkit:docker://harbor.home.tom-mendy.com/homelab/ci/buildkit-forgejo@sha256:2974f53f0c1e4fa2486c7b6dd7aacb1bb76bfbda2735744e78143491c71b26e4
+    - buildkit:docker://harbor.home.tom-mendy.com/homelab/ci/buildkit-forgejo@sha256:3431ed482ff11bcaae957fc5cc257aff09f62bea4758a319e2a82155d27e5017
   resources:
     requests:
       cpu: "500m"
