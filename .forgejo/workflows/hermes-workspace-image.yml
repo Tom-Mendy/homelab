@@ -20,7 +20,9 @@ env:
   REGISTRY: harbor.home.tom-mendy.com
   IMAGE_NAME: harbor.home.tom-mendy.com/homelab/hermes-workspace
   IMAGE_TAG: v2026.7.1-apt1
-  BUILDKITD_FLAGS: --oci-worker-snapshotter=fuse-overlayfs
+  BUILDKITD_FLAGS: >-
+    --oci-worker-snapshotter=fuse-overlayfs
+    --oci-worker-no-process-sandbox
 
 jobs:
   publish:

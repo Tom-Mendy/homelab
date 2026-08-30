@@ -11,6 +11,10 @@ seccomp, AppArmor, and system-path profiles in the BuildKit runner values.
 Without the device, BuildKit falls back to the `native` snapshotter and copies
 the complete root filesystem for every image layer.
 
+Daemonless builds also use `--oci-worker-no-process-sandbox`. A nested
+rootless worker cannot mount a separate `/proc` filesystem inside the job
+container; the Forgejo job container remains the outer isolation boundary.
+
 ## One-time prerequisites
 
 Create a Harbor robot account scoped to project `homelab` with artifact pull
