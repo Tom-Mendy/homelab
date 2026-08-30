@@ -55,6 +55,7 @@ jobs:
           set -euo pipefail
           buildctl-daemonless.sh build \
             --frontend dockerfile.v0 \
+            --progress=plain \
             --local context=kubernetes/coder/workspace-images/hermes \
             --local dockerfile=kubernetes/coder/workspace-images/hermes \
             --opt platform=linux/amd64 \
