@@ -91,13 +91,14 @@ def configure_registry(project):
 
 def configure_project(project, registry_id):
     name = project["name"]
+    prevent_vulnerable = project.get("preventVulnerabilities", True)
     payload = {
         "project_name": name,
         "metadata": {
             "public": "true" if project.get("public", True) else "false",
             "auto_scan": "true",
             "auto_sbom_generation": "true",
-            "prevent_vul": "true",
+            "prevent_vul": "true" if prevent_vulnerable else "false",
             "severity": "high",
             "reuse_sys_cve_allowlist": "true",
         },

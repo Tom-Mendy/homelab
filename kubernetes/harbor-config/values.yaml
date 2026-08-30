@@ -14,6 +14,9 @@ projects:
   - name: homelab
     projectType: local
     public: false
+    # Keep scanning enabled, but do not let Harbor's pull policy reject the
+    # manifest HEAD requests used by BuildKit to update existing tags.
+    preventVulnerabilities: false
     storageLimit: 107374182400
   - name: proxy-dockerhub
     registryName: Docker Hub

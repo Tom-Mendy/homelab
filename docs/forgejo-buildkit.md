@@ -46,6 +46,13 @@ published only with its commit tag because Harbor may reject overwriting a
 mutable tag while an attestation is being indexed. Kubernetes references should
 be updated to the resulting Harbor digest after a release build.
 
+The local `homelab` project scans images and generates SBOMs automatically, but
+does not enable Harbor's `prevent_vul` pull gate. Harbor applies that gate to
+manifest `HEAD` requests, so a vulnerable image already in the registry cannot
+be replaced by a rebuilt image. Treat High and Critical findings as CI and
+remediation signals, and deploy immutable digests. Proxy-cache projects retain
+the pull gate.
+
 ## Rollback
 
 Keep the existing `ubuntu-latest` workflows until a BuildKit run has completed.
