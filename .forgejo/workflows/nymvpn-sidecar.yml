@@ -1,6 +1,11 @@
 name: nymvpn-sidecar
 # Build and publish through the rootless BuildKit runner.
 
+env:
+  BUILDKITD_FLAGS: >-
+    --oci-worker-snapshotter=fuse-overlayfs
+    --oci-worker-no-process-sandbox
+
 on:
   workflow_dispatch:
   push:
@@ -46,6 +51,6 @@ jobs:
             --local context=kubernetes/media/nymvpn \
             --local dockerfile=kubernetes/media/nymvpn \
             --opt platform=linux/amd64 \
-            --output type=image,name="$IMAGE:$FORGEJO_SHA",name="$IMAGE:$IMAGE_TAG",name="$IMAGE:latest",push=true \
+            --output "type=image,\"name=$IMAGE:$FORGEJO_SHA,$IMAGE:$IMAGE_TAG,$IMAGE:latest\",push=true" \
             --import-cache type=registry,ref="$IMAGE:buildcache" \
             --export-cache type=registry,ref="$IMAGE:buildcache",mode=max

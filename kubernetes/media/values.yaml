@@ -68,7 +68,7 @@ apps:
       WEBUI_PORT: "8080"
 
   nzbget:
-    image: lscr.io/linuxserver/nzbget:26.2.20260821@sha256:1dca6a4407e08313919d2780bf2a6bc17e21b947a6e8e34624b9e115795fcf8c
+    image: lscr.io/linuxserver/nzbget:26.3.20260827@sha256:5f3d3fa71029004156eff2cbf4ef4455ce4ce59517cf13fa7d1d7c8a4cd2c8a4
     port: 6789
     host: nzbget.home.tom-mendy.com
     vpn: true
@@ -118,7 +118,7 @@ apps:
       series: true
 
   autobrr:
-    image: ghcr.io/autobrr/autobrr:v1.84.0@sha256:f4792e86b79965eadb2b24ad290ab46d21cab7ae6c18002ce2d18275fa54a4d0
+    image: ghcr.io/autobrr/autobrr:v1.85.0@sha256:f7594d15dfe9a59e7bbc4bce8aee437a1d440d60b350e2ee74331c0d4ec01928
     port: 7474
     host: autobrr.home.tom-mendy.com
     vpn: false

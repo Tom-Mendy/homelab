@@ -8,7 +8,7 @@ harbor:
 
 image:
   repository: python
-  tag: 3.13.7-alpine
+  tag: 3.13-alpine
 
 projects:
   - name: homelab
@@ -18,6 +18,13 @@ projects:
     # manifest HEAD requests used by BuildKit to update existing tags.
     preventVulnerabilities: false
     storageLimit: 107374182400
+  - name: portfolio
+    projectType: local
+    public: false
+    # Keep scans and SBOM generation enabled. BuildKit must be able to replace
+    # an existing tag even when the previous image has unresolved findings.
+    preventVulnerabilities: false
+    storageLimit: 21474836480
   - name: proxy-dockerhub
     registryName: Docker Hub
     registryType: docker-hub
