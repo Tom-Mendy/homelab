@@ -57,6 +57,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # BuildKit expects multiple image names as one quoted CSV value.
           buildctl-daemonless.sh build \
             --frontend dockerfile.v0 \
             --progress=plain \
