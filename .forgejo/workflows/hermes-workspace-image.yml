@@ -29,7 +29,9 @@ jobs:
       credentials:
         username: ${{ secrets.HARBOR_REGISTRY_USER }}
         password: ${{ secrets.HARBOR_REGISTRY_TOKEN }}
-    timeout-minutes: 30
+    # The pinned Hermes base image contains many large layers and can take
+    # more than 30 minutes to unpack on the rootless BuildKit runner.
+    timeout-minutes: 90
     steps:
       - name: Checkout
         uses: actions/checkout@v7
