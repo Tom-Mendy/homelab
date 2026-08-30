@@ -63,6 +63,6 @@ jobs:
             --local context=kubernetes/coder/workspace-images/hermes \
             --local dockerfile=kubernetes/coder/workspace-images/hermes \
             --opt platform=linux/amd64 \
-            --output type=image,name="$IMAGE_NAME:$FORGEJO_SHA",name="$IMAGE_NAME:$IMAGE_TAG",name="$IMAGE_NAME:latest",push=true \
+            --output type=image,name="$IMAGE_NAME:$FORGEJO_SHA,$IMAGE_NAME:$IMAGE_TAG,$IMAGE_NAME:latest",push=true \
             --import-cache type=registry,ref="$IMAGE_NAME:buildcache" \
             --export-cache type=registry,ref="$IMAGE_NAME:buildcache",mode=max
