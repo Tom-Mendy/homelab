@@ -58,6 +58,18 @@ spec:
               name: docker
           resources:
 {{ toYaml .Values.docker.resources | nindent 12 }}
+          startupProbe:
+            tcpSocket:
+              port: docker
+            periodSeconds: 2
+            failureThreshold: 30
+          livenessProbe:
+            tcpSocket:
+              port: docker
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
           volumeMounts:
             - name: docker-data
               mountPath: /var/lib/docker
@@ -117,4 +129,7 @@ spec:
         - name: runner-data
           emptyDir: {}
         - name: docker-data
-          emptyDir: {}
+          emptyDir:
+            {{- with .Values.docker.dataSizeLimit }}
+            sizeLimit: {{ . }}
+            {{- end }}

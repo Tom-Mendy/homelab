@@ -55,7 +55,8 @@
             "pullPolicy": { "type": "string", "minLength": 1 }
           }
         },
-        "resources": { "type": "object" }
+        "resources": { "type": "object" },
+        "dataSizeLimit": { "type": "string", "minLength": 1 }
       }
     },
     "registryAuth": {
