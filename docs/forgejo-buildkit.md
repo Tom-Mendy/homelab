@@ -5,6 +5,12 @@ private Harbor project `homelab`. The runner keeps DinD only as Forgejo's job
 container backend; image builds run with rootless BuildKit and do not use the
 Docker socket.
 
+The BuildKit job container receives `/dev/fuse` and uses `fuse-overlayfs` for
+its rootless snapshotter. Keep the device mapping together with the unconfined
+seccomp, AppArmor, and system-path profiles in the BuildKit runner values.
+Without the device, BuildKit falls back to the `native` snapshotter and copies
+the complete root filesystem for every image layer.
+
 ## One-time prerequisites
 
 Create a Harbor robot account scoped to project `homelab` with artifact pull
