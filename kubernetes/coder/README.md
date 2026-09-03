@@ -98,9 +98,11 @@ running workspace.
 
 ## Forgejo access
 
-Each workspace uses Coder's managed SSH key through `coder gitssh`. On its first
-start, copy the public key printed in the startup log and add it to the Forgejo
-account, then rerun the clone:
+Each workspace uses Coder's managed SSH key through `coder gitssh`. The `t3code`
+template configures this command as Git's global SSH command and prepares
+`known_hosts` for the public Forgejo names. On its first start, copy the public
+key printed in the startup log and add it to the Forgejo account, then retry the
+clone from T3 Code:
 
 ```sh
 GIT_SSH_COMMAND="coder gitssh" git clone --branch main \
@@ -108,9 +110,10 @@ GIT_SSH_COMMAND="coder gitssh" git clone --branch main \
   ~/project
 ```
 
-The templates set `GIT_SSH_COMMAND="coder gitssh"` for the initial clone. No
-local private key or Forgejo token is stored in the workspace PVC or a
-Kubernetes Secret.
+No local private key or Forgejo token is stored in the workspace PVC or a
+Kubernetes Secret. After changing a workspace template, publish it again with
+the `coder templates push` command from the section above, then restart the
+workspace so its startup script runs again.
 
 ## Hermes first-time setup
 
