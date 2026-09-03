@@ -1,6 +1,6 @@
 # Coder agent workspaces
 
-Coder 2.35.3 runs the control plane in `coder`; workspace Deployments and their
+Coder 2.36.4 runs the control plane in `coder`; workspace Deployments and their
 NFS-backed homes run in `coder-workspaces`. Stopping a workspace removes its
 Deployment but retains its PVC. Deleting the workspace is the explicit data
 deletion boundary.
