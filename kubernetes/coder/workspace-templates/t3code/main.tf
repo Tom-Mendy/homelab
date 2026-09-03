@@ -25,6 +25,10 @@ resource "coder_agent" "main" {
     set -eu
     export npm_config_prefix="$HOME/.local"
     export PATH="$HOME/.local/bin:$PATH"
+    profile_line='export PATH="$HOME/.local/bin:$PATH"'
+    if ! grep -Fqx "$profile_line" "$HOME/.profile" 2>/dev/null; then
+      printf '%s\n' "$profile_line" >> "$HOME/.profile"
+    fi
     npm install --global npm@latest t3@latest @openai/codex
     if ! command -v gh >/dev/null 2>&1; then
       sudo apt-get update
@@ -50,7 +54,7 @@ resource "coder_agent" "main" {
   metadata {
     display_name = "Codex version"
     key          = "codex-version"
-    script       = "codex --version"
+    script       = "export PATH=\"$HOME/.local/bin:$PATH\"; codex --version"
     interval     = 300
     timeout      = 5
   }
@@ -66,7 +70,7 @@ resource "coder_agent" "main" {
   metadata {
     display_name = "T3 version"
     key          = "t3-version"
-    script       = "t3 --version"
+    script       = "export PATH=\"$HOME/.local/bin:$PATH\"; t3 --version"
     interval     = 300
     timeout      = 5
   }
