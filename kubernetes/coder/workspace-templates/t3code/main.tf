@@ -25,9 +25,7 @@ resource "coder_agent" "main" {
     set -eu
     export npm_config_prefix="$HOME/.local"
     export PATH="$HOME/.local/bin:$PATH"
-    if ! command -v t3 >/dev/null 2>&1 || ! command -v codex >/dev/null 2>&1; then
-      npm install --global t3@latest @openai/codex
-    fi
+    npm install --global npm@latest t3@latest @openai/codex
     if ! command -v gh >/dev/null 2>&1; then
       sudo apt-get update
       sudo apt-get install --yes gh
