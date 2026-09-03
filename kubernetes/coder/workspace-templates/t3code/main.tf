@@ -25,6 +25,8 @@ resource "coder_agent" "main" {
     set -eu
     export npm_config_prefix="$HOME/.local"
     export PATH="$HOME/.local/bin:$PATH"
+    git config --global user.name "t3code"
+    git config --global user.email "home@tom-mendy.com"
     profile_line='export PATH="$HOME/.local/bin:$PATH"'
     if ! grep -Fqx "$profile_line" "$HOME/.profile" 2>/dev/null; then
       printf '%s\n' "$profile_line" >> "$HOME/.profile"
