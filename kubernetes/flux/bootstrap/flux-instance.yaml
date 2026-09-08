@@ -4,6 +4,13 @@ metadata:
   name: flux
   namespace: flux-system
 spec:
+  components:
+    - source-controller
+    - kustomize-controller
+    - helm-controller
+    - notification-controller
+    - image-reflector-controller
+    - image-automation-controller
   distribution:
     version: 2.9.x
     registry: ghcr.io/fluxcd
@@ -13,4 +20,3 @@ spec:
     ref: refs/heads/main
     path: kubernetes/flux/cluster
     pullSecret: flux-system
-

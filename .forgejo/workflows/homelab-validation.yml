@@ -45,3 +45,6 @@ jobs:
 
       - name: Check Kubernetes storage policy
         run: ./scripts/check-storage-policy.sh
+
+      - name: Test image update checker
+        run: python3 scripts/test-check-image-updates.py
