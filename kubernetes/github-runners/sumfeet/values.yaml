@@ -20,7 +20,7 @@ template:
   spec:
     containers:
       - name: runner
-        image: harbor.home.tom-mendy.com/runners/sumfeet-actions-runner@sha256:d5f0e5422671a8c1d61eb422970c67cf0618e53fb1c79780dd87de865d682a12
+        image: harbor.home.tom-mendy.com/runners/sumfeet-actions-runner@sha256:90e45f1551f4c7a617b1838c97f70695e2c8bc05759a823ec03a824654760b62
         command: ["/home/runner/run.sh"]
         resources:
           requests:
