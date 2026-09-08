@@ -117,3 +117,23 @@ kubectl get autoscalingrunnerset arc-runner-set-sumfleet-tom \
   --namespace arc-runners \
   -o jsonpath='{.spec.runnerScaleSetName}{" "}{.spec.runnerScaleSetLabels}{"\n"}'
 ```
+
+## SumFeet runner image
+
+The SumFeet workflows check out Git LFS objects, which are not included in the
+minimal upstream ARC runner image. The custom image in `sumfeet/Dockerfile`
+adds Git LFS and is published by
+`.forgejo/workflows/sumfeet-actions-runner-image.yml`.
+
+The publisher requires a public Harbor project named `runners`. The existing
+Harbor CI robot needs repository pull and push access to that project through
+the `HARBOR_REGISTRY_USER` and `HARBOR_REGISTRY_TOKEN` Forgejo secrets.
+
+After publishing, copy the reported digest into `sumfeet/values.yaml`. Keep the
+image reference digest-pinned. Flux will replace the ephemeral runner pods on
+the next job without interrupting an active job.
+
+Validate the rollout by running a SumFeet workflow that checks out LFS objects
+and confirming `git lfs version` is available. To roll back, restore the prior
+upstream image digest in `sumfeet/values.yaml` and reconcile the
+`github-runners-sumfeet` HelmRelease.

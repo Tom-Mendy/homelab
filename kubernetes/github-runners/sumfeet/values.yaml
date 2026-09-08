@@ -20,7 +20,7 @@ template:
   spec:
     containers:
       - name: runner
-        image: ghcr.io/actions/actions-runner:2.337.0@sha256:e5496277be5d09bc968b3d64911b74e219ac4a3f2edce956a3ecf9271bea1ef4
+        image: harbor.home.tom-mendy.com/runners/sumfeet-actions-runner@sha256:d5f0e5422671a8c1d61eb422970c67cf0618e53fb1c79780dd87de865d682a12
         command: ["/home/runner/run.sh"]
         resources:
           requests:
