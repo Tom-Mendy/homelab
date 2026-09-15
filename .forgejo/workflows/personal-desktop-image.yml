@@ -14,7 +14,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     env:
-      IMAGE: forgejo.tom-mendy.com/tom-mendy/personal-desktop:v2026.9.15-1
+      IMAGE: forgejo.tom-mendy.com/tom-mendy/personal-desktop:v2026.9.15-2
     steps:
       - name: Checkout
         uses: actions/checkout@v6
