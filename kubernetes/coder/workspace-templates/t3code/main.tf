@@ -27,6 +27,7 @@ resource "coder_agent" "main" {
     export PATH="$HOME/.local/bin:$PATH"
     git config --global user.name "t3code"
     git config --global user.email "home@tom-mendy.com"
+    git config pull.rebase false
     profile_line='export PATH="$HOME/.local/bin:$PATH"'
     if ! grep -Fqx "$profile_line" "$HOME/.profile" 2>/dev/null; then
       printf '%s\n' "$profile_line" >> "$HOME/.profile"
