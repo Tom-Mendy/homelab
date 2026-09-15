@@ -169,7 +169,7 @@ resource "kubernetes_deployment_v1" "workspace" {
           }
 
           resources {
-            requests = { cpu = "1", memory = "2Gi" }
+            requests = { cpu = "500m", memory = "2Gi" }
             limits   = { cpu = "4", memory = "8Gi" }
           }
 
