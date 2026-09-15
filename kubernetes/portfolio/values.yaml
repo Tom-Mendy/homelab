@@ -1,9 +1,13 @@
 replicaCount: 2
 
 image:
-  repository: forgejo.tom-mendy.com/tom-mendy/portfolio
-  tag: latest@sha256:8e040ccc39e34084264a2996c0c9db2f26e9e92c96009047a14ae6ef8fc22b06
+  repository: harbor.home.tom-mendy.com/portfolio/portfolio # {"$imagepolicy": "flux-system:portfolio:name"}
+  tag: latest # {"$imagepolicy": "flux-system:portfolio:tag"}
+  digest: sha256:87d9fd9ee48f5ec84ad2b3042703ffe5d22ebc777be1b53b3132eb61a33a4277 # {"$imagepolicy": "flux-system:portfolio:digest"}
   pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: portfolio-registry-auth
 
 service:
   port: 80
