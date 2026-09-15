@@ -43,7 +43,10 @@ RUN apt-get update \
         zip \
     && ln -sf /usr/bin/fdfind /usr/local/bin/fd \
     && rm -rf /var/lib/apt/lists/* \
-    && install -d -o 10000 -g 10000 /opt/data /opt/data/.vnc /opt/data/.config
+    && install -d -o 10000 -g 10000 /opt/data /opt/data/.vnc /opt/data/.config /opt/novnc \
+    && cp -a /usr/share/novnc/. /opt/novnc/ \
+    && cp /usr/share/novnc/vnc.html /opt/novnc/index.html \
+    && chown -R 10000:10000 /opt/novnc
 
 COPY start-desktop.sh /usr/local/bin/start-desktop.sh
 RUN chmod 0755 /usr/local/bin/start-desktop.sh
