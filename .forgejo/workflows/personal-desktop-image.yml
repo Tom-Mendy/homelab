@@ -1,0 +1,35 @@
+name: personal-desktop-image
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - personal-desktop
+    paths:
+      - kubernetes/coder/workspace-images/personal-desktop/**
+      - .forgejo/workflows/personal-desktop-image.yml
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE: forgejo.tom-mendy.com/tom-mendy/personal-desktop:v2026.9.15-1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Log in to Forgejo registry
+        run: echo "$REGISTRY_TOKEN" | docker login forgejo.tom-mendy.com --username "$REGISTRY_USERNAME" --password-stdin
+        env:
+          REGISTRY_USERNAME: ${{ forgejo.repository_owner }}
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Build and push image
+        run: |
+          docker build --pull --tag "$IMAGE" kubernetes/coder/workspace-images/personal-desktop
+          for attempt in 1 2 3; do
+            docker push "$IMAGE" && exit 0
+            sleep 15
+          done
+          exit 1
