@@ -39,7 +39,7 @@ set -- \
   --key forgejo \
   --secret "$FORGEJO_OIDC_CLIENT_SECRET" \
   --auto-discover-url \
-  https://authentik.home.tom-mendy.com/application/o/forgejo/.well-known/openid-configuration \
+  "$FORGEJO_OIDC_DISCOVERY_URL" \
   --scopes openid \
   --scopes profile \
   --scopes email \

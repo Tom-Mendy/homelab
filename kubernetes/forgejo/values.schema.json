@@ -73,10 +73,11 @@
     "oidc": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["enabled", "secretName"],
+      "required": ["enabled", "secretName", "discoveryUrl"],
       "properties": {
         "enabled": { "type": "boolean" },
-        "secretName": { "type": "string", "minLength": 1 }
+        "secretName": { "type": "string", "minLength": 1 },
+        "discoveryUrl": { "type": "string", "format": "uri", "pattern": "^https://" }
       }
     },
     "actions": {

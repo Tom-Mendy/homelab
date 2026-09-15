@@ -67,6 +67,8 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.oidc.secretName }}
                   key: FORGEJO_OIDC_CLIENT_SECRET
+            - name: FORGEJO_OIDC_DISCOVERY_URL
+              value: {{ .Values.oidc.discoveryUrl | quote }}
             {{- end }}
             - name: FORGEJO__actions__ENABLED
               value: {{ .Values.actions.enabled | quote }}
