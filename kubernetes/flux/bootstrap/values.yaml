@@ -8,7 +8,7 @@ web:
         provider: OIDC
         clientID: flux-web
         clientSecret: ""
-        issuerURL: https://authentik.home.tom-mendy.com/application/o/flux-web/
+        issuerURL: https://authentik.tom-mendy.com/application/o/flux-web/
         autoLogin: true
   ingress:
     enabled: true
