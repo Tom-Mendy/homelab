@@ -49,7 +49,16 @@ RUN apt-get update \
     && chown -R 10000:10000 /opt/novnc
 
 COPY start-desktop.sh /usr/local/bin/start-desktop.sh
-RUN chmod 0755 /usr/local/bin/start-desktop.sh
+RUN chmod 0755 /usr/local/bin/start-desktop.sh \
+    && printf '%s\n' \
+        '#!/bin/sh' \
+        'exec /usr/bin/chromium --no-sandbox "$@"' \
+        > /usr/local/bin/chromium-workspace \
+    && chmod 0755 /usr/local/bin/chromium-workspace \
+    && if [ -f /usr/share/applications/chromium.desktop ]; then \
+         sed -i -E 's|^Exec=([^ ]*chromium)(.*)$|Exec=/usr/local/bin/chromium-workspace\2|' \
+           /usr/share/applications/chromium.desktop; \
+       fi
 
 ENV HOME=/opt/data \
     SHELL=/usr/bin/bash \
