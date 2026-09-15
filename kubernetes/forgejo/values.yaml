@@ -38,6 +38,7 @@ oauth2Client:
 oidc:
   enabled: true
   secretName: forgejo-oidc
+  discoveryUrl: https://authentik.tom-mendy.com/application/o/forgejo/.well-known/openid-configuration
 
 actions:
   enabled: "true"

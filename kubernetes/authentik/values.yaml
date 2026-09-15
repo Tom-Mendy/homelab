@@ -49,12 +49,12 @@ server:
       traefik.ingress.kubernetes.io/router.tls: "true"
       traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
     hosts:
-      - authentik.home.tom-mendy.com
       - authentik.tom-mendy.com
+      - authentik.home.tom-mendy.com
     tls:
       - hosts:
-          - authentik.home.tom-mendy.com
           - authentik.tom-mendy.com
+          - authentik.home.tom-mendy.com
 
 worker:
   replicas: 1
