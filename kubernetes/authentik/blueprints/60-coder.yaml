@@ -2,6 +2,18 @@ version: 1
 metadata:
   name: Coder OIDC client
 entries:
+  - model: authentik_providers_oauth2.scopemapping
+    id: coder-email-scope
+    identifiers:
+      name: Coder email
+    attrs:
+      name: Coder email
+      scope_name: email
+      expression: |
+        return {
+            "email": request.user.email,
+            "email_verified": True,
+        }
   - model: authentik_providers_oauth2.oauth2provider
     id: coder-provider
     identifiers:
@@ -31,6 +43,7 @@ entries:
         - !Find
           - authentik_providers_oauth2.scopemapping
           - [managed, goauthentik.io/providers/oauth2/scope-email]
+        - !KeyOf coder-email-scope
         - !Find
           - authentik_providers_oauth2.scopemapping
           - [managed, goauthentik.io/providers/oauth2/scope-profile]
