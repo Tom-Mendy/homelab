@@ -27,6 +27,33 @@ class FakeCrane:
 
 
 class ImageUpdateTests(unittest.TestCase):
+    def test_separate_repository_tag_and_digest_are_one_pinned_image(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            values = root / "kubernetes/portfolio/values.yaml"
+            values.parent.mkdir(parents=True)
+            values.write_text(
+                "image:\n"
+                "  repository: harbor.example.com/portfolio/portfolio "
+                '# {"$imagepolicy": "flux-system:portfolio:name"}\n'
+                "  tag: latest "
+                '# {"$imagepolicy": "flux-system:portfolio:tag"}\n'
+                "  digest: sha256:" + "0" * 64 + " "
+                '# {"$imagepolicy": "flux-system:portfolio:digest"}\n',
+                encoding="utf-8",
+            )
+
+            uses = MODULE.collect_images(root / "kubernetes", base_dir=root)
+
+            self.assertEqual(len(uses), 1)
+            self.assertEqual(
+                uses[0].reference.full_reference,
+                "harbor.example.com/portfolio/portfolio:latest@sha256:"
+                + "0" * 64,
+            )
+            self.assertEqual(uses[0].value_kind, "digest")
+            self.assertEqual(uses[0].source_key, "image.digest")
+
     def test_repository_override_config_contains_newt_mapping(self) -> None:
         overrides = MODULE.load_overrides(
             SCRIPT.with_name("image-update-overrides.json")

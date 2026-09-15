@@ -4,4 +4,5 @@ resources:
   - ../../authentik
   - namespaces.yaml
   - sources.yaml
+  - image-automation.yaml
   - apps

@@ -17,11 +17,15 @@ IMAGE_VALUE_RE = re.compile(
     r"\bimage:\s*[\"']?(?P<image>(?!\{\{)[^\s\"']+)[\"']?"
 )
 REPOSITORY_RE = re.compile(
-    r"^\s*repository:\s*[\"']?(?P<repository>[^\s\"']+)[\"']?\s*$"
+    r"^\s*repository:\s*[\"']?(?P<repository>[^\s\"']+)[\"']?"
+    r"(?:\s+#.*)?\s*$"
 )
-TAG_RE = re.compile(r"^\s*tag:\s*[\"']?(?P<tag>[^\s\"']*)[\"']?\s*$")
+TAG_RE = re.compile(
+    r"^\s*tag:\s*[\"']?(?P<tag>[^\s\"']*)[\"']?(?:\s+#.*)?\s*$"
+)
 DIGEST_RE = re.compile(
-    r"^\s*digest:\s*[\"']?(?P<digest>sha256:[a-f0-9]{64})[\"']?\s*$",
+    r"^\s*digest:\s*[\"']?(?P<digest>sha256:[a-f0-9]{64})[\"']?"
+    r"(?:\s+#.*)?\s*$",
     re.IGNORECASE,
 )
 KEY_RE = re.compile(r"^(?P<indent>\s*)(?P<key>[A-Za-z0-9_.-]+):(?:\s|$)")
@@ -146,8 +150,24 @@ def collect_images(
     for path in iter_yaml_files(root):
         lines = path.read_text(encoding="utf-8").splitlines()
         pending_repository: tuple[str, int, int] | None = None
+        pending_tag: tuple[str, str | None] | None = None
         key_stack: list[tuple[int, str]] = []
         relative_path = path.relative_to(base_dir).as_posix()
+
+        def flush_pending_image() -> None:
+            nonlocal pending_repository, pending_tag
+            if pending_repository is not None and pending_tag is not None:
+                repository, _, repository_line = pending_repository
+                tag, source_key = pending_tag
+                add(
+                    f"{repository}:{tag}",
+                    path,
+                    repository_line,
+                    value_kind="tag",
+                    source_key=source_key,
+                )
+            pending_repository = None
+            pending_tag = None
 
         for index, line in enumerate(lines, start=1):
             key_path = yaml_key_path(line, key_stack)
@@ -157,6 +177,7 @@ def collect_images(
 
             repository_match = REPOSITORY_RE.match(line)
             if repository_match:
+                flush_pending_image()
                 pending_repository = (
                     repository_match.group("repository"),
                     len(line) - len(line.lstrip()),
@@ -178,19 +199,11 @@ def collect_images(
                     )
                     continue
 
-            if tag_match and pending_repository is not None:
-                repository, repository_indent, repository_line = pending_repository
+            if tag_match and tag and pending_repository is not None:
+                _, repository_indent, _ = pending_repository
                 tag_indent = len(line) - len(line.lstrip())
                 if tag_indent == repository_indent:
-                    if tag:
-                        add(
-                            f"{repository}:{tag}",
-                            path,
-                            repository_line,
-                            value_kind="tag",
-                            source_key=key_path,
-                        )
-                        pending_repository = None
+                    pending_tag = (tag, key_path)
                     continue
 
             digest_match = DIGEST_RE.match(line)
@@ -198,20 +211,24 @@ def collect_images(
                 repository, repository_indent, repository_line = pending_repository
                 digest_indent = len(line) - len(line.lstrip())
                 if digest_indent == repository_indent:
+                    tag = pending_tag[0] if pending_tag is not None else "latest"
                     add(
-                        f"{repository}:latest@{digest_match.group('digest')}",
+                        f"{repository}:{tag}@{digest_match.group('digest')}",
                         path,
-                        repository_line,
+                        index,
                         value_kind="digest",
                         source_key=key_path,
                     )
                     pending_repository = None
+                    pending_tag = None
                     continue
 
             if line.strip() and not line.lstrip().startswith("#"):
                 indent = len(line) - len(line.lstrip())
                 if pending_repository is not None and indent <= pending_repository[1]:
-                    pending_repository = None
+                    flush_pending_image()
+
+        flush_pending_image()
 
     return sorted(found.values(), key=lambda use: use.reference.full_reference)
 

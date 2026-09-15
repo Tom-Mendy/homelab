@@ -567,6 +567,7 @@ spec:
         kind: GitRepository
         name: flux-system
   dependsOn:
+    - name: harbor-extras
     - name: traefik
   install:
     createNamespace: true

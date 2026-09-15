@@ -126,6 +126,30 @@ kubectl -n flux-system wait fluxinstance/flux \
   --for=condition=Ready --timeout=10m
 ```
 
+The Flux instance also installs the image reflector and image automation
+controllers. Portfolio image updates use a separate Forgejo deploy key with
+write access, so the bootstrap key remains read-only. Provision the Harbor and
+Forgejo credentials before the image resources reach the cluster:
+
+```bash
+./scripts/setup-portfolio-image-automation.sh
+```
+
+The wizard stores the Git private key outside the repository and creates
+`flux-system/portfolio-image-git`. It stores the Harbor robot Docker config in
+Infisical at `/harbor/portfolio`; the Harbor extras chart syncs that value to
+`flux-system/portfolio-registry-auth` and
+`portfolio/portfolio-registry-auth`.
+
+After the automation manifests reach `main`, verify the complete path:
+
+```bash
+flux reconcile kustomization flux-system --with-source
+flux get images all --all-namespaces
+flux get image update portfolio --namespace flux-system
+kubectl -n portfolio rollout status deployment/portfolio
+```
+
 Verify that Flux can fetch Forgejo before stopping Argo CD:
 
 ```bash

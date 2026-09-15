@@ -17,3 +17,11 @@ proxyCredentials:
   enabled: true
   name: harbor-proxy-credentials
   secretsPath: /harbor/proxy
+
+portfolioRegistryCredentials:
+  enabled: true
+  name: portfolio-registry-auth
+  secretsPath: /harbor/portfolio
+  targetNamespaces:
+    - flux-system
+    - portfolio

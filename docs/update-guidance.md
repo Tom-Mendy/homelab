@@ -69,8 +69,7 @@ Before this change, the repository had the following update model:
   `all`; Blocky and Traefik use `minor`.
 - Many image references already use `tag@sha256`, although some tag-only images
   remain.
-- No Flux `ImageRepository`, `ImagePolicy`, or `ImageUpdateAutomation` resources
-  are installed.
+- Flux image automation is enabled only for the first-party Portfolio image.
 - Forgejo validates secrets, local Helm charts, rendered Kubernetes resources,
   and the storage policy. It does not run application smoke tests.
 
@@ -121,11 +120,10 @@ The official references are [Renovate's Forgejo platform support](https://docs.r
 [Flux support](https://docs.renovatebot.com/modules/manager/flux/), and
 [regex managers](https://docs.renovatebot.com/modules/manager/regex/).
 
-Flux image automation is still useful for images built by this homelab. It also
-writes the selected image to Git before Flux deploys it. Prefer immutable CI
-tags, for example a version or commit SHA, over repeatedly publishing one tag.
-Mutable-tag tracking is possible with digest reflection, but it hides the source
-version behind a changing digest and makes release history harder to read. See
+Flux image automation updates the first-party Portfolio image. It writes the
+selected digest to Git before Flux deploys it. The current workflow publishes
+commit tags and `latest`; the policy follows only `latest` and records every
+digest change in Git. Prefer immutable CI tags for future applications. See
 the [Flux image update guide](https://fluxcd.io/flux/guides/image-update/) and
 [image automation API](https://fluxcd.io/flux/components/image/imageupdateautomations/).
 
@@ -224,8 +222,8 @@ assuming an older container can read the new data.
 4. Add custom regex managers for full-string image fields that the Helm values
    manager does not detect. Test each expression against this repository before
    widening it.
-5. Consider Flux image automation later for a small set of first-party images.
-   Keep its commits visible in the same Git history.
+5. Keep Flux image automation limited to explicitly labelled first-party image
+   policies. Its commits must stay visible in the same Git history.
 
 The Keel removal is recorded in the repository and must be merged before Flux
 prunes the live releases. Renovate installation remains a separate change.
