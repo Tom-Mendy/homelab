@@ -84,7 +84,7 @@ resource "kubernetes_persistent_volume_claim_v1" "home" {
     access_modes       = ["ReadWriteOnce"]
     storage_class_name = "nfs-k8s"
     resources {
-      requests = { storage = "50Gi" }
+      requests = { storage = "10Gi" }
     }
   }
 }
