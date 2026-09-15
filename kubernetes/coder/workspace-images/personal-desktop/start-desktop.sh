@@ -31,7 +31,7 @@ if ! pgrep -u "$(id -u)" -f 'Xtigervnc.*:1' >/dev/null 2>&1; then
 fi
 
 if ! pgrep -u "$(id -u)" -f 'websockify.*6080' >/dev/null 2>&1; then
-  nohup websockify --web=/usr/share/novnc/ 127.0.0.1:6080 127.0.0.1:5901 \
+  nohup websockify --web=/opt/novnc/ 127.0.0.1:6080 127.0.0.1:5901 \
     >"$HOME/.vnc/websockify.log" 2>&1 &
 fi
 
