@@ -27,7 +27,8 @@ jobs:
 
       - name: Build and push image
         run: |
-          docker build --pull --tag "$IMAGE" kubernetes/coder/workspace-images/personal-desktop
+          # Keep the published image as a single manifest for older Kubernetes runtimes.
+          docker build --pull --provenance=false --tag "$IMAGE" kubernetes/coder/workspace-images/personal-desktop
           for attempt in 1 2 3; do
             docker push "$IMAGE" && exit 0
             sleep 15

@@ -132,7 +132,7 @@ resource "kubernetes_deployment_v1" "workspace" {
 
         container {
           name              = "workspace"
-          image             = "forgejo.tom-mendy.com/tom-mendy/personal-desktop:v2026.9.15-1"
+            image             = "forgejo.tom-mendy.com/tom-mendy/personal-desktop:v2026.9.15-2"
           image_pull_policy = "IfNotPresent"
           command           = ["sh", "-c", coder_agent.main.init_script]
 
