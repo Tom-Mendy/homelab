@@ -66,6 +66,22 @@ coder templates push hermes-personal \
 The `t3code` template is separate from `agent-workspace`. It installs T3 in the
 workspace and compiles its Linux `node-pty` native module during first startup.
 
+The `personal-desktop` template is a separate persistent graphical workspace. It
+runs XFCE behind TigerVNC and noVNC on localhost:6080, exposed only through the
+Coder application proxy as the owner-only `Desktop` app. Its home is a 50Gi NFS
+PVC using `nfs-k8s`; it does not create a direct Ingress, NodePort, or public VNC
+endpoint. Publish it with:
+
+```sh
+coder templates push personal-desktop \
+  --directory kubernetes/coder/workspace-templates/personal-desktop
+```
+
+Create one stable workspace named `tom-personal-desktop`. Open the desktop from
+`https://coder.home.tom-mendy.com` and the workspace's `Desktop` app tile. The
+workspace survives laptop shutdowns, but it does not provide access to the G14's
+local GPU.
+
 Create only one `hermes-personal` workspace and disable its automatic stop in
 the Coder schedule. The namespace quota permits Hermes plus two standard
 workspaces, matching the cluster's intended capacity.
