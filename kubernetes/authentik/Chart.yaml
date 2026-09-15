@@ -1,0 +1,7 @@
+apiVersion: v2
+name: authentik-local
+description: Local Helm chart for authentik Infisical secret sync resources
+type: application
+version: 0.1.0
+appVersion: "2026.2.3"
+
