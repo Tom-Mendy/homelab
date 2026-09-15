@@ -63,6 +63,13 @@ coder templates push hermes-personal \
   --directory kubernetes/coder/workspace-templates/hermes-personal
 ```
 
+If a workspace build reports `requested: requests.storage=50Gi`, the published
+Coder template is stale. The versioned `t3code` template requests `10Gi`, so
+republish it with the command above and retry the workspace. Do not increase
+the namespace quota to hide this drift. Existing stopped workspaces retain
+their PVCs, so delete an unused workspace only when its data is no longer
+needed.
+
 The `t3code` template is separate from `agent-workspace`. It installs T3 in the
 workspace and compiles its Linux `node-pty` native module during first startup.
 
