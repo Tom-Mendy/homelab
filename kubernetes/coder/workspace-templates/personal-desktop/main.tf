@@ -23,58 +23,13 @@ resource "coder_agent" "main" {
 
   startup_script = <<-EOT
     set -eu
-    export npm_config_prefix="$HOME/.local"
+    export HOME="/opt/data"
     export PATH="$HOME/.local/bin:$PATH"
-    git config --global user.name "t3code"
-    git config --global user.email "home@tom-mendy.com"
-    git config pull.rebase false
-    profile_line='export PATH="$HOME/.local/bin:$PATH"'
-    if ! grep -Fqx "$profile_line" "$HOME/.profile" 2>/dev/null; then
-      printf '%s\n' "$profile_line" >> "$HOME/.profile"
-    fi
-    npm install --global npm@latest t3@latest @openai/codex opencode-ai
-    sudo apt-get update
-    sudo apt-get install --yes gh ripgrep
-    mkdir -p "$HOME/.ssh"
-    chmod 700 "$HOME/.ssh"
-    for forgejo_host in forgejo.home.tom-mendy.com forgejo.tom-mendy.com; do
-      ssh-keyscan -T 5 -H "$forgejo_host" >> "$HOME/.ssh/known_hosts" 2>/dev/null || true
-    done
-    sort -u "$HOME/.ssh/known_hosts" -o "$HOME/.ssh/known_hosts"
-    chmod 600 "$HOME/.ssh/known_hosts"
-    git config --global core.sshCommand "coder gitssh"
-    export GIT_SSH_COMMAND="coder gitssh"
-    mkdir -p "$HOME/.local/share/t3"
-    server_pid="$HOME/.local/share/t3/serve.pid"
-    if [ ! -f "$server_pid" ] || ! kill -0 "$(cat "$server_pid")" 2>/dev/null; then
-      nohup t3 serve >"$HOME/.local/share/t3/serve.log" 2>&1 &
-      echo $! >"$server_pid"
-    fi
+    export DISPLAY="$${DISPLAY:-:1}"
+    export XDG_RUNTIME_DIR="$${XDG_RUNTIME_DIR:-/tmp/runtime-$(id -u)}"
+    mkdir -p "$HOME/.local/bin" "$HOME/projects" "$HOME/.config" "$HOME/.cache"
+    /usr/local/bin/start-desktop.sh
   EOT
-
-  metadata {
-    display_name = "Codex version"
-    key          = "codex-version"
-    script       = "export PATH=\"$HOME/.local/bin:$PATH\"; codex --version"
-    interval     = 300
-    timeout      = 5
-  }
-
-  metadata {
-    display_name = "GitHub CLI version"
-    key          = "gh-version"
-    script       = "gh --version | head -1"
-    interval     = 300
-    timeout      = 5
-  }
-
-  metadata {
-    display_name = "T3 version"
-    key          = "t3-version"
-    script       = "export PATH=\"$HOME/.local/bin:$PATH\"; t3 --version"
-    interval     = 300
-    timeout      = 5
-  }
 
   metadata {
     display_name = "CPU Usage"
@@ -91,25 +46,45 @@ resource "coder_agent" "main" {
     interval     = 10
     timeout      = 1
   }
+
+  metadata {
+    display_name = "Desktop"
+    key          = "desktop"
+    script       = "curl --silent --fail --max-time 2 http://127.0.0.1:6080/vnc.html >/dev/null && echo ready || echo starting"
+    interval     = 10
+    timeout      = 3
+  }
+}
+
+resource "coder_app" "desktop" {
+  agent_id     = coder_agent.main.id
+  slug         = "desktop"
+  display_name = "Desktop"
+  icon         = "/icon/desktop.svg"
+  url          = "http://127.0.0.1:6080/vnc.html"
+  share        = "owner"
+  subdomain    = false
 }
 
 resource "kubernetes_persistent_volume_claim_v1" "home" {
   metadata {
-    name      = "coder-${data.coder_workspace.me.id}-t3"
+    name      = "coder-${data.coder_workspace.me.id}-desktop"
     namespace = "coder-workspaces"
     labels = {
-      "app.kubernetes.io/name"   = "t3code-workspace"
+      "app.kubernetes.io/name"   = "personal-desktop-workspace"
       "com.coder.workspace.id"   = data.coder_workspace.me.id
       "com.coder.workspace.name" = data.coder_workspace.me.name
       "com.coder.user.id"        = data.coder_workspace_owner.me.id
     }
   }
+
   wait_until_bound = false
+
   spec {
     access_modes       = ["ReadWriteOnce"]
     storage_class_name = "nfs-k8s"
     resources {
-      requests = { storage = "10Gi" }
+      requests = { storage = "50Gi" }
     }
   }
 }
@@ -120,10 +95,10 @@ resource "kubernetes_deployment_v1" "workspace" {
   depends_on       = [kubernetes_persistent_volume_claim_v1.home]
 
   metadata {
-    name      = "t3-${data.coder_workspace.me.id}"
+    name      = "desktop-${data.coder_workspace.me.id}"
     namespace = "coder-workspaces"
     labels = {
-      "app.kubernetes.io/name" = "t3code-workspace"
+      "app.kubernetes.io/name" = "personal-desktop-workspace"
       "com.coder.workspace.id" = data.coder_workspace.me.id
     }
   }
@@ -131,48 +106,79 @@ resource "kubernetes_deployment_v1" "workspace" {
   spec {
     replicas = 1
     strategy { type = "Recreate" }
+
     selector {
       match_labels = { "com.coder.workspace.id" = data.coder_workspace.me.id }
     }
+
     template {
       metadata {
         labels = {
-          "app.kubernetes.io/name" = "t3code-workspace"
+          "app.kubernetes.io/name" = "personal-desktop-workspace"
           "com.coder.workspace.id" = data.coder_workspace.me.id
         }
       }
+
       spec {
         automount_service_account_token = false
+
         security_context {
-          run_as_user     = 1000
-          run_as_group    = 1000
-          fs_group        = 1000
+          run_as_user     = 10000
+          run_as_group    = 10000
+          fs_group        = 10000
           run_as_non_root = true
           seccomp_profile { type = "RuntimeDefault" }
         }
+
         container {
           name              = "workspace"
-          image             = "codercom/example-universal@sha256:411973a25007c309162e36958038ccf0f93d7cb48bf295f3da16bd30658c3ca7"
+          image             = "forgejo.tom-mendy.com/tom-mendy/personal-desktop:v2026.9.15-1"
           image_pull_policy = "IfNotPresent"
           command           = ["sh", "-c", coder_agent.main.init_script]
+
           security_context {
             allow_privilege_escalation = false
             run_as_non_root            = true
             capabilities { drop = ["ALL"] }
           }
+
           env {
             name  = "CODER_AGENT_TOKEN"
             value = coder_agent.main.token
           }
-          resources {
-            requests = { cpu = "500m", memory = "2Gi" }
-            limits   = { cpu = "2", memory = "6Gi" }
+          env {
+            name  = "HOME"
+            value = "/opt/data"
           }
+          env {
+            name  = "SHELL"
+            value = "/usr/bin/bash"
+          }
+          env {
+            name  = "DISPLAY"
+            value = ":1"
+          }
+          env {
+            name  = "XDG_RUNTIME_DIR"
+            value = "/tmp/runtime-10000"
+          }
+
+          port {
+            name           = "novnc"
+            container_port = 6080
+          }
+
+          resources {
+            requests = { cpu = "1", memory = "2Gi" }
+            limits   = { cpu = "4", memory = "8Gi" }
+          }
+
           volume_mount {
             name       = "home"
-            mount_path = "/home/coder"
+            mount_path = "/opt/data"
           }
         }
+
         volume {
           name = "home"
           persistent_volume_claim {
