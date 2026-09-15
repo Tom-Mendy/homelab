@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.oidc.blueprintConfigMapName }}
+  namespace: {{ .Values.namespace }}
+data:
+  oidc-clients.yaml: |
+{{ .Files.Get "blueprints/oidc-clients.yaml" | nindent 4 }}
