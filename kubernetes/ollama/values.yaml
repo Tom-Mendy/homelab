@@ -72,6 +72,11 @@ openwebui:
   namespaceOverride: ollama
   fullnameOverride: open-webui
 
+  image:
+    repository: ghcr.io/open-webui/open-webui
+    tag: 0.9.6@sha256:90eae5b419e40b4c3dd684582b2c83440b36f9ae2f6532c09639b2ba4ee65158
+    pullPolicy: IfNotPresent
+
   ollama:
     enabled: false
   ollamaUrls:
@@ -132,6 +137,10 @@ openwebui:
       rolesClaim: roles
       allowedRoles: openwebui-user,openwebui-admin
       adminRoles: openwebui-admin
+
+openwebuiFunctionSync:
+  enabled: true
+  schedule: "*/10 * * * *"
 
 openwebuiIngress:
   name: openwebui-ingress
