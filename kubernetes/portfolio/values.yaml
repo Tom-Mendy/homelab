@@ -1,4 +1,4 @@
-replicaCount: 2
+replicaCount: 1
 image:
   repository: harbor.home.tom-mendy.com/portfolio/portfolio # {"$imagepolicy": "flux-system:portfolio:name"}
   tag: latest # {"$imagepolicy": "flux-system:portfolio:tag"}
