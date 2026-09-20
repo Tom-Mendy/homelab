@@ -10,6 +10,7 @@ deployment:
 
 models:
   pull:
+    - gemma4:e4b
     - deepseek-r1:8b
     - SparkLLM/Spark-X2.5-4B:latest
 
