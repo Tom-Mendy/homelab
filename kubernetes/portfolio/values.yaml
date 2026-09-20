@@ -1,18 +1,14 @@
 replicaCount: 2
-
 image:
   repository: harbor.home.tom-mendy.com/portfolio/portfolio # {"$imagepolicy": "flux-system:portfolio:name"}
   tag: latest # {"$imagepolicy": "flux-system:portfolio:tag"}
-  digest: sha256:87d9fd9ee48f5ec84ad2b3042703ffe5d22ebc777be1b53b3132eb61a33a4277 # {"$imagepolicy": "flux-system:portfolio:digest"}
+  digest: sha256:0abe97a78b3f9f47e2b2d3d06dd9ef2580dbc16dd2003436ead04c93a30561b0 # {"$imagepolicy": "flux-system:portfolio:digest"}
   pullPolicy: IfNotPresent
-
 imagePullSecrets:
   - name: portfolio-registry-auth
-
 service:
   port: 80
   targetPort: 8080
-
 ingress:
   host: tom-mendy.com
   className: traefik
@@ -20,7 +16,6 @@ ingress:
     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
-
 resources:
   requests:
     cpu: 10m
