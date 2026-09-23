@@ -2,7 +2,7 @@ replicaCount: 1
 image:
   repository: harbor.home.tom-mendy.com/portfolio/portfolio # {"$imagepolicy": "flux-system:portfolio:name"}
   tag: latest # {"$imagepolicy": "flux-system:portfolio:tag"}
-  digest: sha256:0abe97a78b3f9f47e2b2d3d06dd9ef2580dbc16dd2003436ead04c93a30561b0 # {"$imagepolicy": "flux-system:portfolio:digest"}
+  digest: sha256:132f25013dfae020e34b17e508674a2ffaba01882cfffafc45d431c21f0ec2f7 # {"$imagepolicy": "flux-system:portfolio:digest"}
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: portfolio-registry-auth
