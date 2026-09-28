@@ -42,6 +42,14 @@ blueprints:
 
 server:
   replicas: 1
+  volumes:
+    - name: shared-memory
+      emptyDir:
+        medium: Memory
+        sizeLimit: 256Mi
+  volumeMounts:
+    - name: shared-memory
+      mountPath: /dev/shm
   ingress:
     enabled: true
     annotations:
