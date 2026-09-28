@@ -24,7 +24,7 @@ resource "coder_agent" "main" {
   startup_script = <<-EOT
     set -eu
     UV_CONSTRAINT= uv pip freeze --python /opt/hermes/.venv/bin/python3 | grep -v '^-e ' >"$UV_CONSTRAINT"
-    [ ! -f "$HOME/.profile" ] || sed -i '\|runtime-venv-v2026.7.1|d' "$HOME/.profile"
+    [ ! -f "$HOME/.profile" ] || sed -i '\|runtime-venv-v2026.9.24|d' "$HOME/.profile"
     profile_line='export PATH="/opt/hermes/bin:/opt/hermes/.venv/bin:$HOME/.local/bin:$PATH"'
     grep -qxF "$profile_line" "$HOME/.profile" 2>/dev/null || printf '\n%s\n' "$profile_line" >> "$HOME/.profile"
     bash_login_line='if [ -x /usr/bin/bash ] && [ -z "$${BASH_VERSION:-}" ] && [ -n "$${SSH_TTY:-}" ]; then exec /usr/bin/bash -l; fi'
@@ -113,7 +113,7 @@ resource "kubernetes_deployment_v1" "workspace" {
         }
         container {
           name              = "hermes"
-          image             = "nousresearch/hermes-agent@sha256:b6c019227889e6675424a2b6223b2cafdd36bf7d1048d1ddd8e043b880d6cc0f"
+          image             = "nousresearch/hermes-agent@sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283"
           image_pull_policy = "IfNotPresent"
           command           = ["sh", "-c", coder_agent.main.init_script]
           security_context {
@@ -139,7 +139,7 @@ resource "kubernetes_deployment_v1" "workspace" {
           }
           env {
             name  = "UV_CONSTRAINT"
-            value = "/opt/data/.uv-constraints-v2026.7.1.txt"
+            value = "/opt/data/.uv-constraints-v2026.9.24.txt"
           }
           env {
             name  = "HINDSIGHT_API_URL"
