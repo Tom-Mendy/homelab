@@ -21,6 +21,8 @@ admin accounts exist.
   - `/authentik`
   - `/forgejo`
   - `/oidc`
+- Add `INFISICAL_OIDC_CLIENT_SECRET` to `/oidc` as a unique random client
+  secret.
 - Add the current authentik bootstrap values to `/authentik`:
   - `AUTHENTIK_ENABLED=true`
   - `AUTHENTIK_SECRET_KEY=<current stable value>`
@@ -58,7 +60,9 @@ admin accounts exist.
   - `homelab-admins`
   - `homelab-guests`
   - `forgejo-users`
+  - `infisical-users`
 - Add your admin account to `homelab-admins`.
+- Add Infisical users to `infisical-users`.
 - Create a guest invitation flow:
   - invitation link required
   - public self-registration disabled outside invitations
@@ -72,12 +76,27 @@ admin accounts exist.
 ## OIDC Applications
 
 - Keep providers, applications, groups, and access bindings in
-  `kubernetes/authentik/blueprints/oidc-clients.yaml`.
-- Store the three rotated client secrets under `/oidc/forgejo`,
-  `/oidc/grafana`, and `/oidc/flux` as documented in `docs/flux-gitops.md`.
+  `kubernetes/authentik/blueprints/`.
+- Store the OIDC client secrets under `/oidc` as documented in
+  `docs/flux-gitops.md`.
 - Grant application access through `forgejo-users`, `grafana-users`, and
   `flux-viewers`; `homelab-admins` can access all three applications.
 - Keep local Forgejo and Grafana login enabled for recovery.
+- Configure Infisical's General OIDC provider with:
+  - Discovery URL:
+    `https://authentik.home.tom-mendy.com/application/o/infisical/.well-known/openid-configuration`
+  - Client ID: `infisical`
+  - Client secret: the value stored as `INFISICAL_OIDC_CLIENT_SECRET` in
+    Infisical
+  - JWT algorithm: `RS256`
+  - Redirect URI:
+    `https://infisical.home.tom-mendy.com/api/v1/sso/oidc/callback`
+- Verify `SITE_URL` is set to
+  `https://infisical.home.tom-mendy.com` and `AUTH_SECRET` exists in the
+  `infisical-secrets` Secret.
+- Verify one admin and one `infisical-users` member can sign in through
+  Authentik. Keep SSO optional and do not enable enforcement until recovery
+  access has been tested.
 - Test with the guest account:
   - login through authentik
   - Forgejo account creation or account linking

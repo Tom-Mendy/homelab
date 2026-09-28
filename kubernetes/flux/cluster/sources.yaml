@@ -1,6 +1,15 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
+  name: harbor
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://helm.goharbor.io
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
   name: authentik
   namespace: flux-system
 spec:
@@ -42,15 +51,6 @@ metadata:
 spec:
   interval: 30m
   url: https://dl.cloudsmith.io/public/infisical/helm-charts/helm/charts/
----
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
-metadata:
-  name: keel
-  namespace: flux-system
-spec:
-  interval: 30m
-  url: https://charts.keel.sh
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository

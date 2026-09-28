@@ -25,13 +25,25 @@ resource "coder_agent" "main" {
     set -eu
     export npm_config_prefix="$HOME/.local"
     export PATH="$HOME/.local/bin:$PATH"
-    if ! command -v t3 >/dev/null 2>&1 || ! command -v codex >/dev/null 2>&1; then
-      npm install --global t3@latest @openai/codex
+    git config --global user.name "t3code"
+    git config --global user.email "home@tom-mendy.com"
+    git config pull.rebase false
+    profile_line='export PATH="$HOME/.local/bin:$PATH"'
+    if ! grep -Fqx "$profile_line" "$HOME/.profile" 2>/dev/null; then
+      printf '%s\n' "$profile_line" >> "$HOME/.profile"
     fi
-    if ! command -v gh >/dev/null 2>&1; then
-      sudo apt-get update
-      sudo apt-get install --yes gh
-    fi
+    npm install --global npm@latest t3@latest @openai/codex opencode-ai
+    sudo apt-get update
+    sudo apt-get install --yes gh ripgrep
+    mkdir -p "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh"
+    for forgejo_host in forgejo.home.tom-mendy.com forgejo.tom-mendy.com; do
+      ssh-keyscan -T 5 -H "$forgejo_host" >> "$HOME/.ssh/known_hosts" 2>/dev/null || true
+    done
+    sort -u "$HOME/.ssh/known_hosts" -o "$HOME/.ssh/known_hosts"
+    chmod 600 "$HOME/.ssh/known_hosts"
+    git config --global core.sshCommand "coder gitssh"
+    export GIT_SSH_COMMAND="coder gitssh"
     mkdir -p "$HOME/.local/share/t3"
     server_pid="$HOME/.local/share/t3/serve.pid"
     if [ ! -f "$server_pid" ] || ! kill -0 "$(cat "$server_pid")" 2>/dev/null; then
@@ -43,7 +55,7 @@ resource "coder_agent" "main" {
   metadata {
     display_name = "Codex version"
     key          = "codex-version"
-    script       = "codex --version"
+    script       = "export PATH=\"$HOME/.local/bin:$PATH\"; codex --version"
     interval     = 300
     timeout      = 5
   }
@@ -59,7 +71,7 @@ resource "coder_agent" "main" {
   metadata {
     display_name = "T3 version"
     key          = "t3-version"
-    script       = "t3 --version"
+    script       = "export PATH=\"$HOME/.local/bin:$PATH\"; t3 --version"
     interval     = 300
     timeout      = 5
   }

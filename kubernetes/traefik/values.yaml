@@ -32,8 +32,6 @@ env:
 
 deployment:
   replicas: 1
-  annotations:
-    keel.sh/policy: minor
 
 additionalArguments:
   - --entrypoints.web.http.redirections.entryPoint.to=:443

@@ -14,7 +14,6 @@ Examples currently present in DNS mapping (`kubernetes/blocky/config.yml`):
 - `forgejo.tom-mendy.com`
 - `grafana.home.tom-mendy.com`
 - `homepage.home.tom-mendy.com`
-- `keel.home.tom-mendy.com`
 - `navidrome.home.tom-mendy.com`
 - `openwebui.home.tom-mendy.com`
 - `ollama.home.tom-mendy.com`
@@ -92,7 +91,6 @@ kubectl -n traefik logs deploy/traefik | grep -Ei "acme|certificate|letsencrypt|
 1. Verify host routing and certificate presentation:
 
 ```bash
-curl -Ik https://keel.home.tom-mendy.com
 curl -Ik https://vaultwarden.home.tom-mendy.com
 ```
 

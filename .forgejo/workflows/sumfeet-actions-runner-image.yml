@@ -1,0 +1,74 @@
+name: publish-sumfeet-actions-runner-image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "kubernetes/github-runners/sumfeet/Dockerfile"
+      - ".forgejo/workflows/sumfeet-actions-runner-image.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sumfeet-actions-runner-image
+  cancel-in-progress: true
+
+env:
+  BUILDKITD_FLAGS: >-
+    --oci-worker-snapshotter=fuse-overlayfs
+    --oci-worker-no-process-sandbox
+  REGISTRY: harbor.home.tom-mendy.com
+  IMAGE: harbor.home.tom-mendy.com/runners/sumfeet-actions-runner
+
+jobs:
+  publish:
+    runs-on: buildkit
+    container:
+      image: harbor.home.tom-mendy.com/homelab/ci/buildkit-forgejo@sha256:573c108b9221ef005ba2d62885f64b0028147ce5dbfc0b267843530ab286b26f
+      credentials:
+        username: ${{ secrets.HARBOR_REGISTRY_USER }}
+        password: ${{ secrets.HARBOR_REGISTRY_TOKEN }}
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          clean: true
+
+      - name: Configure Harbor authentication
+        shell: bash
+        env:
+          REGISTRY_USERNAME: ${{ secrets.HARBOR_REGISTRY_USER }}
+          REGISTRY_TOKEN: ${{ secrets.HARBOR_REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$REGISTRY_USERNAME"
+          test -n "$REGISTRY_TOKEN"
+          mkdir -p "$HOME/.docker"
+          auth="$(printf '%s:%s' "$REGISTRY_USERNAME" "$REGISTRY_TOKEN" | base64 | tr -d '\n')"
+          printf '{"auths":{"%s":{"auth":"%s"}}}\n' "$REGISTRY" "$auth" > "$HOME/.docker/config.json"
+
+      - name: Build and publish image
+        id: publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          buildctl-daemonless.sh build \
+            --frontend dockerfile.v0 \
+            --progress=plain \
+            --local context=kubernetes/github-runners/sumfeet \
+            --local dockerfile=kubernetes/github-runners/sumfeet \
+            --opt platform=linux/amd64 \
+            --metadata-file image-metadata.json \
+            --output "type=image,name=$IMAGE:$FORGEJO_SHA,push=true"
+
+          digest="$(sed -n 's/.*"containerimage.digest"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' image-metadata.json)"
+          test -n "$digest"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "Published $IMAGE@$digest"
+
+      - name: Report immutable image reference
+        shell: bash
+        run: echo "$IMAGE@${{ steps.publish.outputs.digest }}"

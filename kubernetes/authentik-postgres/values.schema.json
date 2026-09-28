@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["namespace", "cluster"],
+  "properties": {
+    "namespace": { "type": "string", "minLength": 1 },
+    "cluster": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "instances", "imageName", "storage", "database", "owner"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "instances": { "type": "integer", "minimum": 1 },
+        "imageName": { "type": "string", "minLength": 1 },
+        "storage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["size", "storageClass"],
+          "properties": {
+            "size": { "type": "string", "minLength": 1 },
+            "storageClass": { "const": "nfs-k8s" }
+          }
+        },
+        "database": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

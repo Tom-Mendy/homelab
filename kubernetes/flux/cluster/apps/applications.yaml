@@ -2,6 +2,90 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
+  name: harbor-extras
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: harbor-extras
+  targetNamespace: harbor
+  storageNamespace: harbor
+  chart:
+    spec:
+      chart: ./kubernetes/harbor
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: infisical
+    - name: infisical-operator
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: harbor
+spec:
+  interval: 30m
+  timeout: 20m
+  releaseName: harbor
+  targetNamespace: harbor
+  storageNamespace: harbor
+  chart:
+    spec:
+      chart: harbor
+      version: 1.19.1
+      sourceRef:
+        kind: HelmRepository
+        name: harbor
+  valuesFrom:
+    - kind: ConfigMap
+      name: harbor-values
+  dependsOn:
+    - name: harbor-extras
+    - name: authentik
+    - name: nfs-provisioner
+    - name: traefik
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: harbor-config
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: harbor-config
+  targetNamespace: harbor
+  storageNamespace: harbor
+  chart:
+    spec:
+      chart: ./kubernetes/harbor-config
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: harbor
+  install:
+    createNamespace: true
+  upgrade:
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
   name: coder-extras
 spec:
   interval: 30m
@@ -17,12 +101,11 @@ spec:
         kind: GitRepository
         name: flux-system
   dependsOn:
-    - name: authentik-extras
+    - name: authentik
     - name: cloudnative-pg
     - name: nfs-provisioner
   driftDetection:
     mode: enabled
-
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -37,7 +120,7 @@ spec:
   chart:
     spec:
       chart: coder
-      version: 2.35.3
+      version: 2.36.4
       sourceRef:
         kind: HelmRepository
         name: coder
@@ -49,7 +132,6 @@ spec:
     - name: traefik
   driftDetection:
     mode: enabled
-
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -73,7 +155,7 @@ spec:
       name: grafana-values
   dependsOn:
     - name: grafana-extras
-    - name: authentik-extras
+    - name: authentik
     - name: nfs-provisioner
     - name: prometheus
     - name: traefik
@@ -124,7 +206,7 @@ spec:
         kind: GitRepository
         name: flux-system
   dependsOn:
-    - name: authentik-extras
+    - name: authentik
     - name: nfs-provisioner
     - name: ollama
   install:
@@ -256,7 +338,8 @@ spec:
         kind: GitRepository
         name: flux-system
   dependsOn:
-    - name: authentik-extras
+    - name: authentik
+    - name: cloudnative-pg
     - name: nfs-provisioner
     - name: traefik
   install:
@@ -289,6 +372,10 @@ spec:
     - name: traefik
   install:
     createNamespace: true
+  # Temporary migration: use Helm's non-destructive patch strategy for bound PVCs.
+  upgrade:
+    serverSideApply: disabled
+    force: false
   driftDetection:
     mode: enabled
 
@@ -311,7 +398,7 @@ spec:
         kind: GitRepository
         name: flux-system
   dependsOn:
-    - name: authentik-extras
+    - name: authentik
     - name: infisical-operator
     - name: nfs-provisioner
     - name: traefik
@@ -348,6 +435,36 @@ spec:
     disableSchemaValidation: true
   driftDetection:
     mode: enabled
+  postRenderers:
+    - kustomize:
+        patches:
+          - patch: |
+              - op: replace
+                path: /spec/template/spec/containers/0/livenessProbe/initialDelaySeconds
+                value: 60
+              - op: replace
+                path: /spec/template/spec/containers/0/livenessProbe/failureThreshold
+                value: 8
+              - op: replace
+                path: /spec/template/spec/containers/0/readinessProbe/initialDelaySeconds
+                value: 30
+              - op: replace
+                path: /spec/template/spec/containers/0/readinessProbe/failureThreshold
+                value: 6
+              - op: add
+                path: /spec/template/spec/containers/0/startupProbe
+                value:
+                  exec:
+                    command:
+                      - test
+                      - -f
+                      - /tmp/healthy
+                  failureThreshold: 12
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+            target:
+              kind: Deployment
+              name: newt-newt-main-tunnel
 
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
@@ -435,6 +552,32 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
+  name: portfolio
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: portfolio
+  targetNamespace: portfolio
+  storageNamespace: portfolio
+  chart:
+    spec:
+      chart: ./kubernetes/portfolio
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: harbor-extras
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
   name: blocky
 spec:
   interval: 30m
@@ -476,61 +619,6 @@ spec:
         name: flux-system
   dependsOn:
     - name: traefik
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
-
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: keel
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: keel
-  targetNamespace: keel
-  storageNamespace: keel
-  chart:
-    spec:
-      chart: keel
-      version: 1.2.0
-      sourceRef:
-        kind: HelmRepository
-        name: keel
-  valuesFrom:
-    - kind: ConfigMap
-      name: keel-values
-  dependsOn:
-    - name: traefik
-  install:
-    createNamespace: true
-  driftDetection:
-    mode: enabled
-
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: keel-extras
-spec:
-  interval: 30m
-  timeout: 10m
-  releaseName: keel-extras
-  targetNamespace: keel
-  storageNamespace: keel
-  chart:
-    spec:
-      chart: ./kubernetes/keel
-      reconcileStrategy: Revision
-      sourceRef:
-        kind: GitRepository
-        name: flux-system
-  dependsOn:
-    - name: infisical
-    - name: infisical-operator
-    - name: keel
   install:
     createNamespace: true
   driftDetection:
@@ -614,5 +702,9 @@ spec:
     - name: traefik
   install:
     createNamespace: true
+  # Temporary migration: use Helm's non-destructive patch strategy for bound PVCs.
+  upgrade:
+    serverSideApply: disabled
+    force: false
   driftDetection:
     mode: enabled

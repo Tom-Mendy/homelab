@@ -2,18 +2,17 @@ namespace: ollama
 
 image:
   repository: ollama/ollama
-  tag: 0.30.11@sha256:c484b703176aa19dfc0a54cbfb60ab8094b38faa04283fb77eba1d33319e5eca
+  tag: 0.34.2@sha256:da6e0dc5651df159e45686fd663c4dbe1624a52c44d7280eeac1551d8f865532
   pullPolicy: IfNotPresent
 
 deployment:
-  annotations:
-    keel.sh/policy: all
   strategy: Recreate
 
 models:
   pull:
     - gemma4:e4b
     - deepseek-r1:8b
+    - SparkLLM/Spark-X2.5-4B:latest
 
 nodeSelector:
   gpu: "true"
@@ -58,7 +57,7 @@ gpu:
   devicePlugin:
     enabled: true
     namespace: kube-system
-    image: nvcr.io/nvidia/k8s-device-plugin:v0.17.1
+    image: nvcr.io/nvidia/k8s-device-plugin:v0.20.0@sha256:a61ba9fd8efb82f3a79f877f7580e02c1e8e7593f62473644bc9c79e315c3312
     nodeSelector:
       gpu: "true"
     tolerations:
@@ -73,15 +72,17 @@ openwebui:
   namespaceOverride: ollama
   fullnameOverride: open-webui
 
+  image:
+    repository: ghcr.io/open-webui/open-webui
+    tag: 0.9.6@sha256:90eae5b419e40b4c3dd684582b2c83440b36f9ae2f6532c09639b2ba4ee65158
+    pullPolicy: IfNotPresent
+
   ollama:
     enabled: false
   ollamaUrls:
     - http://ollama:11434
 
   deployment:
-    podAnnotations:
-      keel.sh/policy: all
-
   service:
     type: ClusterIP
     port: 8080
@@ -129,13 +130,17 @@ openwebui:
       clientId: openwebui
       clientExistingSecret: openwebui-oidc
       clientExistingSecretKey: OPENWEBUI_OIDC_CLIENT_SECRET
-      providerUrl: https://authentik.home.tom-mendy.com/application/o/openwebui/.well-known/openid-configuration
+      providerUrl: https://authentik.tom-mendy.com/application/o/openwebui/.well-known/openid-configuration
       providerName: Authentik
       scopes: "openid email profile roles"
     roleManagement:
       rolesClaim: roles
       allowedRoles: openwebui-user,openwebui-admin
       adminRoles: openwebui-admin
+
+openwebuiFunctionSync:
+  enabled: true
+  schedule: "*/10 * * * *"
 
 openwebuiIngress:
   name: openwebui-ingress

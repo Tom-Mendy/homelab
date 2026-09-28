@@ -1,26 +1,4 @@
-namespace: authentik
-
-oidc:
-  blueprintConfigMapName: authentik-oidc-blueprint
-  infisical:
-    connectionName: authentik-oidc-infisical
-    authName: authentik-oidc-infisical
-    identitySecretName: authentik-oidc-infisical-identity
-    secretName: authentik-oidc
-    address: https://infisical.home.tom-mendy.com
-    projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
-    envSlug: prod
-
-authentik:
-  existingSecret:
-    secretName: authentik-secrets
-  error_reporting:
-    enabled: false
-  postgresql:
-    host: authentik-postgres-rw.authentik.svc.cluster.local
-    name: authentik
-    user: authentik
-    port: 5432
+fullnameOverride: authentik
 
 global:
   deploymentAnnotations:
@@ -44,6 +22,17 @@ global:
     - name: AUTHENTIK_POSTGRESQL__PORT
       value: "5432"
 
+authentik:
+  existingSecret:
+    secretName: authentik-secrets
+  error_reporting:
+    enabled: false
+  postgresql:
+    host: authentik-postgres-rw.authentik.svc.cluster.local
+    name: authentik
+    user: authentik
+    port: 5432
+
 postgresql:
   enabled: false
 
@@ -60,12 +49,12 @@ server:
       traefik.ingress.kubernetes.io/router.tls: "true"
       traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
     hosts:
-      - authentik.home.tom-mendy.com
       - authentik.tom-mendy.com
+      - authentik.home.tom-mendy.com
     tls:
       - hosts:
-          - authentik.home.tom-mendy.com
           - authentik.tom-mendy.com
+          - authentik.home.tom-mendy.com
 
 worker:
   replicas: 1

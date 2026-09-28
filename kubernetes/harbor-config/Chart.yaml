@@ -1,0 +1,5 @@
+apiVersion: v2
+name: harbor-config
+description: Declarative Harbor proxy-cache and scanner configuration
+type: application
+version: 0.1.0

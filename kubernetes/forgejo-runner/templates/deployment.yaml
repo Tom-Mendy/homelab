@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: forgejo-runner-homelab
+  name: {{ .Values.runner.name }}
   namespace: {{ .Values.namespace }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: forgejo-runner-homelab
+      app: {{ .Values.runner.name }}
   template:
     metadata:
       labels:
-        app: forgejo-runner-homelab
+        app: {{ .Values.runner.name }}
       annotations:
         checksum/runner-config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
@@ -26,8 +26,29 @@ spec:
           env:
             - name: DOCKER_TLS_CERTDIR
               value: ""
+            {{- if .Values.registryAuth.enabled }}
+            - name: HARBOR_CI_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.registryAuth.secretName }}
+                  key: {{ .Values.registryAuth.usernameKey }}
+            - name: HARBOR_CI_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.registryAuth.secretName }}
+                  key: {{ .Values.registryAuth.tokenKey }}
+            {{- end }}
           command:
-            - dockerd
+            - /bin/sh
+            - -ec
+            - |
+              {{- if .Values.registryAuth.enabled }}
+              mkdir -p /root/.docker
+              auth="$$(printf '%s:%s' "$${HARBOR_CI_USERNAME}" "$${HARBOR_CI_TOKEN}" | base64 | tr -d '\\n')"
+              printf '{"auths":{"harbor.home.tom-mendy.com":{"auth":"%s"}}}\n' "$${auth}" > /root/.docker/config.json
+              {{- end }}
+              exec dockerd "$${@}"
+            - --
           args:
             - -H
             - tcp://0.0.0.0:2375
@@ -37,6 +58,18 @@ spec:
               name: docker
           resources:
 {{ toYaml .Values.docker.resources | nindent 12 }}
+          startupProbe:
+            tcpSocket:
+              port: docker
+            periodSeconds: 2
+            failureThreshold: 30
+          livenessProbe:
+            tcpSocket:
+              port: docker
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
           volumeMounts:
             - name: docker-data
               mountPath: /var/lib/docker
@@ -92,8 +125,11 @@ spec:
       volumes:
         - name: runner-config
           configMap:
-            name: forgejo-runner-config
+            name: {{ .Values.runner.name }}-config
         - name: runner-data
           emptyDir: {}
         - name: docker-data
-          emptyDir: {}
+          emptyDir:
+            {{- with .Values.docker.dataSizeLimit }}
+            sizeLimit: {{ . }}
+            {{- end }}

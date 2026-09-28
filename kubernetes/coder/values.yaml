@@ -10,7 +10,7 @@ coder:
           name: coder-postgres-app
           key: uri
     - name: CODER_OIDC_ISSUER_URL
-      value: https://authentik.home.tom-mendy.com/application/o/coder/
+      value: https://authentik.tom-mendy.com/application/o/coder/
     - name: CODER_OIDC_CLIENT_ID
       value: coder
     - name: CODER_OIDC_CLIENT_SECRET

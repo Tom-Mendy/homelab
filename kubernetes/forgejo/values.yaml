@@ -5,17 +5,31 @@ replicaCount: 1
 
 image:
   repository: codeberg.org/forgejo/forgejo
-  tag: "15"
+  tag: 15.0.7@sha256:1f9c1a9880425614267832ce437f8ae5f5b69e1f3219f38fc468fc37e48c1919
   pullPolicy: IfNotPresent
-
-deploymentAnnotations:
-  keel.sh/policy: all
 
 user:
   uid: "1023"
   gid: "100"
 
 rootUrl: https://forgejo.tom-mendy.com/
+
+database:
+  type: postgres
+  host: forgejo-postgres-rw.forgejo.svc.cluster.local:5432
+  name: forgejo
+  sslMode: disable
+  secretName: forgejo-postgres-app
+
+cluster:
+  name: forgejo-postgres
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17
+  storage:
+    size: 20Gi
+    storageClass: nfs-k8s
+  database: forgejo
+  owner: forgejo
 
 oauth2Client:
   enableAutoRegistration: true
@@ -24,6 +38,7 @@ oauth2Client:
 oidc:
   enabled: true
   secretName: forgejo-oidc
+  discoveryUrl: https://authentik.tom-mendy.com/application/o/forgejo/.well-known/openid-configuration
 
 actions:
   enabled: "true"

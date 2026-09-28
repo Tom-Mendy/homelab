@@ -1,0 +1,73 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: portfolio-image-updates
+  namespace: flux-system
+spec:
+  interval: 1m
+  ref:
+    branch: main
+  secretRef:
+    name: portfolio-image-git
+  url: ssh://git@forgejo.forgejo.svc.cluster.local/Tom-Mendy/homelab.git
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: portfolio
+  namespace: flux-system
+spec:
+  image: harbor.home.tom-mendy.com/portfolio/portfolio
+  interval: 1m
+  secretRef:
+    name: portfolio-registry-auth
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: portfolio
+  namespace: flux-system
+  labels:
+    app.kubernetes.io/name: portfolio
+spec:
+  imageRepositoryRef:
+    name: portfolio
+  filterTags:
+    pattern: ^latest$
+  policy:
+    alphabetical: {}
+  digestReflectionPolicy: Always
+  interval: 1m
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageUpdateAutomation
+metadata:
+  name: portfolio
+  namespace: flux-system
+spec:
+  interval: 1m
+  sourceRef:
+    kind: GitRepository
+    name: portfolio-image-updates
+  policySelector:
+    matchLabels:
+      app.kubernetes.io/name: portfolio
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        name: flux-image-automation
+        email: flux-image-automation@tom-mendy.com
+      messageTemplate: |-
+        Update Portfolio image
+
+        {{ range .Changed.Changes -}}
+        {{ .OldValue }} -> {{ .NewValue }}
+        {{ end -}}
+    push:
+      branch: main
+  update:
+    path: ./kubernetes/portfolio
+    strategy: Setters

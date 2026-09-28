@@ -3,4 +3,4 @@ name: coder-local
 description: Local resources required by the official Coder chart
 type: application
 version: 0.1.0
-appVersion: "2.35.3"
+appVersion: "2.36.4"

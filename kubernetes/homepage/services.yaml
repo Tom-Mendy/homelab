@@ -24,10 +24,6 @@
         icon: flux-cd.svg
         href: https://flux.home.tom-mendy.com
         description: GitOps status
-    - Keel:
-         icon: kubernetes.svg
-         href: https://keel.home.tom-mendy.com
-         description: Kubernetes deployment automation
     - Hindsight:
         icon: kubernetes.svg
         href: https://hindsight.home.tom-mendy.com
@@ -86,6 +82,10 @@
         icon: atuin.svg
         href: https://atuin.home.tom-mendy.com/
         description: Shell history sync and search
+    - Harbor:
+        icon: harbor.svg
+        href: https://harbor.home.tom-mendy.com/
+        description: Container image registry
 
 - Arr Apps:
     - Prowlarr:

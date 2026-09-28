@@ -15,8 +15,9 @@
     },
     "runner": {
       "type": "object",
-      "required": ["image", "secretName", "logLevel", "capacity", "timeout", "labels", "resources"],
+      "required": ["name", "image", "secretName", "logLevel", "capacity", "timeout", "labels", "resources"],
       "properties": {
+        "name": { "type": "string", "minLength": 1 },
         "image": {
           "type": "object",
           "required": ["repository", "tag", "pullPolicy"],
@@ -54,7 +55,23 @@
             "pullPolicy": { "type": "string", "minLength": 1 }
           }
         },
-        "resources": { "type": "object" }
+        "resources": { "type": "object" },
+        "dataSizeLimit": { "type": "string", "minLength": 1 }
+      }
+    },
+    "registryAuth": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "secretName": { "type": "string", "minLength": 1 },
+        "usernameKey": { "type": "string", "minLength": 1 },
+        "tokenKey": { "type": "string", "minLength": 1 }
+      }
+    },
+    "infisicalSecret": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
       }
     },
     "securityContext": {

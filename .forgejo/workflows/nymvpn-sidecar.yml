@@ -1,4 +1,10 @@
 name: nymvpn-sidecar
+# Build and publish through the rootless BuildKit runner.
+
+env:
+  BUILDKITD_FLAGS: >-
+    --oci-worker-snapshotter=fuse-overlayfs
+    --oci-worker-no-process-sandbox
 
 on:
   workflow_dispatch:
@@ -11,24 +17,40 @@ on:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: buildkit
+    container:
+      image: harbor.home.tom-mendy.com/homelab/ci/buildkit-forgejo@sha256:573c108b9221ef005ba2d62885f64b0028147ce5dbfc0b267843530ab286b26f
+      credentials:
+        username: ${{ secrets.HARBOR_REGISTRY_USER }}
+        password: ${{ secrets.HARBOR_REGISTRY_TOKEN }}
     env:
-      IMAGE: forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.3-3
+      REGISTRY: harbor.home.tom-mendy.com
+      IMAGE: harbor.home.tom-mendy.com/homelab/nymvpn-sidecar
+      IMAGE_TAG: 2026.11.3-4
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
+        with:
+          clean: true
 
-      - name: Log in to Forgejo registry
-        run: echo "$REGISTRY_TOKEN" | docker login forgejo.tom-mendy.com --username "$REGISTRY_USERNAME" --password-stdin
-        env:
-          REGISTRY_USERNAME: ${{ forgejo.repository_owner }}
-          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
-
-      - name: Build and push image
+      - name: Configure Harbor authentication
         run: |
-          docker build --pull --tag "$IMAGE" kubernetes/media/nymvpn
-          for attempt in 1 2 3; do
-            docker push "$IMAGE" && exit 0
-            sleep 15
-          done
-          exit 1
+          set -euo pipefail
+          mkdir -p "$HOME/.docker"
+          auth="$(printf '%s:%s' "$HARBOR_USER" "$HARBOR_TOKEN" | base64 | tr -d '\\n')"
+          printf '{"auths":{"%s":{"auth":"%s"}}}\n' "$REGISTRY" "$auth" > "$HOME/.docker/config.json"
+        env:
+          HARBOR_USER: ${{ secrets.HARBOR_REGISTRY_USER }}
+          HARBOR_TOKEN: ${{ secrets.HARBOR_REGISTRY_TOKEN }}
+
+      - name: Build and publish image
+        run: |
+          set -euo pipefail
+          buildctl-daemonless.sh build \
+            --frontend dockerfile.v0 \
+            --local context=kubernetes/media/nymvpn \
+            --local dockerfile=kubernetes/media/nymvpn \
+            --opt platform=linux/amd64 \
+            --output "type=image,\"name=$IMAGE:$FORGEJO_SHA,$IMAGE:$IMAGE_TAG,$IMAGE:latest\",push=true" \
+            --import-cache type=registry,ref="$IMAGE:buildcache" \
+            --export-cache type=registry,ref="$IMAGE:buildcache",mode=max

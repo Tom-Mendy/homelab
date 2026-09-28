@@ -19,7 +19,8 @@ The Flux source is the private Forgejo repository at
 - A current backup of application data and Kubernetes resources.
 - The Authentik OIDC Infisical identity and secrets described below.
 
-Never commit the private deploy key, kubeconfig, or Secret YAML.
+Never commit the private deploy key, kubeconfig, or credential-bearing Secret
+YAML.
 
 ## Install Flux beside Argo CD
 
@@ -27,55 +28,63 @@ Create a Kubernetes-auth Machine Identity named `authentik-oidc-sync` in
 Infisical. Allow the `authentik/authentik-infisical-sync` ServiceAccount to use
 it and grant read-only recursive access to `/oidc` in `homelab/prod`.
 
-Create three independent 32-byte client secrets in Infisical:
+Create independent client secrets in Infisical. Use a separate value for each
+client:
 
 | Path    | Key                                   |
 | ------- | ------------------------------------- |
 | `/oidc` | `FORGEJO_OIDC_CLIENT_SECRET`          |
 | `/oidc` | `GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET` |
 | `/oidc` | `FLUX_WEB_CLIENT_SECRET`              |
+| `/oidc` | `INFISICAL_OIDC_CLIENT_SECRET`        |
 
-Create the namespace and the non-secret Machine Identity reference. Do not put
-any client secret in this Kubernetes Secret:
+Set `identityId` in `kubernetes/authentik/oidc-infisical.yaml` to the Machine
+Identity ID. The ID selects an Infisical identity but does not authenticate by
+itself. Never put an Infisical access token or client secret in Git.
 
-```bash
-kubectl apply -f kubernetes/flux/bootstrap/namespace.yaml
-read -r infisical_oidc_id
-kubectl -n authentik create secret generic \
-  authentik-oidc-infisical-identity \
-  --from-literal=identityId="$INFISICAL_OIDC_ID" \
-  --dry-run=client -o yaml | kubectl apply -f -
-unset INFISICAL_OIDC_ID
-```
+Flux manages Authentik through three independent lifecycles:
 
-Install the Authentik bootstrap resources and wait for Infisical to distribute
-the scoped Secrets:
+- `HelmRelease/authentik` installs the official remote chart.
+- `HelmRelease/authentik-postgres` owns the CloudNativePG Cluster.
+- The Authentik Kustomization owns the Namespace, blueprints, Infisical
+  resources, and outpost Ingresses.
+
+Reconcile the cluster and wait for Infisical to distribute the scoped Secrets:
 
 ```bash
-helm upgrade --install authentik-extras kubernetes/authentik \
-  --namespace authentik
-kubectl -n authentik wait infisicalauth/authentik-oidc-infisical \
-  --for=condition=Ready --timeout=5m
-kubectl -n authentik wait infisicalstaticsecret/authentik-oidc \
-  --for=condition=Ready --timeout=5m
+flux reconcile kustomization flux-system -n flux-system --with-source
+flux reconcile helmrelease authentik-postgres -n flux-system --with-source
+flux reconcile helmrelease authentik -n flux-system --with-source
+kubectl -n authentik wait \
+  infisicalauth/authentik-oidc-infisical \
+  --for=condition=secrets.infisical.com/IsReady \
+  --timeout=5m
+kubectl -n authentik wait \
+  infisicalstaticsecret/authentik-oidc \
+  --for=condition=secrets.infisical.com/LastReconcileStatus \
+  --timeout=5m
 kubectl get secret -n authentik authentik-oidc
 kubectl get secret -n forgejo forgejo-oidc
 kubectl get secret -n grafana grafana-oidc
 kubectl get secret -n flux-system flux-web-client
 ```
 
-Upgrade Authentik so its worker applies the Blueprint, then add the cluster
-administrator to `homelab-admins` in Authentik:
+The Infisical OIDC client is declared in the Authentik blueprint. Its secret is
+distributed to Authentik as `INFISICAL_OIDC_CLIENT_SECRET`; Infisical itself
+stores the client configuration in its organization SSO settings.
+
+Wait for Authentik to apply the Blueprint, then add the cluster administrator to
+`homelab-admins` in Authentik:
 
 ```bash
-helm upgrade --install authentik \
-  https://github.com/goauthentik/helm/releases/download/\
-authentik-2026.5.2/authentik-2026.5.2.tgz \
-  --namespace authentik \
-  --values kubernetes/authentik/values.yaml \
-  --wait
 kubectl -n authentik rollout status deployment/authentik-worker
 ```
+
+The Namespace must never be rendered by either Helm release. Its Flux manifest
+disables pruning. The PostgreSQL chart marks the Cluster with
+`helm.sh/resource-policy: keep`, and `nfs-k8s` retains the PV. Before changing
+ownership, record the Cluster UID, PVC UID, PV name, NFS path, and PostgreSQL
+system ID. If any identifier changes, suspend Authentik and stop the migration.
 
 Install Flux Operator with its TLS ingress and Authentik OIDC login. The client
 secret travels through stdin and is not written to Git or the shell history:
@@ -115,6 +124,30 @@ Apply the Flux instance:
 kubectl apply -f kubernetes/flux/bootstrap/flux-instance.yaml
 kubectl -n flux-system wait fluxinstance/flux \
   --for=condition=Ready --timeout=10m
+```
+
+The Flux instance also installs the image reflector and image automation
+controllers. Portfolio image updates use a separate Forgejo deploy key with
+write access, so the bootstrap key remains read-only. Provision the Harbor and
+Forgejo credentials before the image resources reach the cluster:
+
+```bash
+./scripts/setup-portfolio-image-automation.sh
+```
+
+The wizard stores the Git private key outside the repository and creates
+`flux-system/portfolio-image-git`. It stores the Harbor robot Docker config in
+Infisical at `/harbor/portfolio`; the Harbor extras chart syncs that value to
+`flux-system/portfolio-registry-auth` and
+`portfolio/portfolio-registry-auth`.
+
+After the automation manifests reach `main`, verify the complete path:
+
+```bash
+flux reconcile kustomization flux-system --with-source
+flux get images all --all-namespaces
+flux get image update portfolio --namespace flux-system
+kubectl -n portfolio rollout status deployment/portfolio
 ```
 
 Verify that Flux can fetch Forgejo before stopping Argo CD:

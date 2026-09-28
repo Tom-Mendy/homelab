@@ -1,6 +1,6 @@
 # Coder agent workspaces
 
-Coder 2.35.3 runs the control plane in `coder`; workspace Deployments and their
+Coder 2.36.4 runs the control plane in `coder`; workspace Deployments and their
 NFS-backed homes run in `coder-workspaces`. Stopping a workspace removes its
 Deployment but retains its PVC. Deleting the workspace is the explicit data
 deletion boundary.
@@ -63,6 +63,13 @@ coder templates push hermes-personal \
   --directory kubernetes/coder/workspace-templates/hermes-personal
 ```
 
+If a workspace build reports `requested: requests.storage=50Gi`, the published
+Coder template is stale. The versioned `t3code` template requests `10Gi`, so
+republish it with the command above and retry the workspace. Do not increase
+the namespace quota to hide this drift. Existing stopped workspaces retain
+their PVCs, so delete an unused workspace only when its data is no longer
+needed.
+
 The `t3code` template is separate from `agent-workspace`. It installs T3 in the
 workspace and compiles its Linux `node-pty` native module during first startup.
 
@@ -114,9 +121,11 @@ running workspace.
 
 ## Forgejo access
 
-Each workspace uses Coder's managed SSH key through `coder gitssh`. On its first
-start, copy the public key printed in the startup log and add it to the Forgejo
-account, then rerun the clone:
+Each workspace uses Coder's managed SSH key through `coder gitssh`. The `t3code`
+template configures this command as Git's global SSH command and prepares
+`known_hosts` for the public Forgejo names. On its first start, copy the public
+key printed in the startup log and add it to the Forgejo account, then retry the
+clone from T3 Code:
 
 ```sh
 GIT_SSH_COMMAND="coder gitssh" git clone --branch main \
@@ -124,9 +133,10 @@ GIT_SSH_COMMAND="coder gitssh" git clone --branch main \
   ~/project
 ```
 
-The templates set `GIT_SSH_COMMAND="coder gitssh"` for the initial clone. No
-local private key or Forgejo token is stored in the workspace PVC or a
-Kubernetes Secret.
+No local private key or Forgejo token is stored in the workspace PVC or a
+Kubernetes Secret. After changing a workspace template, publish it again with
+the `coder templates push` command from the section above, then restart the
+workspace so its startup script runs again.
 
 ## Hermes first-time setup
 

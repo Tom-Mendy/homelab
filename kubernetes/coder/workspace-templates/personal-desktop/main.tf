@@ -50,7 +50,7 @@ resource "coder_agent" "main" {
   metadata {
     display_name = "Desktop"
     key          = "desktop"
-    script       = "curl --silent --fail --max-time 2 http://127.0.0.1:6080/vnc.html >/dev/null && echo ready || echo starting"
+    script       = "curl --silent --fail --max-time 2 http://127.0.0.1:6080/ >/dev/null && echo ready || echo starting"
     interval     = 10
     timeout      = 3
   }
@@ -61,7 +61,7 @@ resource "coder_app" "desktop" {
   slug         = "desktop"
   display_name = "Desktop"
   icon         = "/icon/desktop.svg"
-  url          = "http://127.0.0.1:6080/vnc.html"
+  url          = "http://127.0.0.1:6080"
   share        = "owner"
   subdomain    = false
 }
@@ -84,7 +84,7 @@ resource "kubernetes_persistent_volume_claim_v1" "home" {
     access_modes       = ["ReadWriteOnce"]
     storage_class_name = "nfs-k8s"
     resources {
-      requests = { storage = "50Gi" }
+      requests = { storage = "10Gi" }
     }
   }
 }
@@ -132,7 +132,7 @@ resource "kubernetes_deployment_v1" "workspace" {
 
         container {
           name              = "workspace"
-          image             = "forgejo.tom-mendy.com/tom-mendy/personal-desktop:v2026.9.15-1"
+            image             = "forgejo.tom-mendy.com/tom-mendy/personal-desktop:v2026.9.15-4"
           image_pull_policy = "IfNotPresent"
           command           = ["sh", "-c", coder_agent.main.init_script]
 
@@ -169,7 +169,7 @@ resource "kubernetes_deployment_v1" "workspace" {
           }
 
           resources {
-            requests = { cpu = "1", memory = "2Gi" }
+            requests = { cpu = "500m", memory = "2Gi" }
             limits   = { cpu = "4", memory = "8Gi" }
           }
 

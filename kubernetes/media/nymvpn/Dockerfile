@@ -15,6 +15,8 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends /tmp/nym-vpnc.deb /tmp/nym-vpnd.deb ca-certificates iproute2 \
   && rm -rf /var/lib/apt/lists/* /tmp/nym-vpn*.deb
 
+ENV NYMVPN_ACCESS_CODE_FILE=/run/secrets/nymvpn/access-code
+
 COPY --chmod=0755 entrypoint.sh /usr/local/bin/nymvpn-entrypoint
 
 ENTRYPOINT ["/usr/local/bin/nymvpn-entrypoint"]

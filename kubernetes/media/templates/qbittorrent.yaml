@@ -1,5 +1,4 @@
 {{- $app := .Values.apps.qbittorrent }}
-{{- $vpnProvider := default "protonvpn" $app.vpnProvider }}
 {{- if $app.ssoAuthWhitelist }}
 apiVersion: v1
 kind: ConfigMap
@@ -35,9 +34,15 @@ data:
 
     set_key 'WebUI\AuthSubnetWhitelistEnabled' 'true'
     set_key 'WebUI\AuthSubnetWhitelist' "$SSO_AUTH_WHITELIST"
+    # qBittorrent must use the proxy address when evaluating the whitelist.
+    # Otherwise it can ignore the forwarded client address and keep its own
+    # authentication challenge in front of the Authentik session.
+    set_key 'WebUI\LocalHostAuth' 'false'
+    set_key 'WebUI\ReverseProxySupportEnabled' 'true'
+    set_key 'WebUI\TrustedReverseProxiesList' "$SSO_AUTH_WHITELIST"
 ---
 {{- end }}
-{{- if and .Values.vpn.enabled $app.vpn (eq $vpnProvider "nymvpn") }}
+{{- if $app.vpn }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -72,8 +77,6 @@ kind: Deployment
 metadata:
   name: qbittorrent
   namespace: {{ .Values.namespace }}
-  annotations:
-    keel.sh/policy: all
 spec:
   replicas: 1
   selector:
@@ -84,7 +87,7 @@ spec:
       labels:
         app: qbittorrent
     spec:
-      {{- if and .Values.vpn.enabled $app.vpn (eq $vpnProvider "nymvpn") }}
+      {{- if $app.vpn }}
       dnsPolicy: None
       dnsConfig:
         nameservers:
@@ -154,46 +157,6 @@ spec:
               readOnly: true
         {{- end }}
       containers:
-        {{- if and .Values.vpn.enabled $app.vpn (eq $vpnProvider "protonvpn") }}
-        - name: gluetun
-          image: qmcgaw/gluetun:v3.41.1@sha256:1a5bf4b4820a879cdf8d93d7ef0d2d963af56670c9ebff8981860b6804ebc8ab
-          securityContext:
-            capabilities:
-              add:
-                - NET_ADMIN
-          env:
-            - name: VPN_SERVICE_PROVIDER
-              value: {{ .Values.vpn.serviceProvider | quote }}
-            - name: VPN_TYPE
-              value: {{ .Values.vpn.type | quote }}
-            {{- if eq (lower .Values.vpn.type) "wireguard" }}
-            - name: WIREGUARD_PRIVATE_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.vpn.secretName }}
-                  key: WIREGUARD_PRIVATE_KEY
-            {{- else }}
-            - name: OPENVPN_USER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.vpn.secretName }}
-                  key: OPENVPN_USER
-            - name: OPENVPN_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.vpn.secretName }}
-                  key: OPENVPN_PASSWORD
-            {{- end }}
-            - name: FIREWALL
-              value: {{ .Values.vpn.firewall | quote }}
-            - name: FIREWALL_INPUT_PORTS
-              value: {{ $app.port | quote }}
-            - name: SERVER_COUNTRIES
-              value: {{ .Values.vpn.serverCountries | quote }}
-          volumeMounts:
-            - name: tun
-              mountPath: /dev/net/tun
-        {{- end }}
         - name: qbittorrent
           image: {{ $app.image | quote }}
           env:
@@ -228,13 +191,13 @@ spec:
           persistentVolumeClaim:
             claimName: media-downloads-pvc
         {{- end }}
-        {{- if and .Values.vpn.enabled $app.vpn (ne $vpnProvider "none") }}
+        {{- if $app.vpn }}
         - name: tun
           hostPath:
             path: /dev/net/tun
             type: CharDevice
         {{- end }}
-        {{- if and .Values.vpn.enabled $app.vpn (eq $vpnProvider "nymvpn") }}
+        {{- if $app.vpn }}
         - name: nymvpn-state
           persistentVolumeClaim:
             claimName: qbittorrent-nymvpn-pvc
