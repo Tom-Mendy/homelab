@@ -13,6 +13,7 @@ user:
   gid: "100"
 
 rootUrl: https://forgejo.tom-mendy.com/
+sshDomain: forgejo.tom-mendy.com
 
 database:
   type: postgres
