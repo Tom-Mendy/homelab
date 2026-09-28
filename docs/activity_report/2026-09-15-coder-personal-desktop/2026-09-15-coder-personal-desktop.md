@@ -17,7 +17,7 @@ not receive a Kubernetes service-account token or privilege escalation.
 The template creates a 50Gi `nfs-k8s` PVC mounted at `/opt/data` and exposes
 only a Coder owner-only application named `Desktop` at localhost:6080. There is
 no direct VNC Ingress, NodePort, or LoadBalancer. The stable public entry point
-is `https://coder.home.tom-mendy.com`; Coder generates the authenticated app
+is `https://coder.tom-mendy.com`; Coder generates the authenticated app link
 link from the workspace dashboard.
 
 ## Files
@@ -46,7 +46,7 @@ terraform -chdir=kubernetes/coder/workspace-templates/personal-desktop init -bac
 terraform -chdir=kubernetes/coder/workspace-templates/personal-desktop validate
 ./scripts/check-storage-policy.sh
 
-coder login https://coder.home.tom-mendy.com
+coder login https://coder.tom-mendy.com
 coder templates push personal-desktop \
   --directory kubernetes/coder/workspace-templates/personal-desktop
 ```

@@ -3,7 +3,7 @@ coder:
     secrets.infisical.com/auto-reload: "true"
   env:
     - name: CODER_ACCESS_URL
-      value: https://coder.home.tom-mendy.com
+      value: https://coder.tom-mendy.com
     - name: CODER_PG_CONNECTION_URL
       valueFrom:
         secretKeyRef:
@@ -37,7 +37,7 @@ coder:
   ingress:
     enable: true
     className: traefik
-    host: coder.home.tom-mendy.com
+    host: coder.tom-mendy.com
     annotations:
       traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
       traefik.ingress.kubernetes.io/router.tls: "true"

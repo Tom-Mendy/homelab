@@ -20,7 +20,7 @@ kubectl wait -n coder --for=condition=Ready cluster/coder-postgres --timeout=10m
 kubectl rollout status -n coder deployment/coder --timeout=10m
 ```
 
-Open `https://coder.home.tom-mendy.com`, sign in through Authentik, and finish
+Open `https://coder.tom-mendy.com`, sign in through Authentik, and finish
 the owner bootstrap if Coder requests it.
 
 ## Optional Coder Agents integration
@@ -29,7 +29,7 @@ Coder Agents and its AI Gateway require a Coder license entitlement. Check the
 deployment before trying to configure Ollama:
 
 ```sh
-curl -fsS https://coder.home.tom-mendy.com/api/v2/entitlements \
+curl -fsS https://coder.tom-mendy.com/api/v2/entitlements \
   | jq '.features | {aibridge, managed_agent_limit}'
 ```
 
@@ -54,7 +54,7 @@ not seeded through deprecated environment variables.
 Install and authenticate the matching Coder CLI, then push each directory:
 
 ```sh
-coder login https://coder.home.tom-mendy.com
+coder login https://coder.tom-mendy.com
 coder templates push agent-workspace \
   --directory kubernetes/coder/workspace-templates/agent-workspace
 coder templates push t3code \
@@ -78,7 +78,7 @@ coder templates push personal-desktop \
 ```
 
 Create one stable workspace named `tom-personal-desktop`. Open the desktop from
-`https://coder.home.tom-mendy.com` and the workspace's `Desktop` app tile. The
+`https://coder.tom-mendy.com` and the workspace's `Desktop` app tile. The
 workspace survives laptop shutdowns, but it does not provide access to the G14's
 local GPU.
 
