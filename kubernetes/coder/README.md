@@ -20,7 +20,7 @@ kubectl wait -n coder --for=condition=Ready cluster/coder-postgres --timeout=10m
 kubectl rollout status -n coder deployment/coder --timeout=10m
 ```
 
-Open `https://coder.home.tom-mendy.com`, sign in through Authentik, and finish
+Open `https://coder.tom-mendy.com`, sign in through Authentik, and finish
 the owner bootstrap if Coder requests it.
 
 ## Optional Coder Agents integration
@@ -29,7 +29,7 @@ Coder Agents and its AI Gateway require a Coder license entitlement. Check the
 deployment before trying to configure Ollama:
 
 ```sh
-curl -fsS https://coder.home.tom-mendy.com/api/v2/entitlements \
+curl -fsS https://coder.tom-mendy.com/api/v2/entitlements \
   | jq '.features | {aibridge, managed_agent_limit}'
 ```
 
@@ -51,10 +51,20 @@ not seeded through deprecated environment variables.
 
 ## Publish workspace templates
 
-Install and authenticate the matching Coder CLI, then push each directory:
+Commits to `main` that change a workspace template are validated and published
+by Forgejo Actions. The workflow activates the new version and sets existing
+workspaces from that template to update automatically the next time they start.
+It requires a repository Actions secret named `CODER_SESSION_TOKEN` for a Coder
+user that can publish templates and manage all existing workspaces built from
+them. Keep the token dedicated to CI.
+
+Existing running workspaces continue on their current build until they restart.
+Template publication does not interrupt them.
+
+For a manual push, authenticate with the matching Coder CLI and run:
 
 ```sh
-coder login https://coder.home.tom-mendy.com
+coder login https://coder.tom-mendy.com
 coder templates push agent-workspace \
   --directory kubernetes/coder/workspace-templates/agent-workspace
 coder templates push t3code \
@@ -73,6 +83,22 @@ needed.
 The `t3code` template is separate from `agent-workspace`. It installs T3 in the
 workspace and compiles its Linux `node-pty` native module during first startup.
 
+The `personal-desktop` template is a separate persistent graphical workspace. It
+runs XFCE behind TigerVNC and noVNC on localhost:6080, exposed only through the
+Coder application proxy as the owner-only `Desktop` app. Its home is a 50Gi NFS
+PVC using `nfs-k8s`; it does not create a direct Ingress, NodePort, or public VNC
+endpoint. Publish it with:
+
+```sh
+coder templates push personal-desktop \
+  --directory kubernetes/coder/workspace-templates/personal-desktop
+```
+
+Create one stable workspace named `tom-personal-desktop`. Open the desktop from
+`https://coder.tom-mendy.com` and the workspace's `Desktop` app tile. The
+workspace survives laptop shutdowns, but it does not provide access to the G14's
+local GPU.
+
 Create only one `hermes-personal` workspace and disable its automatic stop in
 the Coder schedule. The namespace quota permits Hermes plus two standard
 workspaces, matching the cluster's intended capacity.
@@ -83,11 +109,14 @@ synchronizes it and `HERMES_MATRIX_ACCESS_TOKEN` into the `coder-workspaces`
 namespace. The template injects those values without writing the token to the
 workspace PVC.
 
-The Hermes workspace advertises `/usr/bin/bash` as its shell. Because the
-container runs as an unprivileged user whose image-level login shell is
-`/bin/sh`, its startup script also installs a small `~/.profile` fallback that
-executes Bash for interactive SSH sessions. Non-interactive startup commands
-continue to run through their explicitly selected interpreter.
+The Hermes workspace includes the Coder CLI, installed to the persistent
+`~/.local/bin` directory at startup. Run `coder login` with
+`https://coder.tom-mendy.com` to authenticate it as your user. The workspace
+advertises `/usr/bin/bash` as its shell. Because the container runs as an
+unprivileged user whose image-level login shell is `/bin/sh`, its startup script
+also installs a small `~/.profile` fallback that executes Bash for interactive
+SSH sessions. Non-interactive startup commands continue to run through their
+explicitly selected interpreter.
 
 ## Hermes workspace image
 

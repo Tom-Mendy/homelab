@@ -72,7 +72,7 @@
         description: Federated chat and calls
     - Coder:
         icon: coder.svg
-        href: https://coder.home.tom-mendy.com/
+        href: https://coder.tom-mendy.com/
         description: Isolated agent workspaces
     - Forgejo:
         icon: forgejo.svg
