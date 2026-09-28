@@ -23,10 +23,15 @@ resource "coder_agent" "main" {
 
   startup_script = <<-EOT
     set -eu
+    export PATH="$HOME/.local/bin:/opt/hermes/bin:/opt/hermes/.venv/bin:$PATH"
     UV_CONSTRAINT= uv pip freeze --python /opt/hermes/.venv/bin/python3 | grep -v '^-e ' >"$UV_CONSTRAINT"
     [ ! -f "$HOME/.profile" ] || sed -i '\|runtime-venv-v2026.9.24|d' "$HOME/.profile"
     profile_line='export PATH="/opt/hermes/bin:/opt/hermes/.venv/bin:$HOME/.local/bin:$PATH"'
     grep -qxF "$profile_line" "$HOME/.profile" 2>/dev/null || printf '\n%s\n' "$profile_line" >> "$HOME/.profile"
+    if ! command -v coder >/dev/null 2>&1; then
+      curl -fsSL https://coder.com/install.sh \
+        | sh -s -- --version 2.36.4 --method standalone --prefix "$HOME/.local"
+    fi
     bash_login_line='if [ -x /usr/bin/bash ] && [ -z "$${BASH_VERSION:-}" ] && [ -n "$${SSH_TTY:-}" ]; then exec /usr/bin/bash -l; fi'
     grep -qxF "$bash_login_line" "$HOME/.profile" 2>/dev/null || printf '%s\n' "$bash_login_line" >> "$HOME/.profile"
     mkdir -p "$HERMES_HOME/logs"
