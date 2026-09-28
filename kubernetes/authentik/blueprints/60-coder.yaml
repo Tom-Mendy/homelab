@@ -34,7 +34,7 @@ entries:
         - refresh_token
       redirect_uris:
         - matching_mode: strict
-          url: https://coder.home.tom-mendy.com/api/v2/users/oidc/callback
+          url: https://coder.tom-mendy.com/api/v2/users/oidc/callback
           redirect_uri_type: authorization
       property_mappings:
         - !Find
@@ -60,8 +60,8 @@ entries:
     attrs:
       name: Coder
       provider: !KeyOf coder-provider
-      meta_launch_url: https://coder.home.tom-mendy.com/
-      meta_icon: https://coder.home.tom-mendy.com/favicon.ico
+      meta_launch_url: https://coder.tom-mendy.com/
+      meta_icon: https://coder.tom-mendy.com/favicon.ico
       open_in_new_tab: true
       policy_engine_mode: any
   - model: authentik_policies.policybinding
