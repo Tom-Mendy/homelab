@@ -32,6 +32,12 @@ resource "coder_agent" "main" {
       curl -fsSL https://coder.com/install.sh \
         | sh -s -- --version 2.36.4 --method standalone --prefix "$HOME/.local"
     fi
+    if ! command -v crane >/dev/null 2>&1; then
+      mkdir -p "$HOME/.local/bin"
+      curl -fsSL https://github.com/google/go-containerregistry/releases/download/v0.22.1/go-containerregistry_Linux_x86_64.tar.gz \
+        | tar -xz -C "$HOME/.local/bin" crane
+      chmod 0755 "$HOME/.local/bin/crane"
+    fi
     bash_login_line='if [ -x /usr/bin/bash ] && [ -z "$${BASH_VERSION:-}" ] && [ -n "$${SSH_TTY:-}" ]; then exec /usr/bin/bash -l; fi'
     grep -qxF "$bash_login_line" "$HOME/.profile" 2>/dev/null || printf '%s\n' "$bash_login_line" >> "$HOME/.profile"
     mkdir -p "$HERMES_HOME/logs"

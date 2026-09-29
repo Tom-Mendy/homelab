@@ -4,6 +4,8 @@ USER root
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+ARG CRANE_VERSION=v0.22.1
+
 RUN apt-get update \
     && apt-get install --no-install-recommends --yes \
         bash \
@@ -31,7 +33,10 @@ RUN apt-get update \
         unzip \
         zip \
     && ln -sf /usr/bin/fdfind /usr/local/bin/fd \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -fsSL "https://github.com/google/go-containerregistry/releases/download/${CRANE_VERSION}/go-containerregistry_Linux_x86_64.tar.gz" \
+        | tar -xz -C /usr/local/bin crane \
+    && chmod 0755 /usr/local/bin/crane
 
 ENV HOME=/opt/data \
     SHELL=/usr/bin/bash
