@@ -109,14 +109,16 @@ synchronizes it and `HERMES_MATRIX_ACCESS_TOKEN` into the `coder-workspaces`
 namespace. The template injects those values without writing the token to the
 workspace PVC.
 
-The Hermes workspace includes the Coder CLI and Crane CLI, installed to the
-persistent `~/.local/bin` directory at startup. Run `coder login` with
-`https://coder.tom-mendy.com` to authenticate it as your user. The workspace
-advertises `/usr/bin/bash` as its shell. Because the container runs as an
-unprivileged user whose image-level login shell is `/bin/sh`, its startup script
-also installs a small `~/.profile` fallback that executes Bash for interactive
-SSH sessions. Non-interactive startup commands continue to run through their
-explicitly selected interpreter.
+The Hermes workspace includes the Coder CLI, Crane CLI, and `kubectl`,
+installed to the persistent `~/.local/bin` directory at startup. The workspace
+runs with the `hermes` ServiceAccount and automounts its token, granting
+cluster administrator access to manage and inspect cluster resources. Run
+`coder login` with `https://coder.tom-mendy.com` to authenticate it as your
+user. The workspace advertises `/usr/bin/bash` as its shell. Because the
+container runs as an unprivileged user whose image-level login shell is
+`/bin/sh`, its startup script also installs a small `~/.profile` fallback that
+executes Bash for interactive SSH sessions. Non-interactive startup commands
+continue to run through their explicitly selected interpreter.
 
 ## Hermes workspace image
 

@@ -38,6 +38,11 @@ resource "coder_agent" "main" {
         | tar -xz -C "$HOME/.local/bin" crane
       chmod 0755 "$HOME/.local/bin/crane"
     fi
+    if ! command -v kubectl >/dev/null 2>&1; then
+      mkdir -p "$HOME/.local/bin"
+      curl -fsSL -o "$HOME/.local/bin/kubectl" https://dl.k8s.io/release/v1.34.3/bin/linux/amd64/kubectl
+      chmod 0755 "$HOME/.local/bin/kubectl"
+    fi
     bash_login_line='if [ -x /usr/bin/bash ] && [ -z "$${BASH_VERSION:-}" ] && [ -n "$${SSH_TTY:-}" ]; then exec /usr/bin/bash -l; fi'
     grep -qxF "$bash_login_line" "$HOME/.profile" 2>/dev/null || printf '%s\n' "$bash_login_line" >> "$HOME/.profile"
     mkdir -p "$HERMES_HOME/logs"
@@ -114,7 +119,8 @@ resource "kubernetes_deployment_v1" "workspace" {
         }
       }
       spec {
-        automount_service_account_token = false
+        automount_service_account_token = true
+        service_account_name            = "hermes"
         security_context {
           run_as_user     = 10000
           run_as_group    = 10000
