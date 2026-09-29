@@ -708,3 +708,31 @@ spec:
     force: false
   driftDetection:
     mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: job-search-manager
+spec:
+  interval: 30m
+  timeout: 20m
+  releaseName: job-search-manager
+  targetNamespace: job-search-manager
+  storageNamespace: job-search-manager
+  chart:
+    spec:
+      chart: ./kubernetes/job-search-manager
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  dependsOn:
+    - name: authentik
+    - name: cloudnative-pg
+    - name: nfs-provisioner
+    - name: traefik
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled

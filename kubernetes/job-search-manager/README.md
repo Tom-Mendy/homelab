@@ -1,0 +1,13 @@
+# Job search manager
+
+The release runs FastAPI with a CloudNativePG PostgreSQL cluster and a private single-node Garage object store. PostgreSQL and Garage use the shared `nfs-k8s` storage class, so their pods can move between workers. Garage has no public ingress; only the API service reaches its S3 port. Blocky resolves the app hostname to the internal Traefik address. Authentik exposes the forward-auth outpost for that hostname and grants access to the `homelab-admins` group.
+
+The Forgejo workflow publishes `latest` and an immutable `sha-…` image tag. Configure the repository action secrets `HARBOR_REGISTRY_USER` and `HARBOR_REGISTRY_TOKEN` for a Harbor robot that can push to the `job-search-manager` project. Flux image automation also needs `flux-system/job-search-manager-registry-auth` (a pull-only Harbor robot), `flux-system/job-search-manager-image-git` (a write-enabled deploy key for this homelab repository), and a matching `job-search-manager/job-search-manager-registry` pull secret. These credentials must be provisioned outside Git, through Infisical and the existing cluster workflow.
+
+Before the HelmRelease starts, create `job-search-manager-runtime` in the target namespace with `GARAGE_RPC_SECRET` and `HERMES_API_TOKEN`. Generate the RPC secret with `openssl rand -hex 32`; generate a separate long random Hermes token. Garage can then start while the API waits for its S3 keys.
+
+After Garage starts, use its CLI to assign the one-node layout, create the `job-search-documents` bucket and an application key with read/write access. Add the generated `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY` to `job-search-manager-runtime`; Kubernetes then starts the API. The CNPG operator creates `job-search-manager-postgres-app`; the API runs Alembic migrations on startup. The app is reachable at `https://suivi-stage.home.tom-mendy.com` after Authentik authorizes the user.
+
+Import `app/suivi_stage.sqlite3` and the `CV/` and `Lettre_de_motivation/` folders from the application repository only after PostgreSQL and Garage are ready. Run `uv run --project app python tools/migrate_legacy.py app/suivi_stage.sqlite3` first to review the import summary, then add `--apply` to import. The tool preserves the source database and files. Keep them until you have checked the imported records and documents.
+
+Daily PostgreSQL dumps are retained for 30 days. A daily S3 sync mirrors Garage objects to a second PVC. Both PVCs use the same NFS-backed NAS as the live data, per the selected storage plan; this helps with routine recovery but does not protect against NAS loss. Garage has one replica, so it survives a worker reschedule but is not highly available.

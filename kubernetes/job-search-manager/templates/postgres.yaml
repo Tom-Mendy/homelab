@@ -1,0 +1,17 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: job-search-manager-postgres
+  namespace: {{ .Values.namespace }}
+  annotations:
+    helm.sh/resource-policy: keep
+spec:
+  instances: 1
+  imageName: {{ .Values.database.image }}
+  storage:
+    size: {{ .Values.database.storage }}
+    storageClass: {{ .Values.database.storageClass }}
+  bootstrap:
+    initdb:
+      database: job_search_manager
+      owner: job_search_manager

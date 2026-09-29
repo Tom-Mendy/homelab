@@ -1,6 +1,30 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  name: job-search-manager-authentik-outpost
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+spec:
+  tls:
+    - hosts:
+        - suivi-stage.home.tom-mendy.com
+  rules:
+    - host: suivi-stage.home.tom-mendy.com
+      http:
+        paths:
+          - path: /outpost.goauthentik.io
+            pathType: Prefix
+            backend:
+              service:
+                name: authentik-server
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
   name: hindsight-authentik-outpost
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure

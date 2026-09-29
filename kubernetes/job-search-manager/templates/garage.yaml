@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: job-search-manager-garage-config
+  namespace: {{ .Values.namespace }}
+data:
+  garage.toml.template: |
+    metadata_dir = "/var/lib/garage/meta"
+    data_dir = "/var/lib/garage/data"
+    db_engine = "lmdb"
+    replication_factor = 1
+    rpc_bind_addr = "[::]:3901"
+    rpc_public_addr = "job-search-manager-garage:3901"
+    rpc_secret = "__RPC_SECRET__"
+    [s3_api]
+    s3_region = "garage"
+    api_bind_addr = "[::]:3900"
+    root_domain = ".s3.garage.local"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: job-search-manager-garage-data
+  namespace: {{ .Values.namespace }}
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: {{ .Values.garage.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.garage.storage }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: job-search-manager-garage
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: job-search-manager-garage
+  template:
+    metadata:
+      labels:
+        app: job-search-manager-garage
+    spec:
+      initContainers:
+        - name: render-config
+          image: busybox:1.37.0
+          command: ["/bin/sh", "-ec"]
+          args:
+            - sed "s/__RPC_SECRET__/$GARAGE_RPC_SECRET/" /config/garage.toml.template > /runtime/garage.toml
+          env:
+            - name: GARAGE_RPC_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.runtimeSecret }}
+                  key: GARAGE_RPC_SECRET
+          volumeMounts:
+            - {name: config, mountPath: /config, readOnly: true}
+            - {name: rendered-config, mountPath: /runtime}
+      containers:
+        - name: garage
+          image: {{ .Values.garage.image }}
+          command: ["/garage", "server"]
+          env:
+            - {name: GARAGE_CONFIG_FILE, value: /runtime/garage.toml}
+          ports:
+            - {name: s3, containerPort: 3900}
+            - {name: rpc, containerPort: 3901}
+          volumeMounts:
+            - {name: rendered-config, mountPath: /runtime, readOnly: true}
+            - {name: data, mountPath: /var/lib/garage}
+          readinessProbe:
+            tcpSocket: {port: 3900}
+            initialDelaySeconds: 10
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {memory: 512Mi}
+      volumes:
+        - name: config
+          configMap: {name: job-search-manager-garage-config}
+        - name: rendered-config
+          emptyDir: {}
+        - name: data
+          persistentVolumeClaim: {claimName: job-search-manager-garage-data}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: job-search-manager-garage
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: job-search-manager-garage
+  ports:
+    - {name: s3, port: 3900, targetPort: s3}
+    - {name: rpc, port: 3901, targetPort: rpc}

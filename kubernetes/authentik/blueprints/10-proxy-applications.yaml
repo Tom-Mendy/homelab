@@ -3,6 +3,40 @@ metadata:
   name: Proxy applications
 entries:
   - model: authentik_providers_proxy.proxyprovider
+    id: job-search-manager-provider
+    identifiers:
+      name: Job search manager
+    attrs:
+      authentication_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-authentication-flow]
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+      external_host: https://suivi-stage.home.tom-mendy.com
+      mode: forward_single
+  - model: authentik_core.application
+    id: job-search-manager-application
+    identifiers:
+      slug: job-search-manager
+    attrs:
+      name: Job search manager
+      provider: !KeyOf job-search-manager-provider
+      meta_launch_url: https://suivi-stage.home.tom-mendy.com/
+      open_in_new_tab: true
+      policy_engine_mode: any
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf job-search-manager-application
+      group: !Find [authentik_core.group, [name, homelab-admins]]
+      order: 0
+    attrs:
+      enabled: true
+
+  - model: authentik_providers_proxy.proxyprovider
     id: hindsight-provider
     identifiers:
       name: Hindsight
@@ -165,6 +199,7 @@ entries:
       name: authentik Embedded Outpost
     attrs:
       providers:
+        - !KeyOf job-search-manager-provider
         - !KeyOf radarr-provider
         - !KeyOf sonarr-provider
         - !KeyOf hindsight-provider

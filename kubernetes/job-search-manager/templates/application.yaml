@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: job-search-manager
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: job-search-manager
+  template:
+    metadata:
+      labels:
+        app: job-search-manager
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.image.pullSecret }}
+      containers:
+        - name: api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}{{ if .Values.image.digest }}@{{ .Values.image.digest }}{{ end }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8765
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: job-search-manager-postgres-app
+                  key: uri
+            - name: HERMES_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.runtimeSecret }}
+                  key: HERMES_API_TOKEN
+            - name: S3_ENDPOINT_URL
+              value: "http://job-search-manager-garage:3900"
+            - name: S3_BUCKET
+              value: {{ .Values.garage.bucket | quote }}
+            - name: S3_REGION
+              value: garage
+            - name: S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.runtimeSecret }}
+                  key: S3_ACCESS_KEY_ID
+            - name: S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.runtimeSecret }}
+                  key: S3_SECRET_ACCESS_KEY
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            initialDelaySeconds: 15
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {memory: 512Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: job-search-manager
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: job-search-manager
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
