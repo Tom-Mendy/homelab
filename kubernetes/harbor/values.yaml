@@ -20,17 +20,11 @@ proxyCredentials:
 
 portfolioRegistryCredentials:
   enabled: true
-  name: portfolio-registry-auth
   secretsPath: /harbor/portfolio
-  targetNamespaces:
-    - flux-system
-    - portfolio
-
-jobSearchManagerRegistryCredentials:
-  enabled: true
-  secretsPath: /harbor/job-search-manager
   targets:
-    - name: job-search-manager-registry-auth
+    - name: portfolio-registry-auth
       namespace: flux-system
+    - name: portfolio-registry-auth
+      namespace: portfolio
     - name: job-search-manager-registry
       namespace: job-search-manager

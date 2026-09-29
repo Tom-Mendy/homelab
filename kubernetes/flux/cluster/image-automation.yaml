@@ -94,7 +94,7 @@ spec:
   image: harbor.home.tom-mendy.com/job-search-manager/job-search-manager
   interval: 1m
   secretRef:
-    name: job-search-manager-registry-auth
+    name: portfolio-registry-auth
 ---
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
