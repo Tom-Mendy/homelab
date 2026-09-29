@@ -1,8 +1,8 @@
 namespace: job-search-manager
 image:
   repository: harbor.home.tom-mendy.com/job-search-manager/job-search-manager # {"$imagepolicy": "flux-system:job-search-manager:name"}
-  tag: latest # {"$imagepolicy": "flux-system:job-search-manager:tag"}
-  digest: "" # {"$imagepolicy": "flux-system:job-search-manager:digest"}
+  tag: sha-4dc7c5a593c0b229cad25df4cdc604842579e34f # {"$imagepolicy": "flux-system:job-search-manager:tag"}
+  digest: sha256:6a27258b11a08c400f5689a2b24b487bf650f50f51170627a0a8c0bd261808ec # {"$imagepolicy": "flux-system:job-search-manager:digest"}
   pullPolicy: Always
   pullSecret: job-search-manager-registry
 ingress:
