@@ -1,7 +1,7 @@
 # Forgejo Runners
 
-This chart deploys Forgejo Actions runners for `Tom-Mendy/homelab` and
-`Tom-Mendy/Portfolio`.
+This chart deploys Forgejo Actions runners for `Tom-Mendy/homelab`,
+`Tom-Mendy/Portfolio`, and `Tom-Mendy/job-search-manager`.
 
 The runner uses:
 

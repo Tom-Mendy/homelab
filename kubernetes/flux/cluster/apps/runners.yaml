@@ -185,3 +185,31 @@ spec:
     createNamespace: true
   driftDetection:
     mode: enabled
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo-runner-job-search-manager
+spec:
+  interval: 30m
+  timeout: 10m
+  releaseName: forgejo-runner-job-search-manager
+  targetNamespace: forgejo-runner
+  storageNamespace: forgejo-runner
+  chart:
+    spec:
+      chart: ./kubernetes/forgejo-runner
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  valuesFrom:
+    - kind: ConfigMap
+      name: forgejo-job-search-manager-values
+  dependsOn:
+    - name: forgejo-runner-homelab
+  install:
+    createNamespace: true
+  driftDetection:
+    mode: enabled
