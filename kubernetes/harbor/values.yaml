@@ -25,3 +25,12 @@ portfolioRegistryCredentials:
   targetNamespaces:
     - flux-system
     - portfolio
+
+jobSearchManagerRegistryCredentials:
+  enabled: true
+  secretsPath: /harbor/job-search-manager
+  targets:
+    - name: job-search-manager-registry-auth
+      namespace: flux-system
+    - name: job-search-manager-registry
+      namespace: job-search-manager
