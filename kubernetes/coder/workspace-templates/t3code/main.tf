@@ -33,8 +33,6 @@ resource "coder_agent" "main" {
       printf '%s\n' "$profile_line" >> "$HOME/.profile"
     fi
     npm install --global npm@latest t3@latest @openai/codex opencode-ai
-    sudo apt-get update
-    sudo apt-get install --yes gh ripgrep
     mkdir -p "$HOME/.ssh"
     chmod 700 "$HOME/.ssh"
     for forgejo_host in forgejo.home.tom-mendy.com forgejo.tom-mendy.com; do
