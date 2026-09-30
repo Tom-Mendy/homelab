@@ -5,7 +5,7 @@ replicaCount: 1
 
 image:
   repository: codeberg.org/forgejo/forgejo
-  tag: 15.0.7@sha256:1f9c1a9880425614267832ce437f8ae5f5b69e1f3219f38fc468fc37e48c1919
+  tag: 15.0.9@sha256:91a5310c86934339e16bd06b6078aada836e3d8935b2d70f6598108cbfaed5d1
   pullPolicy: IfNotPresent
 
 user:
@@ -25,7 +25,7 @@ database:
 cluster:
   name: forgejo-postgres
   instances: 1
-  imageName: ghcr.io/cloudnative-pg/postgresql:17
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.11@sha256:70664ebcfa1100361b5bdc28bbf06fdbe08db2dc4ad7bd14de33c5e05fe8ea8e
   storage:
     size: 20Gi
     storageClass: nfs-k8s

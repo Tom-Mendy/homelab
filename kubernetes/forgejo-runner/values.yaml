@@ -33,7 +33,7 @@ docker:
   containerOptions: --add-host=dind.docker.internal:host-gateway
   image:
     repository: docker
-    tag: dind@sha256:12e683a161823b2a839aeea999b9d960e6e1f9a97b1679ad6b441982e2d9cf07
+    tag: dind@sha256:3f3c01aaaebf7cce837356b688b7c059a4749f10bd7660dec7c58fc454a283f0
     pullPolicy: IfNotPresent
   resources:
     requests:

@@ -9,7 +9,7 @@ nfsPermissions:
 atuin:
   image:
     repository: ghcr.io/atuinsh/atuin
-    tag: 18.20.1@sha256:ff9a5c426bb6df99adbc09505182d5aed1524d123f973c40b18de56d25c3562a
+    tag: 18.23.0@sha256:f232feeead54a0a13132b9cd477e312c3380e9dc90f1db24c4f79ce6c8e034ea
     pullPolicy: IfNotPresent
   host: atuin.home.tom-mendy.com
   port: 8888
@@ -31,7 +31,7 @@ atuin:
 postgres:
   image:
     repository: postgres
-    tag: 16.15@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94
+    tag: 16.15@sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54
     pullPolicy: IfNotPresent
   port: 5432
   storage:

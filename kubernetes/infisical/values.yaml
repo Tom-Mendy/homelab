@@ -3,7 +3,7 @@ infisical:
   kubeSecretRef: infisical-secrets
   image:
     repository: infisical/infisical
-    tag: v0.164.1@sha256:d3ff9f82faa786fddf83ce015331c3725bac56db22f6444f48b3b02ff3c772f9
+    tag: v0.165.16@sha256:6b911e3938ac2ff385a782df59ce9272799be7976d26dc5667266a2aecac4116
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP

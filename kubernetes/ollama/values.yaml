@@ -2,7 +2,7 @@ namespace: ollama
 
 image:
   repository: ollama/ollama
-  tag: 0.34.2@sha256:da6e0dc5651df159e45686fd663c4dbe1624a52c44d7280eeac1551d8f865532
+  tag: 0.35.0@sha256:2a6e883b917fc543389599dae79918f5cac9e1438890506982f44aa4f5625d01
   pullPolicy: IfNotPresent
 
 deployment:
@@ -57,7 +57,7 @@ gpu:
   devicePlugin:
     enabled: true
     namespace: kube-system
-    image: nvcr.io/nvidia/k8s-device-plugin:v0.20.0@sha256:a61ba9fd8efb82f3a79f877f7580e02c1e8e7593f62473644bc9c79e315c3312
+    image: nvcr.io/nvidia/k8s-device-plugin:v0.20.1@sha256:27c1b2553a690ca3d29889dcd61df97525d46f58272c0be8dc63c2b18f120075
     nodeSelector:
       gpu: "true"
     tolerations:
@@ -74,7 +74,7 @@ openwebui:
 
   image:
     repository: ghcr.io/open-webui/open-webui
-    tag: 0.9.6@sha256:90eae5b419e40b4c3dd684582b2c83440b36f9ae2f6532c09639b2ba4ee65158
+    tag: 0.11.4@sha256:9591b13f13843c7721c2b8eaf7382846c81b3ffe126526d1888d1fed50c6a33f
     pullPolicy: IfNotPresent
 
   ollama:
@@ -153,7 +153,7 @@ openwebuiIngress:
 openwebuiPostgres:
   name: openwebui-postgres
   instances: 1
-  imageName: ghcr.io/cloudnative-pg/postgresql:17
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.11@sha256:70664ebcfa1100361b5bdc28bbf06fdbe08db2dc4ad7bd14de33c5e05fe8ea8e
   storage:
     size: 10Gi
     storageClass: nfs-k8s

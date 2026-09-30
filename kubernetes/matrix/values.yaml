@@ -15,7 +15,7 @@ infisicalSecret:
   secretsPath: /matrix
 
 tuwunel:
-  image: ghcr.io/matrix-construct/tuwunel:v1.9.0@sha256:295a1ceedbfd7afce05c69a38efb246dd31fa810e5d352fc7a09b261853800ee
+  image: ghcr.io/matrix-construct/tuwunel:v1.9.3@sha256:678b7f5350e06a41614444497c587da9dddf66767e4068a27480402f3c1367d0
   host: matrix.tom-mendy.com
   storage:
     dataSize: 50Gi
@@ -30,7 +30,7 @@ tuwunel:
       memory: 2Gi
 
 cinny:
-  image: ghcr.io/cinnyapp/cinny:v4.12.6@sha256:a7805a8a60ff621d343c128dbca6ba42ac5383ed5292522fd72248a77b9c836f
+  image: ghcr.io/cinnyapp/cinny:v4.12.7@sha256:83de4bd62b0684c536afd1af22f8eb11216f0ae52209e170b56cdae02498a97f
   host: chat.tom-mendy.com
   resources:
     requests:
