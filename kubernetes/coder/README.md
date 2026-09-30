@@ -58,8 +58,10 @@ It requires a repository Actions secret named `CODER_SESSION_TOKEN` for a Coder
 user that can publish templates and manage all existing workspaces built from
 them. Keep the token dedicated to CI.
 
-Existing running workspaces continue on their current build until they restart.
-Template publication does not interrupt them.
+Existing running workspaces continue on their current build until they restart,
+except Hermes. Publishing `hermes-personal` updates and starts the owner's
+`nainjoueur/hermes` workspace, disables autostop, and verifies Kubernetes access
+from inside it. The update briefly interrupts its Matrix gateway.
 
 For a manual push, authenticate with the matching Coder CLI and run:
 
@@ -111,8 +113,8 @@ workspace PVC.
 
 The Hermes workspace includes the Coder CLI, Crane CLI, and `kubectl`,
 installed to the persistent `~/.local/bin` directory at startup. The workspace
-runs with the `hermes` ServiceAccount and automounts its token, granting
-cluster administrator access to manage and inspect cluster resources. Run
+runs with the `hermes` ServiceAccount and explicitly mounts a rotating token,
+granting cluster administrator access to manage and inspect cluster resources. Run
 `coder login` with `https://coder.tom-mendy.com` to authenticate it as your
 user. The workspace advertises `/usr/bin/bash` as its shell. Because the
 container runs as an unprivileged user whose image-level login shell is
@@ -172,6 +174,80 @@ in the memory wizard. Use
 optional API key blank. Restart the workspace afterward; its startup script
 launches `hermes gateway run` when `/opt/data/config.yaml` exists. Hindsight's
 embedded PostgreSQL data remains on its own `nfs-k8s` PVC in `agent`.
+
+## Hermes autonomous cluster administration
+
+Hermes runs inside the cluster with the `hermes` service account, bound to
+`cluster-admin` by `templates/hermes-rbac.yaml`. Its permissions cover all
+namespaces, Secrets, RBAC, Pod execution and node operations. Restrict the
+workspace template to its owner and administrators, and retain the Matrix
+human allowlist. Users who can create arbitrary Pods in `coder-workspaces`
+can also select this account and must be trusted administrators.
+
+`KUBECONFIG=/opt/data/.kube/hermes.config` selects the internal Kubernetes API.
+This file contains paths to the mounted CA and token, without credentials.
+The projected token has a one-hour lifetime and Kubernetes renews it
+independently of the operator's computer. The kubeconfig uses `tokenFile` so
+clients pick up each renewal. See the
+[Kubernetes service account documentation](https://kubernetes.io/docs/concepts/security/service-accounts/).
+
+Startup installs checksum-pinned kubectl 1.34.12, Helm 3.22.0, Flux 2.9.5 and
+jq 1.8.2 in the NFS-backed home. Cached clients survive Pod replacement without
+another download. Update kubectl's minor version when the 1.34 control plane
+changes. Coder and Crane remain available from the existing startup setup.
+
+Startup enables the local terminal and full Hermes CLI toolset for Matrix and
+cron, preserving a private backup of `config.yaml`. The installed
+`homelab-cluster` skill explains cluster operations and storage policy. A
+supervisor restarts the Matrix gateway after process exit. Stop the workspace
+to shut it down intentionally; `hermes gateway stop` alone is temporary.
+
+### Deployment and verification
+
+Pushing this template to `main` triggers the existing Forgejo publication
+workflow. `scripts/activate-hermes.py` then disables the owner's workspace
+shutdown timer, updates and starts Hermes, waits for its agent, and checks
+cluster-wide authorization plus a temporary ConfigMap create/read/delete.
+No Kubernetes administrator credential passes through CI. The checks run
+inside Hermes with its own projected token.
+
+The publisher requires its existing `CODER_SESSION_TOKEN` Actions secret to
+manage this workspace. For a manual activation after publishing the template:
+
+```sh
+coder login https://coder.tom-mendy.com
+coder templates edit hermes-personal --private=true --default-ttl=0 --yes
+coder schedule stop nainjoueur/hermes manual
+coder --yes update nainjoueur/hermes
+coder start nainjoueur/hermes --yes
+coder ssh nainjoueur/hermes -- 'bash -lc "
+  kubectl auth whoami
+  kubectl get nodes -o wide
+  hermes gateway status
+"'
+```
+
+Review existing Coder template permission grants. Disable any separately
+configured mandatory restart or inactivity shutdown policy. The activation
+check fails if the workspace still has a shutdown deadline. Coder's
+[stop schedule](https://coder.com/docs/reference/cli/schedule_stop) applies on
+the next build.
+
+From the allowed Matrix account, ask Hermes to run `kubectl get nodes -o wide`.
+Repeat after closing the operator's SSH session. Verify worker rescheduling
+in a maintenance window from an independent administrator session; evicting
+Hermes' own Pod would interrupt a drain command run from its terminal.
+
+### Revocation and dependencies
+
+Delete `ClusterRoleBinding/hermes-cluster-admin` to revoke permissions, and
+remove its Git manifest so Flux does not recreate it. Stopping the workspace
+removes its Pod and invalidates its token. Restoring the configuration backup
+alone does not revoke permissions, and startup reapplies the terminal settings.
+
+The cluster API, Synology NFS, a worker and the configured model provider must
+remain available. Kubernetes access does not grant Forgejo push or host SSH
+permissions. Use a separately authorized identity for those operations.
 
 ## Recovery check
 

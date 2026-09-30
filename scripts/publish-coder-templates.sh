@@ -23,7 +23,10 @@ for template in "${templates[@]}"; do
 
   if [[ "$EVENT_NAME" != workflow_dispatch && -n "$EVENT_BEFORE" && "$EVENT_BEFORE" =~ [^0] ]]; then
     if git diff --quiet "$EVENT_BEFORE" "$COMMIT_SHA" -- "$directory"; then
-      continue
+      if [[ "$template" != hermes-personal ]] || git diff --quiet \
+        "$EVENT_BEFORE" "$COMMIT_SHA" -- scripts/activate-hermes.py; then
+        continue
+      fi
     fi
   fi
 
@@ -64,4 +67,8 @@ for template in "${templates[@]}"; do
     (( workspace_count < page_size )) && break
     offset=$((offset + page_size))
   done
+
+  if [[ "$template" == hermes-personal ]]; then
+    python3 scripts/activate-hermes.py
+  fi
 done

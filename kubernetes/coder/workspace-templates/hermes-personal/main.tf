@@ -40,16 +40,19 @@ resource "coder_agent" "main" {
         | tar -xz -C "$HOME/.local/bin" crane
       chmod 0755 "$HOME/.local/bin/crane"
     fi
-    if ! command -v kubectl >/dev/null 2>&1; then
-      mkdir -p "$HOME/.local/bin"
-      curl -fsSL -o "$HOME/.local/bin/kubectl" https://dl.k8s.io/release/v1.34.3/bin/linux/amd64/kubectl
-      chmod 0755 "$HOME/.local/bin/kubectl"
-    fi
     bash_login_line='if [ -x /usr/bin/bash ] && [ -z "$${BASH_VERSION:-}" ] && [ -n "$${SSH_TTY:-}" ]; then exec /usr/bin/bash -l; fi'
     grep -qxF "$bash_login_line" "$HOME/.profile" 2>/dev/null || printf '%s\n' "$bash_login_line" >> "$HOME/.profile"
-    mkdir -p "$HERMES_HOME/logs"
+    mkdir -p "$HERMES_HOME/logs" "$HERMES_HOME/skills/homelab-cluster"
+    cat >"$HERMES_HOME/bootstrap-cluster.py" <<'PYTHON'
+${file("${path.module}/bootstrap-cluster.py")}
+PYTHON
+    /opt/hermes/.venv/bin/python3 "$HERMES_HOME/bootstrap-cluster.py"
+    cat >"$HERMES_HOME/skills/homelab-cluster/SKILL.md" <<'SKILL'
+${file("${path.module}/cluster-operations.md")}
+SKILL
     if [ -f "$HERMES_HOME/config.yaml" ]; then
-      nohup hermes gateway run >"$HERMES_HOME/logs/gateway-coder.log" 2>&1 &
+      # Coder starts this supervisor inside the workspace, independently of SSH.
+      nohup bash -c 'while true; do hermes gateway run; sleep 10; done' >"$HERMES_HOME/logs/gateway-coder.log" 2>&1 &
     else
       echo "Run 'hermes model' and 'hermes memory setup' once, then restart the workspace."
     fi
@@ -121,7 +124,7 @@ resource "kubernetes_deployment_v1" "workspace" {
         }
       }
       spec {
-        automount_service_account_token = true
+        automount_service_account_token = false
         service_account_name            = "hermes"
         security_context {
           run_as_user     = 10000
@@ -151,6 +154,14 @@ resource "kubernetes_deployment_v1" "workspace" {
           env {
             name  = "HERMES_HOME"
             value = "/opt/data"
+          }
+          env {
+            name  = "KUBECONFIG"
+            value = "/opt/data/.kube/hermes.config"
+          }
+          env {
+            name  = "TERMINAL_ENV"
+            value = "local"
           }
           env {
             name  = "SHELL"
@@ -208,8 +219,43 @@ resource "kubernetes_deployment_v1" "workspace" {
             limits   = { cpu = "2", memory = "8Gi" }
           }
           volume_mount {
+            name       = "kubernetes-api"
+            mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
+            read_only  = true
+          }
+          volume_mount {
             name       = "home"
             mount_path = "/opt/data"
+          }
+        }
+        volume {
+          name = "kubernetes-api"
+          projected {
+            sources {
+              service_account_token {
+                path               = "token"
+                expiration_seconds = 3600
+              }
+            }
+            sources {
+              config_map {
+                name = "kube-root-ca.crt"
+                items {
+                  key  = "ca.crt"
+                  path = "ca.crt"
+                }
+              }
+            }
+            sources {
+              downward_api {
+                items {
+                  path = "namespace"
+                  field_ref {
+                    field_path = "metadata.namespace"
+                  }
+                }
+              }
+            }
           }
         }
         volume {
