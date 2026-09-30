@@ -11,7 +11,9 @@ terraform {
   }
 }
 
-provider "coder" {}
+provider "coder" {
+  url = "http://coder.coder.svc.cluster.local"
+}
 provider "kubernetes" {}
 
 data "coder_workspace" "me" {}
