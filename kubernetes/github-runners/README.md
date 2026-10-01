@@ -107,8 +107,8 @@ Recommended recovery order:
 Use these labels in workflows:
 
 - `runs-on: arc-runner-set-dotfiles` for `Tom-Mendy/dotfiles`
-- `runs-on: self-hosted` for `MrAmarok/sumfeet` through the scale set
-  `arc-runner-set-sumfleet-tom`
+- `runs-on: dev` (or `runs-on: self-hosted`) for `MrAmarok/sumfeet` through
+  the scale set `arc-runner-set-sumfleet-tom`
 
 Confirm the Sumfeet name and labels after an upgrade:
 
