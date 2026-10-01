@@ -21,7 +21,7 @@ def api(path):
 
 
 def coder(*args):
-    subprocess.run(["coder", *args], check=True, timeout=900)
+    subprocess.run(["coder", *args], input="yes\n", text=True, check=True, timeout=900)
 
 
 def main():
@@ -31,7 +31,7 @@ def main():
     coder("templates", "edit", "hermes-personal", "--private=true",
           "--default-ttl=0", "--yes")
     coder("schedule", "stop", WORKSPACE, "manual")
-    coder("--yes", "update", WORKSPACE)
+    coder("update", WORKSPACE)
     coder("start", WORKSPACE, "--yes")
 
     deadline = time.monotonic() + 600
