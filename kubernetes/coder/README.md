@@ -218,7 +218,7 @@ manage this workspace. For a manual activation after publishing the template:
 coder login https://coder.tom-mendy.com
 coder templates edit hermes-personal --private=true --default-ttl=0 --yes
 coder schedule stop nainjoueur/hermes manual
-coder --yes update nainjoueur/hermes
+coder update nainjoueur/hermes
 coder start nainjoueur/hermes --yes
 coder ssh nainjoueur/hermes -- 'bash -lc "
   kubectl auth whoami
