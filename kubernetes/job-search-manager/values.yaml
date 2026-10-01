@@ -8,7 +8,7 @@ image:
 ingress:
   host: suivi-stage.home.tom-mendy.com
 database:
-  image: ghcr.io/cloudnative-pg/postgresql:17.11@sha256:70664ebcfa1100361b5bdc28bbf06fdbe08db2dc4ad7bd14de33c5e05fe8ea8e
+  image: ghcr.io/cloudnative-pg/postgresql:18.4-system-bullseye@sha256:7af186660aead1b948d827ef1c52c20a8d2cb7b2a4089424b8f612e0a61dc2f9
   storage: 5Gi
   storageClass: nfs-k8s
 garage:
