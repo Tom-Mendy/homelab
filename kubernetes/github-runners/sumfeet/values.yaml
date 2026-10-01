@@ -5,6 +5,7 @@ runnerScaleSetName: "arc-runner-set-sumfleet-tom"
 
 scaleSetLabels:
   - self-hosted
+  - dev
 
 maxRunners: 10
 minRunners: 0
