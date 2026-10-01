@@ -27,6 +27,15 @@ resource "coder_agent" "main" {
     set -eu
     export npm_config_prefix="$HOME/.local"
     export PATH="$HOME/.local/bin:$PATH"
+    fj_version='0.6.0'
+    if ! command -v fj >/dev/null 2>&1 || [ "$(fj version 2>/dev/null | head -1)" != "fj v$fj_version" ]; then
+      fj_tmp="$(mktemp -d)"
+      curl -fsSL "https://codeberg.org/forgejo-contrib/forgejo-cli/releases/download/v$fj_version/forgejo-cli-x86_64-linux.tar.gz" -o "$fj_tmp/fj.tar.gz"
+      printf '%s  %s\n' 'ea559da5449b6dd7e0dd9f7ea51c906b575696f782edd606b52adcf773602742' "$fj_tmp/fj.tar.gz" | sha256sum -c -
+      tar -xzf "$fj_tmp/fj.tar.gz" -C "$fj_tmp" fj
+      install -m 0755 "$fj_tmp/fj" "$HOME/.local/bin/fj"
+      rm -rf "$fj_tmp"
+    fi
     git config --global user.name "t3code"
     git config --global user.email "home@tom-mendy.com"
     git config --global pull.rebase false
