@@ -36,6 +36,10 @@ resource "coder_agent" "main" {
       install -m 0755 "$fj_tmp/fj" "$HOME/.local/bin/fj"
       rm -rf "$fj_tmp"
     fi
+    if ! command -v buildah >/dev/null 2>&1; then
+      sudo apt-get update
+      sudo apt-get install --no-install-recommends --yes buildah
+    fi
     git config --global user.name "t3code"
     git config --global user.email "home@tom-mendy.com"
     git config --global pull.rebase false
@@ -43,7 +47,8 @@ resource "coder_agent" "main" {
     if ! grep -Fqx "$profile_line" "$HOME/.profile" 2>/dev/null; then
       printf '%s\n' "$profile_line" >> "$HOME/.profile"
     fi
-    npm install --global npm@latest t3@latest @openai/codex opencode-ai
+    npm install --global npm@latest @openai/codex opencode-ai
+    curl -fsSL https://t3.codes/install.sh | T3CODE_VERSION='0.0.44' sh
     mkdir -p "$HOME/.ssh"
     chmod 700 "$HOME/.ssh"
     for forgejo_host in forgejo.home.tom-mendy.com forgejo.tom-mendy.com; do
