@@ -8,7 +8,7 @@ image:
 ingress:
   host: suivi-stage.home.tom-mendy.com
 database:
-  image: ghcr.io/cloudnative-pg/postgresql:18.4-system-bullseye@sha256:7af186660aead1b948d827ef1c52c20a8d2cb7b2a4089424b8f612e0a61dc2f9
+  image: ghcr.io/cloudnative-pg/postgresql:18.6-system-bullseye@sha256:899d3ed526b659d77935dde0e6bf2d69dbbf17d3d8c6486ca8cfd04bd3c18533
   storage: 5Gi
   storageClass: nfs-k8s
 garage:
@@ -17,5 +17,5 @@ garage:
   storageClass: nfs-k8s
   bucket: job-search-documents
 backup:
-  image: public.ecr.aws/aws-cli/aws-cli:2.37.6@sha256:82905aa8fdab6e2403b40dceec12dc33aea2535a4c2a6f13d596d98501951105
+  image: public.ecr.aws/aws-cli/aws-cli:2.37.9@sha256:92de75724b6a746951f0e8b915d86bbccd7cb55aff96cd0cb4f7017272160780
 runtimeSecret: job-search-manager-runtime
