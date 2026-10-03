@@ -143,6 +143,8 @@ modes and recovery steps.
   reconciliation flow.
 - [`docs/flux-gitops.md`](docs/flux-gitops.md) documents bootstrap, cutover, and
   rollback.
+- [`docs/synology-sso.md`](docs/synology-sso.md) documents DSM login through
+  Authentik and local administrator recovery.
 - [`docs/kubernetes-storage.md`](docs/kubernetes-storage.md) documents the NFS
   policy and PVC migration process.
 - [`docs/backup-procedures.md`](docs/backup-procedures.md) and

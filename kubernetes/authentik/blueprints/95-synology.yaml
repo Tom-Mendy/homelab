@@ -1,0 +1,75 @@
+version: 1
+metadata:
+  name: Synology DSM OIDC client
+entries:
+  - model: authentik_providers_oauth2.scopemapping
+    id: synology-profile-scope
+    identifiers:
+      name: Synology DSM profile
+    attrs:
+      scope_name: profile
+      expression: |
+        return {
+            "name": request.user.name,
+            "preferred_username": request.user.attributes.get(
+                "synology_username", request.user.username
+            ),
+        }
+  - model: authentik_providers_oauth2.oauth2provider
+    id: synology-provider
+    identifiers:
+      name: Synology DSM
+    attrs:
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+      client_type: confidential
+      client_id: synology
+      client_secret: !Env [SYNOLOGY_OIDC_CLIENT_SECRET, null]
+      issuer_mode: per_provider
+      sub_mode: user_email
+      grant_types:
+        - authorization_code
+      redirect_uris:
+        - matching_mode: strict
+          url: https://10.0.0.11:5001
+          redirect_uri_type: authorization
+      property_mappings:
+        - !Find
+          - authentik_providers_oauth2.scopemapping
+          - [managed, goauthentik.io/providers/oauth2/scope-openid]
+        - !Find
+          - authentik_providers_oauth2.scopemapping
+          - [managed, goauthentik.io/providers/oauth2/scope-email]
+        - !KeyOf synology-profile-scope
+      # Create this RSA certificate-key pair in Authentik before activation.
+      signing_key: !Find
+        - authentik_crypto.certificatekeypair
+        - [name, Synology DSM RSA]
+  - model: authentik_core.application
+    id: synology-application
+    identifiers:
+      slug: synology
+    attrs:
+      name: NAS Synology
+      provider: !KeyOf synology-provider
+      meta_launch_url: https://10.0.0.11:5001/
+      open_in_new_tab: true
+      policy_engine_mode: any
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf synology-application
+      group: !Find [authentik_core.group, [name, homelab-admins]]
+      order: 0
+    attrs:
+      enabled: true
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf synology-application
+      group: !Find [authentik_core.group, [name, synology-users]]
+      order: 1
+    attrs:
+      enabled: true

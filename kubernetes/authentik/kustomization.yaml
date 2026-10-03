@@ -19,5 +19,6 @@ configMapGenerator:
       - 70-matrix.yaml=blueprints/70-matrix.yaml
       - 80-infisical.yaml=blueprints/80-infisical.yaml
       - 90-harbor.yaml=blueprints/90-harbor.yaml
+      - 95-synology.yaml=blueprints/95-synology.yaml
 generatorOptions:
   disableNameSuffixHash: true

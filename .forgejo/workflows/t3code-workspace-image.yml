@@ -1,0 +1,67 @@
+name: publish-t3code-workspace-image
+# Build and publish through the rootless BuildKit runner.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "kubernetes/coder/workspace-images/t3code/**"
+      - ".forgejo/workflows/t3code-workspace-image.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: t3code-workspace-image
+  cancel-in-progress: true
+
+env:
+  REGISTRY: harbor.home.tom-mendy.com
+  IMAGE_NAME: harbor.home.tom-mendy.com/homelab/t3code-workspace
+  IMAGE_TAG: v2026.10.2-buildah1
+  BUILDKITD_FLAGS: >-
+    --oci-worker-snapshotter=fuse-overlayfs
+    --oci-worker-no-process-sandbox
+
+jobs:
+  publish:
+    runs-on: buildkit
+    container:
+      image: harbor.home.tom-mendy.com/homelab/ci/buildkit-forgejo@sha256:573c108b9221ef005ba2d62885f64b0028147ce5dbfc0b267843530ab286b26f
+      credentials:
+        username: ${{ secrets.HARBOR_REGISTRY_USER }}
+        password: ${{ secrets.HARBOR_REGISTRY_TOKEN }}
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          clean: true
+
+      - name: Configure Harbor authentication
+        shell: bash
+        env:
+          REGISTRY_USERNAME: ${{ secrets.HARBOR_REGISTRY_USER }}
+          REGISTRY_TOKEN: ${{ secrets.HARBOR_REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$REGISTRY_USERNAME"
+          test -n "$REGISTRY_TOKEN"
+          mkdir -p "$HOME/.docker"
+          auth="$(printf '%s:%s' "$REGISTRY_USERNAME" "$REGISTRY_TOKEN" | base64 | tr -d '\\n')"
+          printf '{"auths":{"%s":{"auth":"%s"}}}\n' "$REGISTRY" "$auth" > "$HOME/.docker/config.json"
+
+      - name: Build and publish image
+        shell: bash
+        run: |
+          set -euo pipefail
+          buildctl-daemonless.sh build \
+            --frontend dockerfile.v0 \
+            --progress=plain \
+            --local context=kubernetes/coder/workspace-images/t3code \
+            --local dockerfile=kubernetes/coder/workspace-images/t3code \
+            --opt platform=linux/amd64 \
+            --output "type=image,\"name=$IMAGE_NAME:$FORGEJO_SHA,$IMAGE_NAME:$IMAGE_TAG,$IMAGE_NAME:latest\",push=true" \
+            --import-cache type=registry,ref="$IMAGE_NAME:buildcache" \
+            --export-cache type=registry,ref="$IMAGE_NAME:buildcache",mode=max

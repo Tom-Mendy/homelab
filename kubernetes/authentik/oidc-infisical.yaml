@@ -78,6 +78,7 @@ spec:
           MATRIX_OIDC_CLIENT_SECRET: "{{ .MATRIX_OIDC_CLIENT_SECRET.Value }}"
           INFISICAL_OIDC_CLIENT_SECRET: "{{ .INFISICAL_OIDC_CLIENT_SECRET.Value }}"
           HARBOR_OIDC_CLIENT_SECRET: "{{ .HARBOR_OIDC_CLIENT_SECRET.Value }}"
+          SYNOLOGY_OIDC_CLIENT_SECRET: "{{ .SYNOLOGY_OIDC_CLIENT_SECRET.Value }}"
     - name: forgejo-oidc
       namespace: forgejo
       kind: Secret

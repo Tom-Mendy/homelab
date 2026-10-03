@@ -82,8 +82,12 @@ the namespace quota to hide this drift. Existing stopped workspaces retain
 their PVCs, so delete an unused workspace only when its data is no longer
 needed.
 
-The `t3code` template is separate from `agent-workspace`. It installs T3 in the
-workspace and compiles its Linux `node-pty` native module during first startup.
+The `t3code` template is separate from `agent-workspace`. Its Debian-based
+image installs Buildah; the workspace runs Buildah as UID 1000 without elevated
+container privileges. Forgejo Actions builds the image from
+`kubernetes/coder/workspace-images/t3code/Dockerfile` and publishes it to
+Harbor. The workspace also installs T3 and compiles its Linux `node-pty` native
+module during first startup.
 
 The `personal-desktop` template is a separate persistent graphical workspace. It
 runs XFCE behind TigerVNC and noVNC on localhost:6080, exposed only through the

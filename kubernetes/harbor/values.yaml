@@ -28,3 +28,5 @@ portfolioRegistryCredentials:
       namespace: portfolio
     - name: job-search-manager-registry
       namespace: job-search-manager
+    - name: portfolio-registry-auth
+      namespace: coder-workspaces

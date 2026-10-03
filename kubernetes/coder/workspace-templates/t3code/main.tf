@@ -36,10 +36,6 @@ resource "coder_agent" "main" {
       install -m 0755 "$fj_tmp/fj" "$HOME/.local/bin/fj"
       rm -rf "$fj_tmp"
     fi
-    if ! command -v buildah >/dev/null 2>&1; then
-      sudo apt-get update
-      sudo apt-get install --no-install-recommends --yes buildah
-    fi
     git config --global user.name "t3code"
     git config --global user.email "home@tom-mendy.com"
     git config --global pull.rebase false
@@ -157,6 +153,9 @@ resource "kubernetes_deployment_v1" "workspace" {
       }
       spec {
         automount_service_account_token = false
+        image_pull_secrets {
+          name = "portfolio-registry-auth"
+        }
         security_context {
           run_as_user     = 1000
           run_as_group    = 1000
@@ -166,8 +165,8 @@ resource "kubernetes_deployment_v1" "workspace" {
         }
         container {
           name              = "workspace"
-          image             = "codercom/example-universal@sha256:411973a25007c309162e36958038ccf0f93d7cb48bf295f3da16bd30658c3ca7"
-          image_pull_policy = "IfNotPresent"
+          image             = "harbor.home.tom-mendy.com/homelab/t3code-workspace:v2026.10.2-buildah1"
+          image_pull_policy = "Always"
           command           = ["sh", "-c", coder_agent.main.init_script]
           security_context {
             allow_privilege_escalation = false
@@ -177,6 +176,10 @@ resource "kubernetes_deployment_v1" "workspace" {
           env {
             name  = "CODER_AGENT_TOKEN"
             value = coder_agent.main.token
+          }
+          env {
+            name  = "BUILDAH_ISOLATION"
+            value = "chroot"
           }
           resources {
             requests = { cpu = "500m", memory = "2Gi" }
