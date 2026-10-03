@@ -39,7 +39,7 @@ persistence:
 
 ollama:
   url: http://ollama.ollama.svc.cluster.local:11434/v1
-  model: gemma4:e4b
+  model: SparkLLM/Spark-X2.5-4B:latest
   timeout: 600
 
 resources:
