@@ -39,7 +39,6 @@ Updated only pinned image tag/digest values in:
 - `kubernetes/job-search-manager/values.yaml` (PostgreSQL 18 and AWS CLI
   backup images)
 - `kubernetes/wakapi/values.yaml`
-- `kubernetes/media/values.yaml` (NZBGet)
 - `kubernetes/ollama/values.yaml`
 - `kubernetes/harbor-config/values.yaml` (Python)
 
@@ -53,12 +52,29 @@ python3 scripts/check-image-updates.py --json
 ```
 
 The Helm chart tests and storage policy passed; all 5 checker unit tests
-passed. A post-edit image scan found 35 current references, no outdated
-references, and the same 5 registry errors. Rendered updates were
-prepared for Flux deployment from Forgejo `main`.
+passed. Flux initially failed the Ollama Helm upgrade because an old,
+completed function-sync Job had an immutable pod template. Updated its
+deterministic name checksum to include the image configuration; Flux
+then reported the Ollama release ready and the new function-sync Job
+completed successfully.
+
+The PostgreSQL primary restarted onto 18.6 and recovered to a healthy
+CNPG cluster. The new Newt pod connected to Pangolin, the Ollama pod is
+ready on 0.35.1, and all four Forgejo runner deployments became ready
+with the updated Docker-in-Docker digest. The updated AWS CLI CronJob
+template was applied.
+
+The NZBGet rollout could not complete: its replacement pod landed on
+node2, where the unchanged NymVPN init sidecar repeatedly failed its
+startup probe and was killed. The old NZBGet pod remained ready. Reverted
+only the NZBGet image to its previous known-good pin to avoid interrupting
+service; investigate the node2 NymVPN startup issue separately.
+
+After that rollback, the image checker reports NZBGet as outdated and
+the same 5 registry errors. The other 7 image updates remain deployed
+through Flux on Forgejo `main`.
 
 ## Outcome
 
-The candidate image references were updated in GitOps source. Cluster
-rollout and application health checks are recorded after the Forgejo
-`main` deployment.
+Seven image updates are deployed through Flux. NZBGet stays on its
+previous pin pending investigation of the node2 VPN sidecar startup.
