@@ -1,7 +1,7 @@
 {{- if .Values.openwebuiFunctionSync.enabled }}
 {{- $function := .Files.Get "files/openwebui-functions/token_usage_display.py" }}
 {{- $sync := .Files.Get "files/openwebui-functions/sync.py" }}
-{{- $checksum := printf "%s%s%s" $function $sync (toJson .Values.openwebuiFunctionSync) | sha256sum | trunc 10 }}
+{{- $checksum := printf "%s%s%s%s" $function $sync (toJson .Values.openwebuiFunctionSync) (toJson .Values.openwebui.image) | sha256sum | trunc 10 }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
