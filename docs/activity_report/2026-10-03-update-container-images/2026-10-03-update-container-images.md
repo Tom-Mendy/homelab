@@ -54,9 +54,10 @@ python3 scripts/check-image-updates.py --json
 The Helm chart tests and storage policy passed; all 5 checker unit tests
 passed. Flux initially failed the Ollama Helm upgrade because an old,
 completed function-sync Job had an immutable pod template. Updated its
-deterministic name checksum to include the image configuration; Flux
-then reported the Ollama release ready and the new function-sync Job
-completed successfully.
+deterministic name checksum to include the image configuration and
+removed the changing chart-version label from its immutable pod template.
+After removing the old completed Job, Flux then reported the Ollama release
+ready and the new function-sync Job completed successfully.
 
 The PostgreSQL primary restarted onto 18.6 and recovered to a healthy
 CNPG cluster. The new Newt pod connected to Pangolin, the Ollama pod is

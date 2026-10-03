@@ -28,7 +28,9 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/component: openwebui-function-sync
-        {{- include "ollama-local.labels" . | nindent 8 }}
+        app.kubernetes.io/name: ollama
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
     spec:
       restartPolicy: OnFailure
       containers:
