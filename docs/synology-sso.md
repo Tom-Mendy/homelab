@@ -1,6 +1,6 @@
 # Synology DSM login through Authentik
 
-DSM uses native OIDC at `https://10.0.0.11:5001/`. Flux loads
+DSM uses native OIDC at `https://nainjoueur.synology.me:5001/`. Flux loads
 `kubernetes/authentik/blueprints/95-synology.yaml`. Authentik permits
 `homelab-admins` and `synology-users`; DSM keeps its own account permissions.
 SSO does not create DSM accounts or grant DSM administrator rights.
@@ -58,7 +58,7 @@ Connect SSO service, open its settings, and enter these values:
 | Well Known URL | `https://authentik.home.tom-mendy.com/application/o/synology/.well-known/openid-configuration` |
 | Application ID | `synology` |
 | Application Key | Value of `SYNOLOGY_OIDC_CLIENT_SECRET` from Infisical |
-| Redirect URI | `https://10.0.0.11:5001` |
+| Redirect URI | `https://nainjoueur.synology.me:5001` |
 | Authorization Scope | `openid profile email` |
 | Username Claim | `preferred_username` |
 

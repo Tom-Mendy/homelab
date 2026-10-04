@@ -35,7 +35,7 @@ entries:
         - authorization_code
       redirect_uris:
         - matching_mode: strict
-          url: https://10.0.0.11:5001
+          url: https://nainjoueur.synology.me:5001
           redirect_uri_type: authorization
       property_mappings:
         - !Find
@@ -56,7 +56,7 @@ entries:
     attrs:
       name: NAS Synology
       provider: !KeyOf synology-provider
-      meta_launch_url: https://10.0.0.11:5001/
+      meta_launch_url: https://nainjoueur.synology.me:5001/
       open_in_new_tab: true
       policy_engine_mode: any
   - model: authentik_policies.policybinding
