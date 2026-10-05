@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:1.7
 FROM ubuntu:24.04@sha256:019e8eb29a85e74d64925745884f2ec79aa27e3feab36353d24656f4d6b89467
 
-ARG NYMVPN_VERSION=2026.11.3
-ARG NYMVPN_RELEASE=nym-vpn-v2026.11.3
+ARG NYMVPN_VERSION=2026.12.4
+ARG NYMVPN_RELEASE=nym-vpn-v2026.12.4
 
-ADD --checksum=sha256:78149d3f1cd99405042451f75a6dc9cf80d53c53b6242894292c5de7f571d835 \
+ADD --checksum=sha256:dc1d7f43beef5cf05a2dcfa0cee6bc89b335c58bd4ac0ddaf73726cc08d49eab \
   https://github.com/nymtech/nym-vpn-client/releases/download/${NYMVPN_RELEASE}/nym-vpnc_${NYMVPN_VERSION}_amd64.deb \
   /tmp/nym-vpnc.deb
-ADD --checksum=sha256:0047bb2921b3f05819e7c4a7a69874157d4b618e6bf64bce87ac5829d569382c \
+ADD --checksum=sha256:c28260de21d6f4ab486a0f37268ab9968184fbab1a6c4432e0e1fc96673c7934 \
   https://github.com/nymtech/nym-vpn-client/releases/download/${NYMVPN_RELEASE}/nym-vpnd_${NYMVPN_VERSION}_amd64.deb \
   /tmp/nym-vpnd.deb
 

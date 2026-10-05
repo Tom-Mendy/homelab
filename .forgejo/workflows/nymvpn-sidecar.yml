@@ -11,6 +11,7 @@ on:
   push:
     branches:
       - main
+      - fix/nymvpn-client-2026-12-4
     paths:
       - kubernetes/media/nymvpn/**
       - .forgejo/workflows/nymvpn-sidecar.yml
@@ -26,7 +27,7 @@ jobs:
     env:
       REGISTRY: harbor.home.tom-mendy.com
       IMAGE: harbor.home.tom-mendy.com/homelab/nymvpn-sidecar
-      IMAGE_TAG: 2026.11.3-4
+      IMAGE_TAG: 2026.12.4-1
     steps:
       - name: Checkout
         uses: actions/checkout@v7
