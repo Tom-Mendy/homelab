@@ -45,6 +45,8 @@ spec:
         app: nzbget
     spec:
       {{- if $app.vpn }}
+      imagePullSecrets:
+        - name: media-harbor-pull
       dnsPolicy: None
       dnsConfig:
         nameservers:
