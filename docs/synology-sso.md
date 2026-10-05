@@ -5,6 +5,10 @@ DSM uses native OIDC at `https://nainjoueur.synology.me:5001/`. Flux loads
 `homelab-admins` and `synology-users`; DSM keeps its own account permissions.
 SSO does not create DSM accounts or grant DSM administrator rights.
 
+Local DSM accounts require DSM 7.2 or later. DSM 7.1 requires a shared LDAP
+directory for OIDC login; creating a local account does not enable SSO on that
+version. After upgrading, select `Domain/LDAP/local` under **Account type**.
+
 Before deploying the change:
 
 1. In Infisical, open the `homelab` project, `prod` environment, `/oidc` path.
@@ -77,6 +81,39 @@ the existing DSM account. For `not privilege`, check pop-up blocking and the
 redirect URI. Use the exact origin above, without a trailing slash or
 `#/signin`. A future DSM hostname change must update both the blueprint and
 DSM's redirect URI. Use one canonical DSM origin.
+
+If DSM cannot obtain information about the SSO server, check the discovery URL
+before changing certificates or credentials:
+
+```bash
+curl --fail --show-error --max-time 15 \
+  https://authentik.home.tom-mendy.com/application/o/synology/.well-known/openid-configuration
+kubectl -n authentik get pods -o wide
+```
+
+HTTP 503 means the ingress has no available Authentik server. Check server
+readiness and logs. A NAS restart also interrupts Authentik's NFS-backed
+PostgreSQL storage, so confirm database recovery before retrying SSO.
+
+After the 2026-10-04 upgrade to DSM 7.4.1-90080, PostgreSQL on `node3`
+experienced slow NFSv4.1 file opens. Authentik health checks exceeded their
+three-second timeout and the ingress returned HTTP 503. NFS SEQUENCE replies
+persistently carried `SEQ4_STATUS_RECALLABLE_STATE_REVOKED` on `node3`, while
+`node2` had normal latency. NFSv3 provided temporary recovery.
+
+Draining `node3` and closing every Synology NFS mount reset its stale client
+state. The same 192-operation file-open benchmark then completed in 0.066
+seconds, with 0.422 ms p95 latency. The Authentik PostgreSQL PV
+`pvc-838dd586-f332-46ea-b676-84a72bbad01b` was restored to
+`mountOptions: [nfsvers=4.1]`. PostgreSQL recovered on `node3`, and discovery
+and health endpoints returned HTTP 200. The database retains no node placement
+restriction; both workers use the shared `nfs-k8s` storage class.
+
+After the subsequent operator-initiated node updates and reboots, all three
+nodes returned Ready with kernel `6.8.0-142-generic`. PostgreSQL's actual mount
+remained NFSv4.1. The scratch-volume benchmark passed on both workers with p95
+latency below 1 ms, all six CloudNativePG clusters were healthy, and Authentik
+discovery and readiness returned HTTP 200.
 
 For rollback, sign in with the local DSM administrator and disable **Enable
 OpenID Connect SSO service**. Keep that account and its credentials available

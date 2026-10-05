@@ -102,6 +102,25 @@ Use `--disable-eviction` only during the maintenance window. It bypasses PDB
 protection, so Authentik and Infisical may be unavailable while their database
 pods restart on another schedulable node.
 
+After a Synology restart, compare NFS file-open latency on both workers if
+applications become slow. On 2026-10-04, stale NFSv4.1 client state on `node3`
+caused repeated delegation checks and slow PostgreSQL queries. Draining that
+worker and closing all its Synology mounts reset the client without a protocol
+downgrade. Host diagnostic pods that bind `/` can keep those mounts alive;
+remove them before the drain. Confirm the Synology entry disappears from
+`/proc/fs/nfsfs/servers`, then remount, verify file access and database health,
+and uncordon the worker. Preserve existing PVC bindings and NFS paths throughout
+the operation.
+
+Use a disposable diagnostic pod with a scratch `nfs-k8s` PVC on each worker
+to check file-open latency. This command requires an NFSv4.1 mount and fails
+when p95 latency exceeds 10 ms. It removes its own temporary files:
+
+```bash
+kubectl exec -i -n <namespace> <diagnostic-pod> -- python - /data \
+  < scripts/check-nfs-file-access.py
+```
+
 ## Priority
 
 Migrate in this order:
