@@ -59,7 +59,7 @@ Connect SSO service, open its settings, and enter these values:
 | Profile | `OIDC` |
 | Account type | `Domain/LDAP/local` |
 | Name | `Authentik` |
-| Well Known URL | `https://authentik.home.tom-mendy.com/application/o/synology/.well-known/openid-configuration` |
+| Well Known URL | `https://authentik.tom-mendy.com/application/o/synology/.well-known/openid-configuration` |
 | Application ID | `synology` |
 | Application Key | Value of `SYNOLOGY_OIDC_CLIENT_SECRET` from Infisical |
 | Redirect URI | `https://nainjoueur.synology.me:5001` |

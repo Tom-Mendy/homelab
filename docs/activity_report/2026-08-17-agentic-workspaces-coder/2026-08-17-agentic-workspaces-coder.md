@@ -208,7 +208,7 @@ $ curl -o /dev/null -w '%{http_code}' \
 200
 
 $ curl -o /dev/null -w '%{http_code}' \
-    https://authentik.home.tom-mendy.com/application/o/coder/\
+    https://authentik.tom-mendy.com/application/o/coder/\
 .well-known/openid-configuration
 200
 ```

@@ -7,8 +7,8 @@ admin accounts exist.
 
 - Expose authentik publicly at `https://authentik.tom-mendy.com` through
   Pangolin.
-- Keep the private/internal authentik URL available at
-  `https://authentik.home.tom-mendy.com`.
+- Use `https://authentik.tom-mendy.com` for all authentik links, redirects,
+  OIDC endpoints, ingress hosts, and Blocky DNS mappings.
 - Use manual invitations for guest accounts.
 - Give guests controlled access to Forgejo and later to selected apps.
 - Keep Infisical private.
@@ -44,7 +44,7 @@ admin accounts exist.
 ## authentik Public Access
 
 - In authentik, confirm the instance works at:
-  - `https://authentik.home.tom-mendy.com`
+  - `https://authentik.tom-mendy.com`
 - In Pangolin, create a public resource:
   - public hostname: `authentik.tom-mendy.com`
   - upstream URL: `http://authentik-server.authentik.svc.cluster.local:80`
@@ -52,7 +52,7 @@ admin accounts exist.
 - In public DNS, create or verify `authentik.tom-mendy.com` points to Pangolin.
 - Test from outside the LAN:
   - `https://authentik.tom-mendy.com`
-- Keep `authentik.home.tom-mendy.com` as the admin recovery path.
+- Use `https://authentik.tom-mendy.com` for admin recovery access.
 
 ## authentik Groups and Guests
 
@@ -84,7 +84,7 @@ admin accounts exist.
 - Keep local Forgejo and Grafana login enabled for recovery.
 - Configure Infisical's General OIDC provider with:
   - Discovery URL:
-    `https://authentik.home.tom-mendy.com/application/o/infisical/.well-known/openid-configuration`
+    `https://authentik.tom-mendy.com/application/o/infisical/.well-known/openid-configuration`
   - Client ID: `infisical`
   - Client secret: the value stored as `INFISICAL_OIDC_CLIENT_SECRET` in
     Infisical
@@ -129,7 +129,6 @@ kubectl get secret authentik-secrets -n authentik
 
 ## Browser Checks
 
-- `https://authentik.home.tom-mendy.com`
 - `https://authentik.tom-mendy.com`
 - Forgejo login via authentik
 - Guest account application list

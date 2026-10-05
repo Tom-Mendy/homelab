@@ -2,10 +2,11 @@
 
 ## Problem
 
-authentik is currently running privately at
-`authentik.home.tom-mendy.com`. The next operational goal is to expose
-authentik publicly at `authentik.tom-mendy.com` through Pangolin, then use
+Expose authentik at `authentik.tom-mendy.com` through Pangolin, then use
 manual guest invitations for Forgejo and selected apps.
+
+The URLs and ingress example below follow the current hostname policy.
+Use the canonical hostname for all authentik access and DNS mappings.
 
 Infisical must remain private, and real secrets must not be committed to Git.
 
@@ -14,7 +15,7 @@ Infisical must remain private, and real secrets must not be committed to Git.
 The repo uses `*.home.tom-mendy.com` for private services and Traefik ingress
 inside the cluster. Pangolin/Newt already exists for public tunnel access.
 
-The authentik Kubernetes ingress should stay internal-only with the private host.
+The authentik Kubernetes ingress must use `authentik.tom-mendy.com`.
 Pangolin can reach authentik directly through Kubernetes DNS because its
 connector runs inside the cluster. The official authentik chart renders the
 server Service as:
@@ -64,7 +65,6 @@ kubectl get svc -n authentik authentik-server
 Manual browser checks:
 
 ```text
-https://authentik.home.tom-mendy.com
 https://authentik.tom-mendy.com
 ```
 
@@ -89,7 +89,7 @@ spec:
       targetPort: 9000
 ```
 
-The same render confirmed the Kubernetes Ingress remains private-only:
+The Kubernetes Ingress example uses the canonical hostname:
 
 ```text
 kind: Ingress
@@ -97,7 +97,7 @@ metadata:
   name: authentik-server
 spec:
   rules:
-    - host: "authentik.home.tom-mendy.com"
+    - host: "authentik.tom-mendy.com"
 ```
 
 All local chart renders succeeded:
@@ -151,7 +151,7 @@ Success: No issues found in 26 files
 
 The repository now includes:
 
-- authentik ingress configuration kept to `authentik.home.tom-mendy.com`.
+- authentik ingress configuration uses `authentik.tom-mendy.com`.
 - A manual checklist at `docs/authentik-infisical-guest-checklist.md` for
   Infisical, authentik, Pangolin, guest groups, invitations, and Forgejo SSO.
   Pangolin should route the public `authentik.tom-mendy.com` hostname to
