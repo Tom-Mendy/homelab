@@ -7,7 +7,7 @@ securityContext:
   pgid: 100
 
 nymVpn:
-  image: forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.3-3@sha256:0728350cf1d4012b09a8674f58d6ad4290da11cf8db115ceb051fe91dfba25d6
+  image: harbor.home.tom-mendy.com/homelab/nymvpn-sidecar:2026.12.4-1@sha256:8fbc409975c5f0f7012819e65c746960c16fb9579d58c5450cef9d718795fce6
   pullPolicy: IfNotPresent
   secretName: nymvpn-credentials
   entryCountry: FR
