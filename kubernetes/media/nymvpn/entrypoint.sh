@@ -58,7 +58,7 @@ rm -f "$initialized_file" "$ready_file"
 
 # The RPC socket is private to this container; Kubernetes shares the network
 # namespace with the application, not this filesystem.
-nym-vpnd run-as-service --disable-client-verification &
+nym-vpnd -v run-as-service --disable-client-verification &
 daemon_pid=$!
 connect_pid=
 

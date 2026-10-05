@@ -27,7 +27,7 @@ jobs:
     env:
       REGISTRY: harbor.home.tom-mendy.com
       IMAGE: harbor.home.tom-mendy.com/homelab/nymvpn-sidecar
-      IMAGE_TAG: 2026.12.4-1
+      IMAGE_TAG: 2026.12.4-2
     steps:
       - name: Checkout
         uses: actions/checkout@v7
