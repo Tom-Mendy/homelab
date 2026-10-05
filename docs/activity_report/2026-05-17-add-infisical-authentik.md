@@ -112,7 +112,7 @@ kubectl get ingress -n authentik
 Open the authentik initial setup URL with the required trailing slash:
 
 ```text
-https://authentik.home.tom-mendy.com/if/flow/initial-setup/
+https://authentik.tom-mendy.com/if/flow/initial-setup/
 ```
 
 ## Command results

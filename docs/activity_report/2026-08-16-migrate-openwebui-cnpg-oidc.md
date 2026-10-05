@@ -97,7 +97,7 @@ Verify the provider and application:
 
 ```sh
 curl -fsS \
-  https://authentik.home.tom-mendy.com/application/o/openwebui/.well-known/openid-configuration
+  https://authentik.tom-mendy.com/application/o/openwebui/.well-known/openid-configuration
 ```
 
 ```text

@@ -4,6 +4,12 @@
 
 code & docs in english always
 
+## Authentik hostname policy
+
+Use `authentik.tom-mendy.com` for all Authentik URLs, redirects, OIDC
+endpoints, ingress hosts, DNS mappings, and documentation. No alternate
+Authentik hostname is allowed.
+
 ## script creation
 
 prefer python (uv if usable), else use

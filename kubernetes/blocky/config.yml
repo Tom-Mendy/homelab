@@ -36,7 +36,6 @@ customDNS:
     grafana.home.tom-mendy.com: 10.0.0.60
     atuin.home.tom-mendy.com: 10.0.0.60
     infisical.home.tom-mendy.com: 10.0.0.60
-    authentik.home.tom-mendy.com: 10.0.0.60
     flux.home.tom-mendy.com: 10.0.0.60
     harbor.home.tom-mendy.com: 10.0.0.60
     suivi-stage.home.tom-mendy.com: 10.0.0.60

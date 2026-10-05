@@ -18,7 +18,7 @@
         description: Secrets management
     - Authentik:
         icon: authentik.svg
-        href: https://authentik.home.tom-mendy.com
+        href: https://authentik.tom-mendy.com
         description: Identity provider
     - Flux:
         icon: flux-cd.svg

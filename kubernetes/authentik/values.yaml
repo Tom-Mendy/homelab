@@ -58,11 +58,9 @@ server:
       traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
     hosts:
       - authentik.tom-mendy.com
-      - authentik.home.tom-mendy.com
     tls:
       - hosts:
           - authentik.tom-mendy.com
-          - authentik.home.tom-mendy.com
 
 worker:
   replicas: 1
