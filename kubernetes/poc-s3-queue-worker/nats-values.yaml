@@ -1,0 +1,24 @@
+config:
+  jetstream:
+    enabled: true
+    fileStore:
+      enabled: true
+      pvc:
+        enabled: true
+        size: 1Gi
+        storageClassName: nfs-k8s
+  monitor:
+    enabled: true
+container:
+  image:
+    repository: nats
+    tag: 2.14.2-alpine
+natsBox:
+  enabled: false
+service:
+  enabled: true
+  ports:
+    monitor:
+      enabled: true
+    nats:
+      enabled: true

@@ -6,6 +6,7 @@ resources:
   - identity.yaml
   - applications.yaml
   - runners.yaml
+  - nats.yaml
 configMapGenerator:
   - name: arc-controller-values
     files:
@@ -55,6 +56,9 @@ configMapGenerator:
   - name: nfs-provisioner-values
     files:
       - values.yaml=../../../nfs-provisioner/values.yaml
+  - name: nats-values
+    files:
+      - values.yaml=../../../poc-s3-queue-worker/nats-values.yaml
   - name: prometheus-values
     files:
       - values.yaml=../../../prometheus/values.yaml
