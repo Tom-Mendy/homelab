@@ -177,7 +177,7 @@ resource "kubernetes_deployment_v1" "workspace" {
         }
         container {
           name              = "workspace"
-          image             = "harbor.home.tom-mendy.com/homelab/t3code-workspace:v2026.10.2-buildah1"
+          image             = "harbor.home.tom-mendy.com/homelab/t3code-workspace@sha256:46858b365f399685d74c49cb0d191fcb68f82ecccf7203f6fc0c16d511b140e0"
           image_pull_policy = "Always"
           command           = ["sh", "-c", coder_agent.main.init_script]
           security_context {
