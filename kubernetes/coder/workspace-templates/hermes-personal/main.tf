@@ -138,6 +138,9 @@ resource "kubernetes_deployment_v1" "workspace" {
       spec {
         automount_service_account_token = false
         service_account_name            = "hermes"
+        image_pull_secrets {
+          name = "portfolio-registry-auth"
+        }
         security_context {
           run_as_user     = 10000
           run_as_group    = 10000
@@ -147,7 +150,7 @@ resource "kubernetes_deployment_v1" "workspace" {
         }
         container {
           name              = "hermes"
-          image             = "nousresearch/hermes-agent@sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283"
+          image             = "harbor.home.tom-mendy.com/homelab/hermes-workspace@sha256:b6ce9d55c6b2d8fff9e6ffb8da930218539c1b4e94eae289b448b7717aa8439c"
           image_pull_policy = "IfNotPresent"
           command           = ["sh", "-c", coder_agent.main.init_script]
           security_context {

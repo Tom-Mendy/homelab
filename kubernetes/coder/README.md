@@ -130,10 +130,11 @@ continue to run through their explicitly selected interpreter.
 
 The custom workspace image is built by Forgejo Actions from
 `kubernetes/coder/workspace-images/hermes/Dockerfile`. It installs the stable
-Debian system dependencies used for development and infrastructure work while
-keeping the runtime user non-root. The repository's Forgejo Actions settings
-must contain a `REGISTRY_TOKEN` secret with package-write permission before the
-image workflow can publish to `forgejo.tom-mendy.com`.
+Debian system dependencies used for development and infrastructure work,
+including `unzip` for Bun, while keeping the runtime user non-root. The template
+pins this image by digest and pulls it using `portfolio-registry-auth` in
+`coder-workspaces`. Forgejo Actions needs the `HARBOR_REGISTRY_USER` and
+`HARBOR_REGISTRY_TOKEN` secrets to publish image updates to Harbor.
 
 The image is intentionally built separately from the Terraform template. Push
 and verify the image publication before changing the template's image digest;
