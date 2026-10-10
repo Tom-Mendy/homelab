@@ -26,7 +26,11 @@ resource "coder_agent" "main" {
   startup_script = <<-EOT
     set -eu
     export npm_config_prefix="$HOME/.local"
-    export PATH="$HOME/.local/bin:$PATH"
+    export BUN_INSTALL="$HOME/.bun"
+    export PATH="$BUN_INSTALL/bin:$HOME/.local/bin:$PATH"
+    if ! command -v bun >/dev/null 2>&1; then
+      curl -fsSL https://bun.sh/install | bash
+    fi
     fj_version='0.6.0'
     if ! command -v fj >/dev/null 2>&1 || [ "$(fj version 2>/dev/null | head -1)" != "fj v$fj_version" ]; then
       fj_tmp="$(mktemp -d)"
@@ -39,7 +43,7 @@ resource "coder_agent" "main" {
     git config --global user.name "t3code"
     git config --global user.email "home@tom-mendy.com"
     git config --global pull.rebase false
-    profile_line='export PATH="$HOME/.local/bin:$PATH"'
+    profile_line='export BUN_INSTALL="$HOME/.bun"; export PATH="$BUN_INSTALL/bin:$HOME/.local/bin:$PATH"'
     if ! grep -Fqx "$profile_line" "$HOME/.profile" 2>/dev/null; then
       printf '%s\n' "$profile_line" >> "$HOME/.profile"
     fi
@@ -66,6 +70,14 @@ resource "coder_agent" "main" {
     display_name = "Codex version"
     key          = "codex-version"
     script       = "export PATH=\"$HOME/.local/bin:$PATH\"; codex --version"
+    interval     = 300
+    timeout      = 5
+  }
+
+  metadata {
+    display_name = "Bun version"
+    key          = "bun-version"
+    script       = "export BUN_INSTALL=\"$HOME/.bun\"; export PATH=\"$BUN_INSTALL/bin:$PATH\"; bun --version"
     interval     = 300
     timeout      = 5
   }

@@ -86,8 +86,8 @@ The `t3code` template is separate from `agent-workspace`. Its Debian-based
 image installs Buildah; the workspace runs Buildah as UID 1000 without elevated
 container privileges. Forgejo Actions builds the image from
 `kubernetes/coder/workspace-images/t3code/Dockerfile` and publishes it to
-Harbor. The workspace also installs T3 and compiles its Linux `node-pty` native
-module during first startup.
+Harbor. On first startup, the workspace installs Bun into its persistent home,
+alongside T3, and compiles T3's Linux `node-pty` native module.
 
 The `personal-desktop` template is a separate persistent graphical workspace. It
 runs XFCE behind TigerVNC and noVNC on localhost:6080, exposed only through the
@@ -115,8 +115,8 @@ synchronizes it and `HERMES_MATRIX_ACCESS_TOKEN` into the `coder-workspaces`
 namespace. The template injects those values without writing the token to the
 workspace PVC.
 
-The Hermes workspace includes the Coder CLI, Crane CLI, and `kubectl`,
-installed to the persistent `~/.local/bin` directory at startup. The workspace
+The Hermes workspace includes Bun, the Coder CLI, Crane CLI, and `kubectl`,
+installed into its persistent home at startup. The workspace
 runs with the `hermes` ServiceAccount and explicitly mounts a rotating token,
 granting cluster administrator access to manage and inspect cluster resources. Run
 `coder login` with `https://coder.tom-mendy.com` to authenticate it as your

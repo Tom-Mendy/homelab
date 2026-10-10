@@ -25,10 +25,14 @@ resource "coder_agent" "main" {
 
   startup_script = <<-EOT
     set -eu
-    export PATH="$HOME/.local/bin:/opt/hermes/bin:/opt/hermes/.venv/bin:$PATH"
+    export BUN_INSTALL="$HOME/.bun"
+    export PATH="$BUN_INSTALL/bin:$HOME/.local/bin:/opt/hermes/bin:/opt/hermes/.venv/bin:$PATH"
+    if ! command -v bun >/dev/null 2>&1; then
+      curl -fsSL https://bun.sh/install | bash
+    fi
     UV_CONSTRAINT= uv pip freeze --python /opt/hermes/.venv/bin/python3 | grep -v '^-e ' >"$UV_CONSTRAINT"
     [ ! -f "$HOME/.profile" ] || sed -i '\|runtime-venv-v2026.9.24|d' "$HOME/.profile"
-    profile_line='export PATH="/opt/hermes/bin:/opt/hermes/.venv/bin:$HOME/.local/bin:$PATH"'
+    profile_line='export BUN_INSTALL="$HOME/.bun"; export PATH="$BUN_INSTALL/bin:/opt/hermes/bin:/opt/hermes/.venv/bin:$HOME/.local/bin:$PATH"'
     grep -qxF "$profile_line" "$HOME/.profile" 2>/dev/null || printf '\n%s\n' "$profile_line" >> "$HOME/.profile"
     if ! command -v coder >/dev/null 2>&1; then
       curl -fsSL https://coder.com/install.sh \
@@ -62,6 +66,14 @@ SKILL
     display_name = "Hermes version"
     key          = "hermes-version"
     script       = "hermes --version"
+    interval     = 300
+    timeout      = 5
+  }
+
+  metadata {
+    display_name = "Bun version"
+    key          = "bun-version"
+    script       = "export BUN_INSTALL=\"$HOME/.bun\"; export PATH=\"$BUN_INSTALL/bin:$PATH\"; bun --version"
     interval     = 300
     timeout      = 5
   }
