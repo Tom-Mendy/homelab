@@ -8,6 +8,9 @@ image:
 deployment:
   strategy: Recreate
 
+ollama:
+  contextLength: 8192
+
 models:
   pull:
     - gemma4:e4b

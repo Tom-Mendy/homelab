@@ -80,6 +80,8 @@ spec:
           env:
             - name: OLLAMA_HOST
               value: 0.0.0.0:11434
+            - name: OLLAMA_CONTEXT_LENGTH
+              value: {{ .Values.ollama.contextLength | quote }}
           volumeMounts:
             - name: data
               mountPath: /root/.ollama
