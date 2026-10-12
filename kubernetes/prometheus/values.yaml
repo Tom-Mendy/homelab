@@ -37,6 +37,17 @@ scrapeConfigs:
 alertmanager:
   enabled: false
 
+# The reloader only reads ConfigMaps; do not share root's node-wide inotify quota.
+configmapReload:
+  prometheus:
+    containerSecurityContext:
+      runAsUser: 65534
+      runAsGroup: 65534
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+
 server:
   securityContext:
     runAsUser: 0
