@@ -47,18 +47,63 @@ existingSecretAdminPasswordKey: HARBOR_ADMIN_PASSWORD
 existingSecretSecretKey: harbor-secrets
 
 core:
+  image:
+    repository: mirror.gcr.io/goharbor/harbor-core
+    tag: v2.15.4@sha256:7d2ba5304a729887cdec7cb222a82b500278423de230ae5150c386a6c332b112
   existingSecret: harbor-secrets
   existingSecretKey: secret
 
 jobservice:
+  image:
+    repository: mirror.gcr.io/goharbor/harbor-jobservice
+    tag: v2.15.4@sha256:f143578ef30e2be5c48873298257ed0fca31545025958c534e536a06765d2b82
   existingSecret: harbor-secrets
   existingSecretKey: JOBSERVICE_SECRET
 
 registry:
+  registry:
+    image:
+      repository: mirror.gcr.io/goharbor/registry-photon
+      tag: v2.15.4@sha256:dc0cb388a6445c69c8a0c406679290d2991c9698833d9e6e86a23bdfaf2f83c3
+  controller:
+    image:
+      repository: mirror.gcr.io/goharbor/harbor-registryctl
+      tag: v2.15.4@sha256:30bd1ace4e3bb390d75b84673f98ddb4a69fcc6d116932ea764391df01943fb7
   existingSecret: harbor-secrets
   existingSecretKey: REGISTRY_HTTP_SECRET
   credentials:
     existingSecret: harbor-secrets
+
+# Harbor 2.15.2+ migrates the internal PostgreSQL database from 15 to 18
+# and uses Valkey in place of Redis. Restore the pre-upgrade native/logical
+# backups rather than downgrading the image if a database rollback is needed.
+# Keep image pulls independent of the registry being upgraded.
+portal:
+  image:
+    repository: mirror.gcr.io/goharbor/harbor-portal
+    tag: v2.15.4@sha256:01edf478505b21dba23a83c095f6ecac0c1e705690093edbab41e9a4d6754a75
+
+trivy:
+  image:
+    repository: mirror.gcr.io/goharbor/trivy-adapter-photon
+    tag: v2.15.4@sha256:813ca81b4a4ea0f44f5fa81cca2645eeb58d4b1f6c66b428df9d506174bb71d9
+
+exporter:
+  image:
+    repository: mirror.gcr.io/goharbor/harbor-exporter
+    tag: v2.15.4@sha256:9ffede33dc519b4be035596a72f00f354754a22a3769077731f81ee7d6852f4f
+
+database:
+  internal:
+    image:
+      repository: mirror.gcr.io/goharbor/harbor-db
+      tag: v2.15.4@sha256:a32d51e636d76303e086a7c5251a2c8415c6f165b2f87bafa914efd866c5403f
+
+redis:
+  internal:
+    image:
+      repository: mirror.gcr.io/goharbor/valkey-photon
+      tag: v2.15.4@sha256:bb022e8f236f56f53cee7bb1f609595e497da67d829048e0af2284f97e6eb54f
 
 metrics:
   enabled: true
