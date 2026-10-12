@@ -94,7 +94,7 @@ kubectl -n flux-system get secret flux-web-client \
   -o jsonpath='{.data.FLUX_WEB_CLIENT_SECRET}' | base64 -d | \
   helm upgrade --install flux-operator \
     oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator \
-    --version '0.58.x' \
+    --version '0.61.0' \
     --namespace flux-system \
     --create-namespace \
     --values kubernetes/flux/bootstrap/values.yaml \
