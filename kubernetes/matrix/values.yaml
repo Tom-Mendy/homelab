@@ -16,8 +16,8 @@ infisicalSecret:
 
 tuwunel:
   # Set to zero only for a consistent offline maintenance backup.
-  replicas: 0
-  image: ghcr.io/matrix-construct/tuwunel:v1.9.3@sha256:678b7f5350e06a41614444497c587da9dddf66767e4068a27480402f3c1367d0
+  replicas: 1
+  image: ghcr.io/matrix-construct/tuwunel:v1.9.4@sha256:0e86c6164d6c9f5b60291938eb61ad8395021c37fe58d47a963ea7edddbedaec
   host: matrix.tom-mendy.com
   storage:
     dataSize: 50Gi
@@ -45,8 +45,8 @@ cinny:
 rtc:
   host: rtc.tom-mendy.com
   publicIp: 92.222.90.223
-  livekitImage: livekit/livekit-server:v1.13.5@sha256:3497163e15c48fef6e7830c78716f9e9d5edc28abf7aa90b61c86e93bbc306b1
-  jwtImage: ghcr.io/element-hq/lk-jwt-service:0.5.0@sha256:29918567e6b7cd920e2853b4cd6848ce01b79947c3d19a9f1ed5b74f0a2a88bf
+  livekitImage: livekit/livekit-server:v1.13.9@sha256:d0c04791bf63ca8dcea123571827d56ba9504bd57c8d5de60ee03b5408cc3154
+  jwtImage: ghcr.io/element-hq/lk-jwt-service:0.8.0@sha256:fe787619877b9c12d4370ed39dc8edecf99b1a71fa8958c0fdcb687c1d31c775
   resources:
     livekit:
       requests:
