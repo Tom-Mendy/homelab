@@ -2,7 +2,7 @@ namespace: ollama
 
 image:
   repository: ollama/ollama
-  tag: 0.35.1@sha256:292ee7945dfc3d5840a181f3ab86fedb1e66703e02c8af98b50f4da56b7e278c
+  tag: 0.40.3@sha256:adca95a12c2b386a8f9a995e7fa0600e187e3323b5e5522f5a6c3b1ec73eff99
   pullPolicy: IfNotPresent
 
 deployment:
@@ -77,7 +77,7 @@ openwebui:
 
   image:
     repository: ghcr.io/open-webui/open-webui
-    tag: 0.11.4@sha256:9591b13f13843c7721c2b8eaf7382846c81b3ffe126526d1888d1fed50c6a33f
+    tag: 0.12.0@sha256:1565038903151ced924b5a3226f73f40f16963df4b910441f6391f10144afdaa
     pullPolicy: IfNotPresent
 
   ollama:
