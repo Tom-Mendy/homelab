@@ -18,7 +18,6 @@ Examples currently present in DNS mapping (`kubernetes/blocky/config.yml`):
 - `openwebui.home.tom-mendy.com`
 - `ollama.home.tom-mendy.com`
 - `prometheus.home.tom-mendy.com`
-- `trilium.home.tom-mendy.com`
 - `vaultwarden.home.tom-mendy.com`
 
 ## Why DNS-01

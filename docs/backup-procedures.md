@@ -73,7 +73,6 @@ Stateful services in this repo include at least:
 - `grafana`
 - `prometheus`
 - `navidrome` data PVC
-- `trilium`
 - `matrix` (`tuwunel-data` and `tuwunel-backups`)
 - Harbor registry data, job logs, and Trivy cache
 

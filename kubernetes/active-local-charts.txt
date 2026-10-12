@@ -18,7 +18,5 @@ ollama
 portfolio
 prometheus
 searxng
-stirling-pdf
 traefik
-trilium
 vaultwarden

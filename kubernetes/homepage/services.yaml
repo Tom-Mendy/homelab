@@ -42,10 +42,6 @@
         icon: searxng.svg
         href: https://searxng.home.tom-mendy.com/
         description: Privacy-respecting metasearch engine
-    - Stirling PDF:
-        icon: stirling-pdf.svg
-        href: https://stirling-pdf.home.tom-mendy.com/
-        description: Web Application to Edit PDF
     - Vaultwarden:
         icon: vaultwarden.svg
         href: https://vaultwarden.home.tom-mendy.com/
