@@ -51,12 +51,15 @@ resource "coder_agent" "main" {
 ${file("${path.module}/bootstrap-cluster.py")}
 PYTHON
     /opt/hermes/.venv/bin/python3 "$HERMES_HOME/bootstrap-cluster.py"
+    cat >"$HERMES_HOME/launch-gateway.py" <<'PYTHON'
+${file("${path.module}/launch-gateway.py")}
+PYTHON
     cat >"$HERMES_HOME/skills/homelab-cluster/SKILL.md" <<'SKILL'
 ${file("${path.module}/cluster-operations.md")}
 SKILL
     if [ -f "$HERMES_HOME/config.yaml" ]; then
       # Coder starts this supervisor inside the workspace, independently of SSH.
-      nohup bash -c 'while true; do hermes gateway run; sleep 10; done' >"$HERMES_HOME/logs/gateway-coder.log" 2>&1 &
+      nohup bash -c 'while true; do /opt/hermes/.venv/bin/python3 "$HERMES_HOME/launch-gateway.py"; sleep 10; done' >"$HERMES_HOME/logs/gateway-coder.log" 2>&1 &
     else
       echo "Run 'hermes model' and 'hermes memory setup' once, then restart the workspace."
     fi
