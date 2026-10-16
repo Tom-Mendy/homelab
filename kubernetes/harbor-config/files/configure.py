@@ -115,6 +115,12 @@ def configure_project(project, registry_id):
 
 
 wait_for_harbor()
+request(
+    "PUT",
+    "/api/v2.0/configurations",
+    {"oidc_endpoint": os.environ["HARBOR_OIDC_ENDPOINT"]},
+    expected=(200,),
+)
 projects = json.loads(os.environ["HARBOR_PROXY_PROJECTS"])
 for project in projects:
     registry_id = None if project.get("projectType") == "local" else configure_registry(project)

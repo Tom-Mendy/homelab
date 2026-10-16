@@ -22,6 +22,8 @@ spec:
           env:
             - name: HARBOR_URL
               value: {{ .Values.harbor.url | quote }}
+            - name: HARBOR_OIDC_ENDPOINT
+              value: {{ .Values.harbor.oidcEndpoint | quote }}
             - name: HARBOR_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:

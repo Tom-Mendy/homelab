@@ -2,6 +2,7 @@ namespace: harbor
 
 harbor:
   url: http://harbor-core.harbor.svc.cluster.local
+  oidcEndpoint: https://authentik.tom-mendy.com/application/o/harbor/
   adminSecretName: harbor-secrets
   adminSecretKey: HARBOR_ADMIN_PASSWORD
   proxySecretName: harbor-proxy-credentials
