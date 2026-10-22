@@ -44,6 +44,17 @@ spec:
   valuesFrom:
     - kind: ConfigMap
       name: harbor-values
+  postRenderers:
+    - kustomize:
+        patches:
+          # PostgreSQL must not reap orphaned health-check processes as PID 1.
+          - target:
+              kind: StatefulSet
+              name: harbor-database
+            patch: |
+              - op: add
+                path: /spec/template/spec/shareProcessNamespace
+                value: true
   dependsOn:
     - name: harbor-extras
     - name: authentik
