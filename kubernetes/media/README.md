@@ -10,8 +10,6 @@ by the other charts in `kubernetes/`.
 - `Prowlarr`
 - `Sonarr`
 - `Radarr`
-- `Bazarr`
-- `Autobrr`
 
 Only downloader apps are VPN-routed, ARR apps stay outside VPN. qBittorrent
 and NZBGet use NymVPN.
@@ -24,6 +22,12 @@ Configured in `values.yaml`:
 - Movies: `/volume1/video/Film`
 - Series: `/volume1/video/Serie`
 - NFS server: `10.0.0.11`
+
+Autobrr and Bazarr were retired on 2026-10-22. Their workloads, ingress routes,
+DNS mappings, dashboard links, and dedicated configuration PVCs were removed.
+Their retained PVs and dedicated NFS configuration directories were also deleted.
+The shared downloads, movies, and series volumes remain in use by the other apps.
+Reinstalling either retired app requires a new configuration volume.
 
 Container identity defaults:
 

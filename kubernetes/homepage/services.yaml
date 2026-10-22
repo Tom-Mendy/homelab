@@ -96,11 +96,3 @@
         icon: radarr.svg
         href: https://radarr.home.tom-mendy.com/
         description: Movies manager
-    - Bazarr:
-        icon: bazarr.svg
-        href: https://bazarr.home.tom-mendy.com/
-        description: Subtitle manager
-    - Autobrr:
-        icon: autobrr.svg
-        href: https://autobrr.home.tom-mendy.com/
-        description: Automation and racing

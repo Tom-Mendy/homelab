@@ -106,23 +106,3 @@ apps:
       downloads: false
       movies: false
       series: false
-
-  bazarr:
-    image: lscr.io/linuxserver/bazarr:1.6.2@sha256:8b30e81c4aec2991f469e78fae8afaa89ecc9b21a80e3897f50427216b55470c
-    port: 6767
-    host: bazarr.home.tom-mendy.com
-    vpn: false
-    mounts:
-      downloads: false
-      movies: true
-      series: true
-
-  autobrr:
-    image: ghcr.io/autobrr/autobrr:v1.88.0@sha256:e200008d43fe6cd2d944c9bcf20900cfb8ba8a8e509625bb78ee51910b994005
-    port: 7474
-    host: autobrr.home.tom-mendy.com
-    vpn: false
-    mounts:
-      downloads: false
-      movies: false
-      series: false
