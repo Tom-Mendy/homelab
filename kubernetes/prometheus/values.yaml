@@ -23,6 +23,10 @@ rbac:
   create: true
 
 scrapeConfigs:
+  kubernetes-api-servers:
+    tls_config:
+      # The API certificate covers this DNS name, not the migrated node IP.
+      server_name: kubernetes.default.svc
   kubernetes-nodes-cadvisor:
     relabel_configs:
       - action: labelmap

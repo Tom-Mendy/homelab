@@ -95,6 +95,14 @@ exporter:
 
 database:
   internal:
+    # NFS crash recovery can take longer than the chart's five-minute delay.
+    # Let PostgreSQL finish recovery before liveness checks can restart it.
+    livenessProbe:
+      initialDelaySeconds: 900
+      periodSeconds: 30
+      timeoutSeconds: 10
+    readinessProbe:
+      timeoutSeconds: 10
     image:
       repository: mirror.gcr.io/goharbor/harbor-db
       tag: v2.15.4@sha256:a32d51e636d76303e086a7c5251a2c8415c6f165b2f87bafa914efd866c5403f
