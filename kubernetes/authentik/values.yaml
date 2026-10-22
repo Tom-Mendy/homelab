@@ -42,6 +42,18 @@ blueprints:
 
 server:
   replicas: 1
+  # Database latency can exceed the chart's three-second probe timeout.
+  # Keep health checks active without repeatedly restarting a responsive server.
+  startupProbe:
+    timeoutSeconds: 30
+    periodSeconds: 30
+    failureThreshold: 20
+  livenessProbe:
+    timeoutSeconds: 30
+    periodSeconds: 30
+  readinessProbe:
+    timeoutSeconds: 30
+    periodSeconds: 30
   volumes:
     - name: shared-memory
       emptyDir:

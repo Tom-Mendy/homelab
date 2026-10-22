@@ -214,6 +214,9 @@ entries:
     identifiers:
       name: authentik Embedded Outpost
     attrs:
+      config:
+        authentik_host: https://authentik.tom-mendy.com
+        authentik_host_browser: https://authentik.tom-mendy.com
       providers:
         - !KeyOf radarr-provider
         - !KeyOf sonarr-provider
