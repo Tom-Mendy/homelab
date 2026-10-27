@@ -7,4 +7,5 @@ binaryData:
   node-exporter.json: {{ .Files.Get "dashboards/node-exporter.json" | b64enc | quote }}
   blocky.json: {{ .Files.Get "dashboards/blocky.json" | b64enc | quote }}
   kubernetes.json: {{ .Files.Get "dashboards/kubernetes.json" | b64enc | quote }}
+  pod-container-resources.json: {{ .Files.Get "dashboards/pod-container-resources.json" | b64enc | quote }}
   traefik.json: {{ .Files.Get "dashboards/traefik.json" | b64enc | quote }}

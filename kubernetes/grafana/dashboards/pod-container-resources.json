@@ -1,0 +1,1210 @@
+{
+  "uid": "pod-container-resources",
+  "title": "Pod & Container Resources",
+  "description": "Pod and container resource usage from kubelet cAdvisor and kube-state-metrics, with requests, limits and throttling.",
+  "tags": [
+    "kubernetes",
+    "containers",
+    "cadvisor",
+    "resources"
+  ],
+  "schemaVersion": 40,
+  "version": 1,
+  "editable": true,
+  "timezone": "browser",
+  "refresh": "1m",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "templating": {
+    "list": [
+      {
+        "name": "DS_PROMETHEUS",
+        "label": "Datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {},
+        "refresh": 1,
+        "options": []
+      },
+      {
+        "name": "node",
+        "label": "Node",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(kube_node_info,node)",
+        "query": {
+          "query": "label_values(kube_node_info,node)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "sort": 1,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "options": []
+      },
+      {
+        "name": "namespace",
+        "label": "Namespace",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(kube_pod_container_info{node=~\"$node\"},namespace)",
+        "query": {
+          "query": "label_values(kube_pod_container_info{node=~\"$node\"},namespace)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "sort": 1,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "options": []
+      },
+      {
+        "name": "pod",
+        "label": "Pod",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(kube_pod_container_info{node=~\"$node\",namespace=~\"$namespace\"},pod)",
+        "query": {
+          "query": "label_values(kube_pod_container_info{node=~\"$node\",namespace=~\"$namespace\"},pod)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "sort": 1,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "options": []
+      },
+      {
+        "name": "container",
+        "label": "Container",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(kube_pod_container_info{node=~\"$node\",namespace=~\"$namespace\",pod=~\"$pod\"},container)",
+        "query": {
+          "query": "label_values(kube_pod_container_info{node=~\"$node\",namespace=~\"$namespace\",pod=~\"$pod\"},container)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "sort": 1,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "options": []
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "links": [
+    {
+      "title": "Kubernetes Cluster",
+      "type": "link",
+      "url": "/d/k8s-cluster",
+      "targetBlank": false
+    }
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "title": "CPU in use · cores",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "1.0 means one CPU core. CPU usage may exceed a request when spare capacity is available.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(max by (namespace,pod,container) (rate(container_cpu_usage_seconds_total{job=\"kubernetes-nodes-cadvisor\",container!=\"\",container!=\"POD\",namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"}[$__rate_interval])) and on (namespace,pod,container) max by (namespace,pod,container) (kube_pod_container_info{namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"}))",
+          "legendFormat": "CPU cores",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": false,
+          "instant": true,
+          "interval": "1m"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 2,
+      "title": "Memory working set",
+      "type": "stat",
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Active containers only. Working set includes RSS and non-reclaimable cache; it is not the same as RSS.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(max by (namespace,pod,container) (container_memory_working_set_bytes{job=\"kubernetes-nodes-cadvisor\",container!=\"\",container!=\"POD\",namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"}) and on (namespace,pod,container) max by (namespace,pod,container) (kube_pod_container_info{namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"}))",
+          "legendFormat": "Working set",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": false,
+          "instant": true,
+          "interval": "1m"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 3,
+      "title": "Running containers",
+      "type": "stat",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(max by (namespace,pod,container) (kube_pod_container_status_running{namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"}))",
+          "legendFormat": "Containers",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": false,
+          "instant": true,
+          "interval": "1m"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 4,
+      "title": "Container restarts · selected time range",
+      "type": "stat",
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Counter increase across the selected time range. Prometheus extrapolation can yield fractional estimates.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(max by (namespace,pod,container) (increase(kube_pod_container_status_restarts_total{namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"}[$__range])))",
+          "legendFormat": "Restarts",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": false,
+          "instant": true,
+          "interval": "1m"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 5,
+      "title": "Container CPU · usage, requests and limits",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Values are CPU cores, not percent. Dashed lines show configured requests and limits. A missing limit line means no CPU limit is configured.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisCenteredZero": false
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "^(Request|Limit) ·"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    6,
+                    6
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max by (namespace,pod,container) (rate(container_cpu_usage_seconds_total{job=\"kubernetes-nodes-cadvisor\",container!=\"\",container!=\"POD\",namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"}[$__rate_interval]))",
+          "legendFormat": "Usage · {{namespace}} / {{pod}} / {{container}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": true,
+          "instant": false,
+          "interval": "1m"
+        },
+        {
+          "refId": "B",
+          "expr": "max by (namespace,pod,container) (kube_pod_container_resource_requests{namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\",resource=\"cpu\"})",
+          "legendFormat": "Request · {{namespace}} / {{pod}} / {{container}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": true,
+          "instant": false,
+          "interval": "1m"
+        },
+        {
+          "refId": "C",
+          "expr": "max by (namespace,pod,container) (kube_pod_container_resource_limits{namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\",resource=\"cpu\"}) > 0",
+          "legendFormat": "Limit · {{namespace}} / {{pod}} / {{container}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": true,
+          "instant": false,
+          "interval": "1m"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Container memory · usage, requests and limits",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Dashed lines show configured requests and limits. A missing limit line means no memory limit is configured.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisCenteredZero": false
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "^(Request|Limit) ·"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    6,
+                    6
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max by (namespace,pod,container) (container_memory_working_set_bytes{job=\"kubernetes-nodes-cadvisor\",container!=\"\",container!=\"POD\",namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"})",
+          "legendFormat": "Working set · {{namespace}} / {{pod}} / {{container}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": true,
+          "instant": false,
+          "interval": "1m"
+        },
+        {
+          "refId": "B",
+          "expr": "max by (namespace,pod,container) (kube_pod_container_resource_requests{namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\",resource=\"memory\"})",
+          "legendFormat": "Request · {{namespace}} / {{pod}} / {{container}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": true,
+          "instant": false,
+          "interval": "1m"
+        },
+        {
+          "refId": "C",
+          "expr": "max by (namespace,pod,container) (kube_pod_container_resource_limits{namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\",resource=\"memory\"}) > 0",
+          "legendFormat": "Limit · {{namespace}} / {{pod}} / {{container}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": true,
+          "instant": false,
+          "interval": "1m"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Top 10 containers · CPU cores",
+      "type": "bargauge",
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Current CPU rate, ranked within the selected filters.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(10, max by (namespace,pod,container) (rate(container_cpu_usage_seconds_total{job=\"kubernetes-nodes-cadvisor\",container!=\"\",container!=\"POD\",namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"}[$__rate_interval])) and on (namespace,pod,container) max by (namespace,pod,container) (kube_pod_container_info{namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"}))",
+          "legendFormat": "{{namespace}} / {{pod}} / {{container}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": false,
+          "instant": true,
+          "interval": "1m"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": true
+        },
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": false
+      }
+    },
+    {
+      "id": 8,
+      "title": "Top 10 containers · memory working set",
+      "type": "bargauge",
+      "gridPos": {
+        "x": 12,
+        "y": 13,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(10, max by (namespace,pod,container) (container_memory_working_set_bytes{job=\"kubernetes-nodes-cadvisor\",container!=\"\",container!=\"POD\",namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"}) and on (namespace,pod,container) max by (namespace,pod,container) (kube_pod_container_info{namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"}))",
+          "legendFormat": "{{namespace}} / {{pod}} / {{container}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": false,
+          "instant": true,
+          "interval": "1m"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": true
+        },
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": false
+      }
+    },
+    {
+      "id": 9,
+      "title": "CPU throttled periods",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Percentage of CPU scheduling periods in which the container was throttled, not percentage of CPU time lost. Unlimited containers may have no series.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisCenteredZero": false
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "100 * (max by (namespace,pod,container) (rate(container_cpu_cfs_throttled_periods_total{job=\"kubernetes-nodes-cadvisor\",container!=\"\",container!=\"POD\",namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"}[$__rate_interval]))) / (max by (namespace,pod,container) (rate(container_cpu_cfs_periods_total{job=\"kubernetes-nodes-cadvisor\",container!=\"\",container!=\"POD\",namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"}[$__rate_interval])) > 0)",
+          "legendFormat": "{{namespace}} / {{pod}} / {{container}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": true,
+          "instant": false,
+          "interval": "1m"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "Memory working set / configured limit",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 21,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Only containers with a positive memory limit are shown. No data for an unlimited container is expected.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisCenteredZero": false
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "100 * (max by (namespace,pod,container) (container_memory_working_set_bytes{job=\"kubernetes-nodes-cadvisor\",container!=\"\",container!=\"POD\",namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"})) / (max by (namespace,pod,container) (kube_pod_container_resource_limits{namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\",resource=\"memory\"}) > 0)",
+          "legendFormat": "{{namespace}} / {{pod}} / {{container}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": true,
+          "instant": false,
+          "interval": "1m"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "title": "Pod network · receive",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 29,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Network accounting is shared by the pod. This panel follows node, namespace and pod filters; the container filter does not apply.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisCenteredZero": false
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (namespace,pod) (max by (namespace,pod,interface) (rate(container_network_receive_bytes_total{job=\"kubernetes-nodes-cadvisor\",namespace=~\"$namespace\",pod=~\"$pod\",node=~\"$node\",container=\"\",interface!=\"lo\"}[$__rate_interval])))",
+          "legendFormat": "{{namespace}} / {{pod}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": true,
+          "instant": false,
+          "interval": "1m"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 12,
+      "title": "Pod network · transmit",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 29,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Network accounting is shared by the pod. This panel follows node, namespace and pod filters; the container filter does not apply.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisCenteredZero": false
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (namespace,pod) (max by (namespace,pod,interface) (rate(container_network_transmit_bytes_total{job=\"kubernetes-nodes-cadvisor\",namespace=~\"$namespace\",pod=~\"$pod\",node=~\"$node\",container=\"\",interface!=\"lo\"}[$__rate_interval])))",
+          "legendFormat": "{{namespace}} / {{pod}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": true,
+          "instant": false,
+          "interval": "1m"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 13,
+      "title": "Container filesystem · reads",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 37,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "cAdvisor filesystem counters measure block I/O. They do not fully represent NFS traffic or NFS wait time; zero here does not exclude storage delays.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisCenteredZero": false
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (namespace,pod,container) (max by (namespace,pod,container,device) (rate(container_fs_reads_bytes_total{job=\"kubernetes-nodes-cadvisor\",container!=\"\",container!=\"POD\",namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"}[$__rate_interval])))",
+          "legendFormat": "{{namespace}} / {{pod}} / {{container}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": true,
+          "instant": false,
+          "interval": "1m"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 14,
+      "title": "Container filesystem · writes",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 37,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "cAdvisor filesystem counters measure block I/O. They do not fully represent NFS traffic or NFS wait time; zero here does not exclude storage delays.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisCenteredZero": false
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (namespace,pod,container) (max by (namespace,pod,container,device) (rate(container_fs_writes_bytes_total{job=\"kubernetes-nodes-cadvisor\",container!=\"\",container!=\"POD\",namespace=~\"$namespace\",pod=~\"$pod\",container=~\"$container\",node=~\"$node\"}[$__rate_interval])))",
+          "legendFormat": "{{namespace}} / {{pod}} / {{container}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "range": true,
+          "instant": false,
+          "interval": "1m"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 15,
+      "title": "Reading these charts",
+      "type": "text",
+      "gridPos": {
+        "x": 0,
+        "y": 45,
+        "w": 24,
+        "h": 4
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Select a namespace, then a pod and container. CPU is shown in **cores**; memory is the **working set**. Requests reserve capacity and influence scheduling. Limits are upper bounds. Missing limit or throttling series can be normal for unlimited containers. Metrics are scraped every minute, so short spikes can be missed. Pod network charts ignore the container filter. Filesystem charts do not measure NFS wait time."
+      }
+    }
+  ]
+}

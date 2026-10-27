@@ -79,6 +79,12 @@
       "tooltip": "Original dashboard",
       "type": "link",
       "url": "https://grafana.com/grafana/dashboards/15661-k8s-dashboard-en-20250125/"
+    },
+    {
+      "title": "Pod & Container Resources",
+      "type": "link",
+      "url": "/d/pod-container-resources",
+      "targetBlank": false
     }
   ],
   "liveNow": false,
