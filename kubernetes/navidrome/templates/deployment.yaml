@@ -21,6 +21,10 @@ spec:
         - name: navidrome
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.resources }}
+          resources:
+{{ toYaml . | nindent 12 }}
+          {{- end }}
           ports:
             - containerPort: {{ .Values.service.port }}
               name: http

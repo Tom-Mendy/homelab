@@ -7,6 +7,14 @@
     "namespace": { "type": "string", "minLength": 1 },
     "createNamespace": { "type": "boolean" },
     "replicaCount": { "type": "integer", "minimum": 1 },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requests": { "$ref": "#/definitions/resourceQuantities" },
+        "limits": { "$ref": "#/definitions/resourceQuantities" }
+      }
+    },
     "image": {
       "type": "object",
       "additionalProperties": false,
@@ -59,6 +67,12 @@
         "size": { "type": "string", "minLength": 1 },
         "storageClassName": { "type": "string", "minLength": 1 }
       }
+    }
+  },
+  "definitions": {
+    "resourceQuantities": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 1 }
     }
   }
 }

@@ -3,6 +3,12 @@ createNamespace: true
 
 replicaCount: 1
 
+# Reserve capacity during scans without capping CPU or memory bursts.
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
 image:
   repository: deluan/navidrome
   tag: 0.64.2@sha256:38dc2727bfcfd5ede290f8ada114fc90368146f265ae4701ddddbcbe2a44ee52
