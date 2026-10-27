@@ -48,7 +48,7 @@ resource "coder_agent" "main" {
       printf '%s\n' "$profile_line" >> "$HOME/.profile"
     fi
     npm install --global npm@latest @openai/codex opencode-ai
-    curl -fsSL https://t3.codes/install.sh | T3CODE_VERSION='0.0.44' sh
+    curl -fsSL https://t3.codes/install.sh | sh
     mkdir -p "$HOME/.ssh"
     chmod 700 "$HOME/.ssh"
     for forgejo_host in forgejo.home.tom-mendy.com forgejo.tom-mendy.com; do
@@ -113,6 +113,18 @@ resource "coder_agent" "main" {
     interval     = 10
     timeout      = 1
   }
+}
+
+resource "coder_script" "t3_update" {
+  agent_id     = coder_agent.main.id
+  display_name = "Update T3 daily"
+  cron         = "CRON_TZ=UTC 0 0 4 * * *"
+  script       = <<-EOT
+    #!/bin/sh
+    set -eu
+    export PATH="$HOME/.local/bin:$PATH"
+    t3 update
+  EOT
 }
 
 resource "kubernetes_persistent_volume_claim_v1" "home" {

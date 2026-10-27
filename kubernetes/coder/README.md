@@ -86,8 +86,10 @@ The `t3code` template is separate from `agent-workspace`. Its Debian-based
 image installs Buildah; the workspace runs Buildah as UID 1000 without elevated
 container privileges. Forgejo Actions builds the image from
 `kubernetes/coder/workspace-images/t3code/Dockerfile` and publishes it to
-Harbor. On first startup, the workspace installs Bun into its persistent home,
-alongside T3, and compiles T3's Linux `node-pty` native module.
+Harbor. At startup, the workspace installs T3 into its persistent home with
+`curl -fsSL https://t3.codes/install.sh | sh`. Coder runs `t3 update` daily at
+04:00 UTC while the workspace is running. Update logs appear under
+`Update T3 daily` in the Coder dashboard.
 
 The `personal-desktop` template is a separate persistent graphical workspace. It
 runs XFCE behind TigerVNC and noVNC on localhost:6080, exposed only through the
