@@ -25,9 +25,16 @@ resource "coder_agent" "main" {
 
   startup_script = <<-EOT
     set -eu
-    export npm_config_prefix="$HOME/.local"
     export BUN_INSTALL="$HOME/.bun"
     export PATH="$BUN_INSTALL/bin:$HOME/.local/bin:$PATH"
+    # Only downloadable binaries use disposable storage; userdata stays on NFS.
+    python3 - <<'PYTHON'
+${file("${path.module}/prepare-runtime.py")}
+PYTHON
+    curl -fsSL https://t3.codes/install.sh | sh
+    curl -fsSL https://chatgpt.com/codex/install.sh | sh
+    curl -fsSL https://opencode.ai/v2/install | bash
+    ln -sfn "$HOME/.opencode/bin/opencode" "$HOME/.local/bin/opencode"
     if ! command -v bun >/dev/null 2>&1; then
       curl -fsSL https://bun.sh/install | bash
     fi
@@ -47,8 +54,6 @@ resource "coder_agent" "main" {
     if ! grep -Fqx "$profile_line" "$HOME/.profile" 2>/dev/null; then
       printf '%s\n' "$profile_line" >> "$HOME/.profile"
     fi
-    npm install --global npm@latest @openai/codex opencode-ai
-    curl -fsSL https://t3.codes/install.sh | sh
     mkdir -p "$HOME/.ssh"
     chmod 700 "$HOME/.ssh"
     for forgejo_host in forgejo.home.tom-mendy.com forgejo.tom-mendy.com; do
@@ -124,6 +129,31 @@ resource "coder_script" "t3_update" {
     set -eu
     export PATH="$HOME/.local/bin:$PATH"
     t3 update
+  EOT
+}
+
+resource "coder_script" "codex_update" {
+  agent_id     = coder_agent.main.id
+  display_name = "Update Codex daily"
+  cron         = "CRON_TZ=UTC 0 10 4 * * *"
+  script       = <<-EOT
+    #!/bin/bash
+    set -euo pipefail
+    export PATH="$HOME/.local/bin:$PATH"
+    curl -fsSL https://chatgpt.com/codex/install.sh | sh
+  EOT
+}
+
+resource "coder_script" "opencode_update" {
+  agent_id     = coder_agent.main.id
+  display_name = "Update OpenCode daily"
+  cron         = "CRON_TZ=UTC 0 20 4 * * *"
+  script       = <<-EOT
+    #!/bin/bash
+    set -euo pipefail
+    export PATH="$HOME/.local/bin:$PATH"
+    curl -fsSL https://opencode.ai/v2/install | bash
+    ln -sfn "$HOME/.opencode/bin/opencode" "$HOME/.local/bin/opencode"
   EOT
 }
 

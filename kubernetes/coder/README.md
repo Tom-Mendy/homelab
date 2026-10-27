@@ -91,6 +91,32 @@ Harbor. At startup, the workspace installs T3 into its persistent home with
 04:00 UTC while the workspace is running. Update logs appear under
 `Update T3 daily` in the Coder dashboard.
 
+T3's `~/.t3/runtime` points to `/tmp/t3code-local/runtime` in the container.
+This disposable cache holds downloaded executables and modules, including
+versions installed by SSH clients and `t3 update`. NFS metadata operations made
+loading those modules too slow. Startup recreates the cache and installs T3
+after Pod replacement on either worker. Projects, credentials, settings and
+history remain on the `nfs-k8s` home PVC. The first migration retains the old
+runtime as `~/.t3/runtime.nfs-backup-*` for rollback.
+
+Codex and OpenCode use their standalone installers at startup and daily while
+the workspace is running:
+
+| Tool | Installer | Daily update, UTC |
+| --- | --- | --- |
+| Codex | `https://chatgpt.com/codex/install.sh` via `sh` | 04:10 |
+| OpenCode | `https://opencode.ai/v2/install` via `bash` | 04:20 |
+
+Coder exposes separate `Update Codex daily` and `Update OpenCode daily` logs.
+The Codex installer is also its updater, as documented in the
+[Codex CLI guide](https://learn.chatgpt.com/docs/codex/cli#getting-started).
+`~/.codex/packages/standalone` and `~/.opencode/bin` point to disposable
+container caches under `/tmp/codex-local` and `/tmp/opencode-local`; startup
+recreates them after Pod replacement. Codex configuration, authentication and
+sessions, and OpenCode user data remain on the NFS-backed home. The
+`~/.local/bin/opencode` launcher selects the standalone installation over the
+previous npm installation.
+
 The `personal-desktop` template is a separate persistent graphical workspace. It
 runs XFCE behind TigerVNC and noVNC on localhost:6080, exposed only through the
 Coder application proxy as the owner-only `Desktop` app. Its home is a 50Gi NFS
