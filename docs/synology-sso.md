@@ -1,6 +1,6 @@
 # Synology DSM login through Authentik
 
-DSM uses native OIDC at `https://nainjoueur.synology.me:5001/`. Flux loads
+DSM uses native OIDC at `https://nas.tom-mendy.com/`. Flux loads
 `kubernetes/authentik/blueprints/95-synology.yaml`. Authentik permits
 `homelab-admins` and `synology-users`; DSM keeps its own account permissions.
 SSO does not create DSM accounts or grant DSM administrator rights.
@@ -62,7 +62,7 @@ Connect SSO service, open its settings, and enter these values:
 | Well Known URL | `https://authentik.tom-mendy.com/application/o/synology/.well-known/openid-configuration` |
 | Application ID | `synology` |
 | Application Key | Value of `SYNOLOGY_OIDC_CLIENT_SECRET` from Infisical |
-| Redirect URI | `https://nainjoueur.synology.me:5001` |
+| Redirect URI | `https://nas.tom-mendy.com` |
 | Authorization Scope | `openid profile email` |
 | Username Claim | `preferred_username` |
 
@@ -87,7 +87,7 @@ before changing certificates or credentials:
 
 ```bash
 curl --fail --show-error --max-time 15 \
-  https://authentik.home.tom-mendy.com/application/o/synology/.well-known/openid-configuration
+  https://authentik.tom-mendy.com/application/o/synology/.well-known/openid-configuration
 kubectl -n authentik get pods -o wide
 ```
 
