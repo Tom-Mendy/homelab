@@ -6,6 +6,7 @@ resources:
   - serviceaccount.yaml
   - oidc-infisical.yaml
   - outpost-ingresses.yaml
+  - qbittorrent-outpost-ingress.yaml
 configMapGenerator:
   - name: authentik-oidc-blueprint
     files:

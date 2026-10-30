@@ -57,7 +57,7 @@ apps:
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:5.2.4@sha256:b522f9f4b769f8f36d49d22d5eb6a92e9aa18904c6a1830b1439df511ec21983
     port: 8080
-    host: qbittorrent.home.tom-mendy.com
+    host: torrent.tom-mendy.com
     vpn: true
     ssoAuthWhitelist: 10.233.64.0/18
     mounts:

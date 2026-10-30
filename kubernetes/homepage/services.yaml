@@ -48,7 +48,7 @@
         description: Password manager
     - qBittorrent:
         icon: qbittorrent.svg
-        href: https://qbittorrent.home.tom-mendy.com/
+        href: https://torrent.tom-mendy.com/
         description: Torrent downloader (VPN)
     - NZBGet:
         icon: nzbget.svg

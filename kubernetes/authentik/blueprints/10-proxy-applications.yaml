@@ -167,7 +167,7 @@ entries:
       invalidation_flow: !Find
         - authentik_flows.flow
         - [slug, default-provider-invalidation-flow]
-      external_host: https://qbittorrent.home.tom-mendy.com
+      external_host: https://torrent.tom-mendy.com
       mode: forward_single
   - model: authentik_core.application
     id: qbittorrent-application
@@ -176,7 +176,7 @@ entries:
     attrs:
       name: qBittorrent
       provider: !KeyOf qbittorrent-provider
-      meta_launch_url: https://qbittorrent.home.tom-mendy.com/
+      meta_launch_url: https://torrent.tom-mendy.com/
       meta_icon: https://raw.githubusercontent.com/qbittorrent/qBittorrent/master/src/webui/www/private/images/qbittorrent32.png
       open_in_new_tab: true
       policy_engine_mode: any
