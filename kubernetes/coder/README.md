@@ -86,8 +86,11 @@ The `t3code` template is separate from `agent-workspace`. Its Debian-based
 image installs Buildah; the workspace runs Buildah as UID 1000 without elevated
 container privileges. Forgejo Actions builds the image from
 `kubernetes/coder/workspace-images/t3code/Dockerfile` and publishes it to
-Harbor. At startup, the workspace installs T3 into its persistent home with
-`curl -fsSL https://t3.codes/install.sh | sh`. Coder runs `t3 update` daily at
+Harbor. At startup, the workspace reconstructs missing T3/Codex/OpenCode
+executables using `install-tools.sh`; usable cached tools do not require a
+network update on every agent restart. Downloads and installer execution have
+bounded timeouts, failed downloads are never executed, and startup/daily
+installations share a lock. Coder refreshes T3 daily at
 04:00 UTC while the workspace is running. Update logs appear under
 `Update T3 daily` in the Coder dashboard.
 

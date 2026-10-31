@@ -24,17 +24,18 @@ resource "coder_agent" "main" {
   arch = "amd64"
 
   startup_script = <<-EOT
-    set -eu
+#!/bin/bash
+    set -euo pipefail
     export BUN_INSTALL="$HOME/.bun"
     export PATH="$BUN_INSTALL/bin:$HOME/.local/bin:$PATH"
     # Only downloadable binaries use disposable storage; userdata stays on NFS.
     python3 - <<'PYTHON'
 ${file("${path.module}/prepare-runtime.py")}
 PYTHON
-    curl -fsSL https://t3.codes/install.sh | sh
-    curl -fsSL https://chatgpt.com/codex/install.sh | sh
-    curl -fsSL https://opencode.ai/v2/install | bash
-    ln -sfn "$HOME/.opencode/bin/opencode" "$HOME/.local/bin/opencode"
+    cat > /tmp/t3code-local/install-tools.sh <<'INSTALLER'
+${file("${path.module}/install-tools.sh")}
+INSTALLER
+    bash /tmp/t3code-local/install-tools.sh
     if ! command -v bun >/dev/null 2>&1; then
       curl -fsSL https://bun.sh/install | bash
     fi
@@ -128,7 +129,7 @@ resource "coder_script" "t3_update" {
     #!/bin/sh
     set -eu
     export PATH="$HOME/.local/bin:$PATH"
-    t3 update
+    bash /tmp/t3code-local/install-tools.sh --update t3
   EOT
 }
 
@@ -140,7 +141,7 @@ resource "coder_script" "codex_update" {
     #!/bin/bash
     set -euo pipefail
     export PATH="$HOME/.local/bin:$PATH"
-    curl -fsSL https://chatgpt.com/codex/install.sh | sh
+    bash /tmp/t3code-local/install-tools.sh --update codex
   EOT
 }
 
@@ -152,8 +153,7 @@ resource "coder_script" "opencode_update" {
     #!/bin/bash
     set -euo pipefail
     export PATH="$HOME/.local/bin:$PATH"
-    curl -fsSL https://opencode.ai/v2/install | bash
-    ln -sfn "$HOME/.opencode/bin/opencode" "$HOME/.local/bin/opencode"
+    bash /tmp/t3code-local/install-tools.sh --update opencode
   EOT
 }
 
