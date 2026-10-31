@@ -1,9 +1,10 @@
 # Coder agent workspaces
 
-Coder 2.36.4 runs the control plane in `coder`; workspace Deployments and their
-NFS-backed homes run in `coder-workspaces`. Stopping a workspace removes its
-Deployment but retains its PVC. Deleting the workspace is the explicit data
-deletion boundary.
+Coder 2.36.4 runs the control plane in `coder`; workspace Deployments run in
+`coder-workspaces`. Hermes and Desktop keep NFS-backed homes. T3 uses a disposable
+home and persists only selected tool settings/authentication on a 1Gi `nfs-k8s`
+PVC. Stopping a workspace removes its Deployment but retains its PVC. Deleting
+the workspace is the explicit persistent-data deletion boundary.
 
 ## Before Flux reconciliation
 
@@ -95,12 +96,29 @@ installations share a lock. Coder refreshes T3 daily at
 `Update T3 daily` in the Coder dashboard.
 
 T3's `~/.t3/runtime` points to `/tmp/t3code-local/runtime` in the container.
-This disposable cache holds downloaded executables and modules, including
-versions installed by SSH clients and `t3 update`. NFS metadata operations made
-loading those modules too slow. Startup recreates the cache and installs T3
-after Pod replacement on either worker. Projects, credentials, settings and
-history remain on the `nfs-k8s` home PVC. The first migration retains the old
-runtime as `~/.t3/runtime.nfs-backup-*` for rollback.
+T3, Codex and OpenCode executables, package caches, SQLite session/history
+stores and **all project files** are disposable. They are not included in the
+settings PVC. Applications are reinstalled when the disposable home is replaced.
+
+`settings-sync.py`, running as a native Kubernetes sidecar, restores the allowed
+configuration/authentication files before the workspace starts, copies changes
+to NFS every five seconds, and flushes after the main container exits. A sudden
+worker failure can lose changes made during that five-second checkpoint window.
+It copies files rather than symlinking them so atomic application config writes
+remain supported. Credentials remain private and are never logged. The exact
+allowlist is versioned in that helper; it covers T3 settings/keybindings/secrets,
+Codex configuration/authentication/skills/rules, and OpenCode configuration and
+authentication. Dependencies such as `node_modules`, databases, logs, runtimes
+and projects are excluded.
+
+The settings PVC requests **1Gi**, while the disposable home is an `emptyDir`
+limited to 16Gi. Main-container ephemeral storage requests 1Gi and is limited
+to 20Gi. These are not worker-local persistent volumes: loss/replacement of a
+Pod intentionally discards projects and tools, while settings survive on NFS.
+An existing 10Gi PVC cannot be shrunk in place: migration must stop the workspace,
+verify `Retain`, recreate its claim at 1Gi, copy only allowlisted settings from
+the retained old NFS directory, and validate a clean Pod replacement before
+retiring the rollback data.
 
 Codex and OpenCode use their standalone installers at startup and daily while
 the workspace is running:
@@ -115,8 +133,9 @@ The Codex installer is also its updater, as documented in the
 [Codex CLI guide](https://learn.chatgpt.com/docs/codex/cli#getting-started).
 `~/.codex/packages/standalone` and `~/.opencode/bin` point to disposable
 container caches under `/tmp/codex-local` and `/tmp/opencode-local`; startup
-recreates them after Pod replacement. Codex configuration, authentication and
-sessions, and OpenCode user data remain on the NFS-backed home. The
+recreates them after Pod replacement. Only allowlisted configuration and
+authentication files are checkpointed to NFS; sessions, histories and databases
+are disposable. The
 `~/.local/bin/opencode` launcher selects the standalone installation over the
 previous npm installation.
 

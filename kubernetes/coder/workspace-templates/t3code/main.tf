@@ -173,7 +173,7 @@ resource "kubernetes_persistent_volume_claim_v1" "home" {
     access_modes       = ["ReadWriteOnce"]
     storage_class_name = "nfs-k8s"
     resources {
-      requests = { storage = "10Gi" }
+      requests = { storage = "1Gi" }
     }
   }
 }
@@ -206,7 +206,42 @@ resource "kubernetes_deployment_v1" "workspace" {
         }
       }
       spec {
-        automount_service_account_token = false
+        automount_service_account_token  = false
+        termination_grace_period_seconds = 60
+        # Native sidecar restores settings before startup and flushes after the
+        # application exits. Atomic config-file replacement remains supported.
+        init_container {
+          name           = "settings-sync"
+          image          = "docker.io/library/python@sha256:8acac70227ce3b34da9453120c375cc5b66cd0b062d4dc6bc74286f81a3819e1"
+          restart_policy = "Always"
+          command        = ["python3", "-u", "-c", file("${path.module}/settings-sync.py"), "watch"]
+          startup_probe {
+            exec {
+              command = ["/usr/bin/test", "-f", "/home/coder/.config-sync-ready"]
+            }
+            period_seconds    = 3
+            timeout_seconds   = 5
+            failure_threshold = 40
+          }
+          security_context {
+            allow_privilege_escalation = false
+            read_only_root_filesystem  = true
+            run_as_non_root            = true
+            capabilities { drop = ["ALL"] }
+          }
+          resources {
+            requests = { cpu = "10m", memory = "32Mi" }
+            limits   = { cpu = "100m", memory = "128Mi" }
+          }
+          volume_mount {
+            name       = "home"
+            mount_path = "/home/coder"
+          }
+          volume_mount {
+            name       = "settings"
+            mount_path = "/settings"
+          }
+        }
         image_pull_secrets {
           name = "portfolio-registry-auth"
         }
@@ -220,7 +255,7 @@ resource "kubernetes_deployment_v1" "workspace" {
         container {
           name              = "workspace"
           image             = "harbor.home.tom-mendy.com/homelab/t3code-workspace@sha256:46858b365f399685d74c49cb0d191fcb68f82ecccf7203f6fc0c16d511b140e0"
-          image_pull_policy = "Always"
+          image_pull_policy = "IfNotPresent"
           command           = ["sh", "-c", coder_agent.main.init_script]
           security_context {
             allow_privilege_escalation = false
@@ -232,12 +267,16 @@ resource "kubernetes_deployment_v1" "workspace" {
             value = coder_agent.main.token
           }
           env {
+            name  = "HOME"
+            value = "/home/coder"
+          }
+          env {
             name  = "BUILDAH_ISOLATION"
             value = "chroot"
           }
           resources {
-            requests = { cpu = "500m", memory = "2Gi" }
-            limits   = { cpu = "2", memory = "6Gi" }
+            requests = { cpu = "500m", memory = "2Gi", ephemeral-storage = "1Gi" }
+            limits   = { cpu = "2", memory = "6Gi", ephemeral-storage = "20Gi" }
           }
           volume_mount {
             name       = "home"
@@ -246,6 +285,10 @@ resource "kubernetes_deployment_v1" "workspace" {
         }
         volume {
           name = "home"
+          empty_dir { size_limit = "16Gi" }
+        }
+        volume {
+          name = "settings"
           persistent_volume_claim {
             claim_name = kubernetes_persistent_volume_claim_v1.home.metadata[0].name
           }
