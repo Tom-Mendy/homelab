@@ -68,6 +68,53 @@ If a graceful drain fails, the controller restores scheduling and stops. If a
 requested reboot fails, the worker remains cordoned for operator inspection.
 It never force-deletes a stuck database or retries reboot indefinitely.
 
+## Verified recovery on 2026-10-31
+
+The independent controller completed successfully: node3 obtained a new boot
+ID, resumed scheduling, restored all 64 previously healthy controllers and
+reported **0 TEST_STATEID/s**. All three nodes were Ready and all six CNPG
+clusters healthy. Authentik and all three Coder workspaces returned.
+
+A 48-open read/write benchmark, without modifying file contents, measured:
+
+| Workspace | Before p95 | After reboot p95 |
+| --- | ---: | ---: |
+| Hermes | 79.729 ms | 0.767 ms |
+| T3 | 75.564 ms | 0.592 ms |
+| Desktop | 0.795 ms | 0.701 ms |
+
+These measurements precede the separate, user-requested T3 storage migration.
+T3 subsequently moved to a 1Gi settings-only NFS claim with an ephemeral home.
+Only 77 allowlisted configuration/authentication files (371,115 bytes) were
+copied; no projects, runtimes, applications or SQLite databases. A real Pod
+replacement preserved three checked settings files and Codex authentication,
+discarded a disposable project fixture and returned HTTP 200 on port 3773.
+The former T3 PV is retained as a temporary rollback source, not a live backup
+of future projects. Workspace PVC requests total 31Gi of the 40Gi quota.
+
+Controller logs/status were exported under `/opt/data/reports`, and the
+temporary maintenance namespace, ClusterRole and ClusterRoleBinding were
+removed after health checks. The change-only NFS watchdog remains enabled;
+NFS rule/probe installation has its own rollout verification gates in
+[`NFS-MONITORING.md`](../kubernetes/prometheus/NFS-MONITORING.md).
+
+## Separate unresolved SQLite compatibility
+
+Do not interpret client recovery as SQLite WAL becoming supported on NFS.
+The current installed Hermes source re-enables WAL and does not implement the
+[new documented `database.journal_mode`](https://hermes-agent.nousresearch.com/docs/user-guide/configuration#database-settings)
+or the offline `hermes sessions set-journal-mode` command. A synthetic-only
+source test confirmed that converting to DELETE alone is undone on open.
+`verification_evidence` and the Matrix crypto store also explicitly request WAL.
+Even upgrading to an image that supports the setting requires checking those
+additional database owners, especially Matrix, before claiming NFS compatibility.
+
+Preparation requires a supported image first, then coordinated writer shutdown
+across all NFS clients, a coherent backup, integrity checks, supported offline
+conversion and verification after restart. No live journal conversion, WAL/SHM
+deletion or runtime monkeypatch was performed. No corruption was demonstrated.
+T3's disposable SQLite stores now remain outside NFS, independently of Hermes.
+
 ## Cleanup
 
 After exporting the controller logs/status and completing application checks:

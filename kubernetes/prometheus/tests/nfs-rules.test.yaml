@@ -1,0 +1,111 @@
+# check.py extracts the deployed rules from the rendered upstream ConfigMap.
+rule_files: [nfs-alerting-rules.yml]
+evaluation_interval: 1m
+tests:
+  - name: sustained-storm-is-node-scoped
+    interval: 1m
+    input_series:
+      - series: node_nfs_requests_total{job="kubernetes-service-endpoints",node="node3",method="TestStateID"}
+        values: 0+12000x30
+      - series: node_nfs_requests_total{job="kubernetes-service-endpoints",node="node3",method="Read"}
+        values: 0+60x30
+      - series: node_nfs_requests_total{job="kubernetes-service-endpoints",node="node2",method="TestStateID"}
+        values: 0+0x30
+      - series: node_nfs_requests_total{job="kubernetes-service-endpoints",node="node2",method="Read"}
+        values: 0+60x30
+    promql_expr_test:
+      - expr: count(ALERTS{alertname="NFSTestStateIDStorm",alertstate="firing",node="node3"})
+        eval_time: 16m
+        exp_samples: [{labels: '{}', value: 1}]
+      - expr: ALERTS{alertname="NFSTestStateIDStorm",alertstate="firing",node="node2"}
+        eval_time: 16m
+        exp_samples: []
+      - expr: ALERTS{alertname="NFSTestStateIDStorm",alertstate="firing"}
+        eval_time: 8m
+        exp_samples: []
+  - name: high-rate-with-low-fraction-is-not-a-storm
+    interval: 1m
+    input_series:
+      - series: node_nfs_requests_total{job="kubernetes-service-endpoints",node="node3",method="TestStateID"}
+        values: 0+12000x30
+      - series: node_nfs_requests_total{job="kubernetes-service-endpoints",node="node3",method="Read"}
+        values: 0+60000x30
+    promql_expr_test:
+      - expr: ALERTS{alertname="NFSTestStateIDStorm",alertstate="firing"}
+        eval_time: 16m
+        exp_samples: []
+  - name: short-burst-is-not-a-storm
+    interval: 1m
+    input_series:
+      - series: node_nfs_requests_total{job="kubernetes-service-endpoints",node="node3",method="TestStateID"}
+        values: 0+12000x4 48000+0x25
+    promql_expr_test:
+      - expr: ALERTS{alertname="NFSTestStateIDStorm",alertstate="firing"}
+        eval_time: 8m
+        exp_samples: []
+      - expr: ALERTS{alertname="NFSTestStateIDStorm",alertstate="firing"}
+        eval_time: 16m
+        exp_samples: []
+  - name: counter-reset-does-not-hide-sustained-storm
+    interval: 1m
+    input_series:
+      - series: node_nfs_requests_total{job="kubernetes-service-endpoints",node="node3",method="TestStateID"}
+        values: 0+12000x12 0+12000x18
+      - series: node_nfs_requests_total{job="kubernetes-service-endpoints",node="node3",method="Read"}
+        values: 0+60x30
+    promql_expr_test:
+      - expr: count(ALERTS{alertname="NFSTestStateIDStorm",alertstate="firing",node="node3"})
+        eval_time: 20m
+        exp_samples: [{labels: '{}', value: 1}]
+  - name: missing-inputs-do-not-fake-healthy
+    interval: 1m
+    promql_expr_test:
+      - expr: ALERTS{alertname="NFSTestStateIDStorm",alertstate="firing"}
+        eval_time: 16m
+        exp_samples: []
+      - expr: count(ALERTS{alertname="NFSProbeScrapeMissing",alertstate="firing"})
+        eval_time: 16m
+        exp_samples: [{labels: '{}', value: 1}]
+      - expr: count(ALERTS{alertname="NFSProbeCoverageMissing",alertstate="firing"})
+        eval_time: 16m
+        exp_samples: [{labels: '{}', value: 1}]
+  - name: synthetic-failure-latency-staleness-and-coverage
+    interval: 1m
+    input_series:
+      - series: nfs_probe_p95_seconds{job="nfs-worker-probe",node="node3"}
+        values: 0.02+0x30
+      - series: nfs_probe_success{job="nfs-worker-probe",node="node3"}
+        values: 0+0x30
+      - series: nfs_probe_last_result_timestamp_seconds{job="nfs-worker-probe",node="node3"}
+        values: 0+0x30
+      - series: up{job="nfs-worker-probe",node="node3"}
+        values: 0+0x30
+      - series: kube_daemonset_status_desired_number_scheduled{namespace="prometheus",daemonset="nfs-worker-probe"}
+        values: 2+0x30
+      - series: kube_daemonset_status_number_ready{namespace="prometheus",daemonset="nfs-worker-probe"}
+        values: 1+0x30
+    promql_expr_test:
+      - expr: count(ALERTS{alertname=~"NFSProbeSlow|NFSProbeFailed|NFSProbeStale|NFSProbeScrapeMissing|NFSProbeCoverageMissing|NFSClientMetricsMissing",alertstate="firing"})
+        eval_time: 16m
+        exp_samples: [{labels: '{}', value: 6}]
+  - name: healthy-synthetic-and-client-metrics
+    interval: 1m
+    input_series:
+      - series: nfs_probe_p95_seconds{job="nfs-worker-probe",node="node2"}
+        values: 0.001+0x30
+      - series: nfs_probe_success{job="nfs-worker-probe",node="node2"}
+        values: 1+0x30
+      - series: nfs_probe_last_result_timestamp_seconds{job="nfs-worker-probe",node="node2"}
+        values: 0+60x30
+      - series: up{job="nfs-worker-probe",node="node2"}
+        values: 1+0x30
+      - series: node_nfs_requests_total{job="kubernetes-service-endpoints",node="node2",method="TestStateID"}
+        values: 0+0x30
+      - series: kube_daemonset_status_desired_number_scheduled{namespace="prometheus",daemonset="nfs-worker-probe"}
+        values: 2+0x30
+      - series: kube_daemonset_status_number_ready{namespace="prometheus",daemonset="nfs-worker-probe"}
+        values: 2+0x30
+    promql_expr_test:
+      - expr: ALERTS{alertstate="firing"}
+        eval_time: 16m
+        exp_samples: []

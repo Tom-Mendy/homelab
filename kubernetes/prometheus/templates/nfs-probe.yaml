@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nfs-probe-scratch
+  namespace: {{ .Values.namespace }}
+spec:
+  accessModes: [ReadWriteMany]
+  storageClassName: nfs-k8s
+  resources:
+    requests:
+      storage: {{ .Values.nfsProbe.scratchSize }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nfs-worker-probe
+  namespace: {{ .Values.namespace }}
+data:
+  nfs-probe.py: |
+{{ .Files.Get "files/nfs-probe.py" | indent 4 }}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nfs-worker-probe
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: nfs-worker-probe
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nfs-worker-probe
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nfs-worker-probe
+      annotations:
+        checksum/probe: {{ .Files.Get "files/nfs-probe.py" | sha256sum }}
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 5
+      nodeSelector:
+        kubernetes.io/os: linux
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: DoesNotExist
+                  - key: node-role.kubernetes.io/master
+                    operator: DoesNotExist
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: probe
+          image: {{ .Values.nfsProbe.image | quote }}
+          imagePullPolicy: IfNotPresent
+          command: [python3, -B, /app/nfs-probe.py]
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+          ports:
+            - name: metrics
+              containerPort: 9808
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 96Mi
+          # Only process/HTTP health: storage failure must not trigger restarts.
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+            periodSeconds: 10
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 2
+          volumeMounts:
+            - name: script
+              mountPath: /app
+              readOnly: true
+            - name: scratch
+              mountPath: /scratch
+      volumes:
+        - name: script
+          configMap:
+            name: nfs-worker-probe
+            defaultMode: 0444
+        - name: scratch
+          persistentVolumeClaim:
+            claimName: nfs-probe-scratch

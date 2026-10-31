@@ -23,9 +23,17 @@ def transition(previous, issue):
         message = "⚠️ Alerte NFS persistante : " + issue
         alerted = True
     elif not issue and alerted:
-        message = "✅ NFS rétabli : les vérifications d’état sont revenues sous le seuil d’alerte."
+        message = "✅ NFS rétabli : les indicateurs surveillés sont revenus sous les seuils d’alerte."
         alerted = False
     return {"failures": count, "alerted": alerted, "issue": issue}, message
+
+
+def firing_nfs_alerts(alerts):
+    return sorted({
+        item["labels"].get("node", "cluster") + ": " + item["labels"]["alertname"]
+        for item in alerts
+        if item.get("state") == "firing" and item.get("labels", {}).get("alertname", "").startswith("NFS")
+    })
 
 
 def observe(url):
@@ -42,6 +50,11 @@ def observe(url):
             return "métriques NFS absentes : " + ", ".join(sorted(missing))
         failures = [f"{node}: TEST_STATEID={value:.0f}/s" for node, value in sorted(samples.items())
                     if not math.isfinite(value) or value > 100]
+        with urllib.request.urlopen(url.rstrip("/") + "/api/v1/alerts", timeout=20) as response:
+            alert_document = json.load(response)
+        if alert_document.get("status") != "success":
+            return "lecture des alertes Prometheus en échec"
+        failures.extend(firing_nfs_alerts(alert_document["data"]["alerts"]))
         return "; ".join(failures)
     except Exception as error:
         return "supervision NFS inaccessible (" + type(error).__name__ + ")"
