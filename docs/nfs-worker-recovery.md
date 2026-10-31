@@ -98,6 +98,18 @@ removed after health checks. The change-only NFS watchdog remains enabled;
 NFS rule/probe installation has its own rollout verification gates in
 [`NFS-MONITORING.md`](../kubernetes/prometheus/NFS-MONITORING.md).
 
+## Remaining Coder publication credential gate
+
+The live T3 migration and Pod-replacement test succeeded. Its source is committed,
+but the active Coder template remains `daily-cli-installers-20261027` until
+publication completes. Forgejo validation passed; publication was first blocked
+by a TLS reset downloading `coder.com/install.sh`. The replacement official-release
+installer was exercised locally and in CI, with SHA-256 verification, successfully.
+The remaining CI error is an unset repository Actions `CODER_SESSION_TOKEN`.
+Do not bypass Coder authentication through database changes. An authorized
+operator must configure the dedicated token securely and rerun the publisher.
+Do not rebuild T3 from the old full-home template before activation is verified.
+
 ## Separate unresolved SQLite compatibility
 
 Do not interpret client recovery as SQLite WAL becoming supported on NFS.

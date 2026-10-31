@@ -57,7 +57,13 @@ by Forgejo Actions. The workflow activates the new version and sets existing
 workspaces from that template to update automatically the next time they start.
 It requires a repository Actions secret named `CODER_SESSION_TOKEN` for a Coder
 user that can publish templates and manage all existing workspaces built from
-them. Keep the token dedicated to CI.
+them. Keep the token dedicated to CI. An absent secret is a hard publication
+failure: source push and Flux reconciliation do not activate a Coder template.
+Verify the active template version separately. In particular, do not rebuild an
+already migrated settings-only T3 workspace from the old 10Gi full-home template:
+it would restore the wrong storage contract and try to expand the new claim.
+Configure the dedicated token in Forgejo Actions secrets, never in chat or Git,
+then rerun publication and verify the active version before rebuilding.
 
 Existing running workspaces continue on their current build until they restart,
 except Hermes. Publishing `hermes-personal` updates and starts the owner's

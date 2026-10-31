@@ -103,3 +103,11 @@ baseline. Allow two complete batches before interpreting startup failures.
 A successful exporter scrape alone does not prove healthy NFS. Confirm the
 existing watchdog cron separately; distinguish configured routing from an
 end-to-end failure delivery test.
+
+Verified rollout on 2026-10-31: both HelmReleases reconciled successfully,
+the scratch claim was Bound, and exactly one probe ran on node2 and node3.
+Both targets were up, each returned 96 samples and success=1, and at least two
+complete batches per worker were confirmed from Pod creation and success times.
+Both TEST_STATEID rates were zero. All seven rules were healthy and inactive
+once initial discovery completed. The watchdog's real observe-only call returned
+healthy. Validation artifacts are under `/opt/data/reports` on the Hermes PVC.
