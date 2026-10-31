@@ -7,6 +7,7 @@ on:
     paths:
       - kubernetes/coder/workspace-templates/**
       - scripts/publish-coder-templates.sh
+      - scripts/install-coder-cli.py
       - scripts/activate-hermes.py
       - .forgejo/workflows/publish-coder-templates.yml
   workflow_dispatch:
@@ -42,9 +43,8 @@ jobs:
 
       - name: Install Coder CLI
         run: |
-          curl -fsSL https://coder.com/install.sh \
-            | sudo sh -s -- --version "$CODER_CLI_VERSION" --prefix /usr/local
-          coder version
+          python3 scripts/install-coder-cli.py --directory "$RUNNER_TEMP/coder-cli/bin"
+          printf '%s\n' "$RUNNER_TEMP/coder-cli/bin" >> "$GITHUB_PATH"
 
       - name: Publish changed templates
         run: ./scripts/publish-coder-templates.sh

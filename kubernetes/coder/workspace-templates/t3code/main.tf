@@ -215,6 +215,7 @@ resource "kubernetes_deployment_v1" "workspace" {
           image          = "docker.io/library/python@sha256:8acac70227ce3b34da9453120c375cc5b66cd0b062d4dc6bc74286f81a3819e1"
           restart_policy = "Always"
           command        = ["python3", "-u", "-c", file("${path.module}/settings-sync.py"), "watch"]
+          # Avoid Python interpreter startup under the sidecar CPU quota.
           startup_probe {
             exec {
               command = ["/usr/bin/test", "-f", "/home/coder/.config-sync-ready"]
