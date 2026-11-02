@@ -7,6 +7,7 @@
     "namespace": { "type": "string", "minLength": 1 },
     "createNamespace": { "type": "boolean" },
     "replicaCount": { "type": "integer", "minimum": 1 },
+    "offlineUpgradeEnabled": { "type": "boolean", "default": false },
     "image": {
       "type": "object",
       "additionalProperties": false,
