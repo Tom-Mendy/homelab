@@ -55,7 +55,7 @@ ingress:
 
 
 # Delete only the Deployment for maintenance; all PVCs and routing stay managed.
-qbittorrentMaintenance: true
+qbittorrentMaintenance: false
 
 apps:
   qbittorrent:
