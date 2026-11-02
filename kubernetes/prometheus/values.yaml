@@ -91,7 +91,7 @@ extraScrapeConfigs: |
       - source_labels: [__meta_kubernetes_pod_node_name]
         target_label: node
 
-# Standalone prometheus-community/prometheus 29.36.1 loads this file by default.
+# Standalone prometheus-community/prometheus loads this file by default.
 # No Prometheus Operator and no additional notification receiver are required.
 serverFiles:
   alerting_rules.yml:
