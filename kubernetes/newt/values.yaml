@@ -22,7 +22,7 @@ global:
 
 newtInstances:
   - name: main-tunnel
-    enabled: false
+    enabled: true
     auth:
       existingSecretName: newt-creds
       keys:

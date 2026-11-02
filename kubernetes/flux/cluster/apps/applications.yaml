@@ -427,6 +427,10 @@ spec:
     - kustomize:
         patches:
           - patch: |
+              - op: add
+                path: /spec/strategy
+                value:
+                  type: Recreate
               - op: replace
                 path: /spec/template/spec/containers/0/livenessProbe/initialDelaySeconds
                 value: 60
