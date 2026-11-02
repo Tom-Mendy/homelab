@@ -72,6 +72,7 @@ spec:
       storage: {{ default .Values.configStorage.defaultSize $app.configSize }}
   storageClassName: {{ .Values.configStorage.className }}
 ---
+{{- if not .Values.qbittorrentMaintenance }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -79,12 +80,10 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
-  # Claim inherited rollout defaults before switching the VPN state to Recreate.
+  # Both qBittorrent resume state and the VPN state require one active writer.
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
+    type: Recreate
+    rollingUpdate: null
   selector:
     matchLabels:
       app: qbittorrent
@@ -223,6 +222,7 @@ spec:
             name: qbittorrent-sso
             defaultMode: 0555
         {{- end }}
+{{- end }}
 ---
 apiVersion: v1
 kind: Service

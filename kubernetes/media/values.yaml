@@ -53,9 +53,13 @@ ingress:
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
 
+
+# Delete only the Deployment for maintenance; all PVCs and routing stay managed.
+qbittorrentMaintenance: true
+
 apps:
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:5.2.4@sha256:b522f9f4b769f8f36d49d22d5eb6a92e9aa18904c6a1830b1439df511ec21983
+    image: lscr.io/linuxserver/qbittorrent:5.3.0@sha256:05c1454f9a32967affc1f34f67f8cc0cc57dd805dca45489fe797095a6286556
     port: 8080
     host: torrent.tom-mendy.com
     vpn: true
