@@ -4,7 +4,7 @@ createNamespace: true
 replicaCount: 1
 
 # Enable for exactly one prepared upgrade after backup resources are deployed.
-offlineUpgradeEnabled: true
+offlineUpgradeEnabled: false
 
 image:
   repository: codeberg.org/forgejo/forgejo
