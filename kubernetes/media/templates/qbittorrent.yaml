@@ -79,6 +79,12 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
+  # Claim inherited rollout defaults before switching the VPN state to Recreate.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: qbittorrent
