@@ -12,6 +12,7 @@ spec:
   # SQLite uses a shared NFS volume; never overlap old and new writers.
   strategy:
     type: Recreate
+    rollingUpdate: null
   selector:
     matchLabels:
       app: vaultwarden
