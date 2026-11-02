@@ -1,0 +1,3 @@
+# Inactive overlay: merge into active values only during approved maintenance.
+maintenance:
+  enabled: true

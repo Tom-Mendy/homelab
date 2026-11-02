@@ -1,5 +1,9 @@
 namespace: agent
 
+# Explicit GitOps quiescence gate; never enable without a prepared resume change.
+maintenance:
+  enabled: false
+
 image:
   repository: ghcr.io/vectorize-io/hindsight-api
   digest: sha256:1ba631f950a04460feff6b1e212bad3cdf127b0cfb3d765bdcba12f512481d7b

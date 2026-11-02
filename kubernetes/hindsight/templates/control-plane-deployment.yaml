@@ -4,7 +4,7 @@ metadata:
   name: hindsight-control-plane
   namespace: {{ .Values.namespace }}
 spec:
-  replicas: 1
+  replicas: {{ ternary 0 1 .Values.maintenance.enabled }}
   selector:
     matchLabels:
       app.kubernetes.io/name: hindsight-control-plane
