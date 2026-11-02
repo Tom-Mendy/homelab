@@ -64,8 +64,14 @@ def main():
         if b'TABLE' not in listing.stdout or dump.read_bytes()[:5] != b'PGDMP':
             raise RuntimeError('Invalid database archive')
         archive = backup / 'data.tar.gz'
+        def application_files(member):
+            parts = Path(member.name).parts
+            # Synology trash and generated thumbnail indexes are not Forgejo data.
+            if '@eaDir' in parts or member.name == 'data/#recycle' or member.name.startswith('data/#recycle/'):
+                return None
+            return member
         with tarfile.open(archive, 'w:gz') as tar:
-            tar.add('/data', arcname='data')
+            tar.add('/data', arcname='data', filter=application_files)
         with tarfile.open(archive, 'r:gz') as tar:
             members = tar.getmembers()
             if not members:
