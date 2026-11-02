@@ -159,7 +159,8 @@ spec:
   chart:
     spec:
       chart: grafana
-      version: 13.5.0
+      # Chart 14 validates value types; keep schema validation enabled.
+      version: 14.3.0
       sourceRef:
         kind: HelmRepository
         name: grafana
