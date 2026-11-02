@@ -1,8 +1,10 @@
 # Infisical application, chart and operator — staged source only
 
-Nothing under `maintenance/` is referenced by Flux. Active application, chart,
-operator and `identity.yaml` remain unchanged. Do NOT treat the prepared patches
-as a single atomic upgrade or enable them without the gates below.
+Nothing under `maintenance/` is referenced by Flux. The server application and
+server chart remain unchanged. The operator was independently upgraded to
+0.11.16; all 12 existing static-secret resources successfully reconciled against
+the unchanged server. Do NOT treat the prepared server patches as a single atomic
+upgrade or enable them without the gates below.
 
 ## Evidence / blockers
 
@@ -25,7 +27,7 @@ Infisical with outbound integrations against production systems.
 ## Serialized GitOps procedure
 
 1. Prepare immediate old-image resume (`replicaCount: 1`, chart 1.8.0) before
-   maintenance. Hold operator 0.11.0 unchanged during application migration.
+   maintenance. Hold the validated operator 0.11.16 unchanged during application migration.
 2. Review Agent Vault clients and identity credential permissions. Stop/drain
    any external queue producers and make an explicit decision about preserving
    Redis state. Merge `01-quiesce.values.yaml` into active values, retaining OLD
@@ -48,9 +50,11 @@ Infisical with outbound integrations against production systems.
    reconcile Infisical alone. Verify migration logs, `/api/status`, SSO, existing
    identity authentication, decryption/read of a representative existing secret,
    and consumer sync without printing values. Check queues and Redis separately.
-7. Upgrade the operator as a DIFFERENT operation using
-   `04-operator.helmrelease-patch.yaml` after app verification. Preserve defaults
-   disabling automatic default auth/connection creation. Verify installed CRDs,
+7. The independent operator operation is complete;
+   `04-operator.helmrelease-patch.yaml` is retained as a reference, not a pending
+   server migration stage. Preserve defaults disabling automatic default
+   auth/connection creation and keep `defaultResourcesHelmHooks: false`.
+   Verify installed CRDs,
    resource Ready conditions, auth and observed secret resourceVersions; do not
    delete/re-adopt existing live Secrets as an upgrade workaround.
 8. After migration, rollback requires stopping all application Pods and restoring
