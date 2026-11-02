@@ -83,8 +83,9 @@ spec:
       restartPolicy: Never
       terminationGracePeriodSeconds: 60
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 1023
+        # /data/ssh contains root-owned host keys; application data stays read-only.
+        runAsNonRoot: false
+        runAsUser: 0
         runAsGroup: 100
         fsGroup: 100
         seccompProfile:
@@ -97,6 +98,7 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop: [ALL]
+              add: [DAC_OVERRIDE]
           env:
             - name: PGHOST
               value: forgejo-postgres-rw.forgejo.svc.cluster.local
