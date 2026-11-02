@@ -52,6 +52,9 @@ configMapGenerator:
   - name: newt-values
     files:
       - values.yaml=../../../newt/values.yaml
+  - name: newt-upstream-values
+    files:
+      - values.yaml=../../../newt/upstream-values.yaml
   - name: nfs-provisioner-values
     files:
       - values.yaml=../../../nfs-provisioner/values.yaml

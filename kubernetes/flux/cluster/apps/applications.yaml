@@ -407,20 +407,17 @@ spec:
   chart:
     spec:
       chart: newt
-      version: 1.1.0
+      version: 1.5.0
       sourceRef:
         kind: HelmRepository
         name: newt
   valuesFrom:
     - kind: ConfigMap
-      name: newt-values
+      name: newt-upstream-values
   dependsOn:
     - name: traefik
   install:
     createNamespace: true
-    disableSchemaValidation: true
-  upgrade:
-    disableSchemaValidation: true
   driftDetection:
     mode: enabled
   postRenderers:
@@ -434,13 +431,13 @@ spec:
               - op: replace
                 path: /spec/template/spec/containers/0/livenessProbe/initialDelaySeconds
                 value: 60
-              - op: replace
+              - op: add
                 path: /spec/template/spec/containers/0/livenessProbe/failureThreshold
                 value: 8
               - op: replace
                 path: /spec/template/spec/containers/0/readinessProbe/initialDelaySeconds
                 value: 30
-              - op: replace
+              - op: add
                 path: /spec/template/spec/containers/0/readinessProbe/failureThreshold
                 value: 6
               - op: add
