@@ -9,12 +9,9 @@ metadata:
   {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
-  # Transitional field ownership before adopting Recreate with server-side apply.
+  # SQLite uses a shared NFS volume; never overlap old and new writers.
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
+    type: Recreate
   selector:
     matchLabels:
       app: vaultwarden
