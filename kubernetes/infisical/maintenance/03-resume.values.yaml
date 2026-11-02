@@ -1,0 +1,3 @@
+# Inactive overlay; only combine with 02-stage.values.yaml after all gates.
+infisical:
+  replicaCount: 1

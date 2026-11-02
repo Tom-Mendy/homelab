@@ -1,0 +1,9 @@
+# Inactive overlay. Stage while replicaCount remains ZERO, then review rendered
+# resources, verify external key escrow, and rehearse migration before resuming.
+infisical:
+  replicaCount: 0
+  rolloutOnEveryRender: false
+  autoBootstrap:
+    enabled: false
+  image:
+    tag: v0.167.4@sha256:80a3bb51bee4092b7332d000506d5740ba57b1c4d48550e50746fe9c5209715d
