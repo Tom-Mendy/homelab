@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Low-impact scratch-only NFSv4.1 probe; HTTP never touches the mount."""
 import argparse
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import math
 import os
@@ -142,6 +141,9 @@ class Supervisor:
 
 
 def make_server(supervisor, host, port):
+    # Only the long-lived parent needs the CPU-heavy HTTP/email/SSL imports.
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):
             if self.path not in ("/metrics", "/healthz"):
