@@ -13,7 +13,7 @@ CHART = ROOT / "kubernetes/prometheus"
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--upstream-chart", required=True, help="Downloaded prometheus 29.36.1 chart archive")
+    parser.add_argument("--upstream-chart", required=True, help="Downloaded upstream Prometheus chart archive matching the active Flux version")
     parser.add_argument("--promtool", default="promtool")
     args = parser.parse_args()
     subprocess.run(["helm", "lint", str(CHART)], check=True)

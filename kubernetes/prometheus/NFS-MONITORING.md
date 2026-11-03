@@ -2,7 +2,7 @@
 
 ## Deployment boundary
 
-The upstream `prometheus` HelmRelease uses chart **29.36.1** and consumes
+The upstream `prometheus` HelmRelease uses chart **29.40.3** and consumes
 `values.yaml` through the generated `prometheus-values` ConfigMap. Its
 `serverFiles.alerting_rules.yml` is loaded by the chart's default `rule_files`.
 The separate `prometheus-extras` HelmRelease renders the local scratch PVC,
@@ -12,12 +12,19 @@ Git revision; no Prometheus Operator or `PrometheusRule` CR is involved.
 Alertmanager remains disabled. The existing script-only Hermes cron running
 `/opt/data/scripts/homelab-nfs-watchdog.py` provides actual Matrix notification
 for TEST_STATEID recurrence and forwards firing `NFS*` rules from Prometheus,
-including synthetic checks, after two consecutive faulty observations.
+including synthetic checks, after two consecutive faulty observations. Recovery
+also requires two consecutive healthy observations, five minutes apart, plus
+successful probe batches newer than 180 seconds on both workers. Absence of firing
+rules alone can mean a pending `for` timer and must not announce recovery.
 Notifications and recovery messages are change-only, with a five-minute polling
 interval. No additional messaging token is copied into the cluster. Do not
 enable an empty receiver or treat the homeserver as an Alertmanager webhook.
-A healthy read verifies the integration; actual failure-message delivery must
-be verified separately without inventing a production storage fault.
+An observe-only read verifies Prometheus access and the decision path, not Matrix
+delivery. Actual failure-message delivery must be verified separately without
+inventing a production storage fault. The scheduler wrapper executes the installed
+artifact at `/opt/data/scripts/homelab-nfs-watchdog-runtime.py`, not a mutable
+research worktree. After reviewing/testing a source update, install it and verify
+its SHA-256 against `scripts/nfs-alert-watchdog.py` before activation.
 Prometheus and the Hermes watchdog also depend on NFS: total NAS loss needs
 an independent external monitor.
 
@@ -41,6 +48,11 @@ an independent external monitor.
   started until that child has actually exited. Hard-mounted NFS can keep a
   killed child in kernel sleep; **the deadline does not guarantee kernel I/O
   cancellation or bounded pod termination**. Health probes only check HTTP.
+- Reserve 50m CPU and allow 500m bursts. The 20-second deadline includes child
+  startup, so CPU starvation can fail the probe even when storage is fast. Only
+  the long-lived parent imports the HTTP server stack; do not reload it in each
+  storage child. Investigate cgroup throttling before blaming the NAS or raising
+  the timeout. Latency and failure thresholds remain unchanged.
 - No recursive `fsGroup` change or root permission-fixing container is used.
   The provisioned scratch root must allow UID/GID 65534 to create a directory
   (the normal NFS provisioner directory permissions). A permission problem is
@@ -66,10 +78,10 @@ Run from the repository root; keep downloaded artifacts outside the repository:
 
 ```sh
 helm pull prometheus --repo https://prometheus-community.github.io/helm-charts \
-  --version 29.36.1 --destination /opt/data/cache
+  --version 29.40.3 --destination /opt/data/cache
 python3 -m unittest scripts.tests.test_nfs_probe -v
 python3 kubernetes/prometheus/tests/check.py \
-  --upstream-chart /opt/data/cache/prometheus-29.36.1.tgz \
+  --upstream-chart /opt/data/cache/prometheus-29.40.3.tgz \
   --promtool /opt/data/cache/promtool
 ./scripts/check-storage-policy.sh
 rumdl check kubernetes/prometheus/NFS-MONITORING.md
