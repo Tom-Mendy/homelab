@@ -119,6 +119,8 @@ metadata:
   name: job-search-manager
   namespace: flux-system
 spec:
+  # Hold the last healthy image until the failing latest build is repaired and tested.
+  suspend: true
   interval: 1m
   sourceRef:
     kind: GitRepository

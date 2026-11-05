@@ -1,5 +1,8 @@
 hostAPI: https://infisical.home.tom-mendy.com/api
 
+# Existing connection/auth resources remain owned by their local charts.
+defaultResourcesHelmHooks: false
+
 controllerManager:
   replicas: 1
 

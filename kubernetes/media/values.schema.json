@@ -4,6 +4,7 @@
   "additionalProperties": false,
   "required": ["namespace", "timezone", "securityContext", "nymVpn", "storage", "configStorage", "ingress", "apps", "infisicalSecret"],
   "properties": {
+    "qbittorrentMaintenance": { "type": "boolean", "default": false },
     "namespace": { "type": "string", "minLength": 1 },
     "timezone": { "type": "string", "minLength": 1 },
     "securityContext": {

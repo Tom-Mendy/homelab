@@ -21,6 +21,31 @@ class BatchTests(unittest.TestCase):
     def test_probe_source_exists(self):
         self.assertTrue(SOURCE.is_file(), "The isolated NFS probe is not implemented")
 
+    def test_storage_child_does_not_initialize_exporter_http_stack(self):
+        import subprocess
+        import sys
+        code = r'''
+import builtins
+import runpy
+import sys
+original = builtins.__import__
+def storage_only_import(name, *args, **kwargs):
+    if name == "http.server":
+        raise AssertionError("Storage child must not initialize the HTTP exporter")
+    return original(name, *args, **kwargs)
+builtins.__import__ = storage_only_import
+sys.argv = [sys.argv[1], "--child", "--root", "/not-a-real-nfs-mount"]
+try:
+    runpy.run_path(sys.argv[0], run_name="__main__")
+except ValueError as error:
+    assert str(error) == "Scratch must be an NFSv4.1 mount", str(error)
+else:
+    raise AssertionError("Invalid mount must still fail in the storage child")
+'''
+        result = subprocess.run([sys.executable, "-B", "-c", code, str(SOURCE)],
+                                capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_nearest_rank_and_reject_incomplete_or_invalid_samples(self):
         probe = load_probe()
         self.assertEqual(probe.percentile95(list(range(96)), 96), 91)
@@ -212,6 +237,11 @@ class ManifestTests(unittest.TestCase):
         self.assertTrue(pod["securityContext"]["runAsNonRoot"])
         self.assertNotIn("initContainers", pod)
         container = pod["containers"][0]
+        cpu = container["resources"]["limits"]["cpu"]
+        cpu_millicores = float(cpu[:-1]) if cpu.endswith("m") else float(cpu) * 1000
+        self.assertGreaterEqual(cpu_millicores, 500,
+                                "CPU quota must not make interpreter startup exhaust the storage deadline")
+        self.assertEqual(load_probe().Supervisor(lambda: None).timeout, 20)
         self.assertEqual(container["image"], "docker.io/library/python@sha256:8acac70227ce3b34da9453120c375cc5b66cd0b062d4dc6bc74286f81a3819e1")
         self.assertTrue(container["securityContext"]["readOnlyRootFilesystem"])
         self.assertFalse(container["securityContext"]["allowPrivilegeEscalation"])

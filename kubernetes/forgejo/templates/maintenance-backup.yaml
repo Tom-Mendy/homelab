@@ -1,0 +1,143 @@
+# These resources exist before the one-shot pre-upgrade hook is enabled.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: forgejo-maintenance-backups
+  namespace: {{ .Values.namespace }}
+  annotations:
+    helm.sh/resource-policy: keep
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: nfs-k8s
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: forgejo-maintenance
+  namespace: {{ .Values.namespace }}
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: forgejo-maintenance
+  namespace: {{ .Values.namespace }}
+rules:
+  - apiGroups: [apps]
+    resources: [deployments]
+    resourceNames: [forgejo]
+    verbs: [get, delete]
+  # Recovery can recreate the old Deployment if an offline backup fails.
+  - apiGroups: [apps]
+    resources: [deployments]
+    verbs: [create]
+  - apiGroups: ['']
+    resources: [pods]
+    verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: forgejo-maintenance
+  namespace: {{ .Values.namespace }}
+subjects:
+  - kind: ServiceAccount
+    name: forgejo-maintenance
+    namespace: {{ .Values.namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: forgejo-maintenance
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forgejo-maintenance-code
+  namespace: {{ .Values.namespace }}
+data:
+  offline_backup.py: |
+{{ .Files.Get "maintenance/offline_backup.py" | indent 4 }}
+{{- if .Values.offlineUpgradeEnabled }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: forgejo-offline-upgrade
+  namespace: {{ .Values.namespace }}
+  annotations:
+    helm.sh/hook: pre-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 900
+  template:
+    metadata:
+      labels:
+        app: forgejo-offline-upgrade
+    spec:
+      serviceAccountName: forgejo-maintenance
+      automountServiceAccountToken: true
+      restartPolicy: Never
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        # /data/ssh contains root-owned host keys; application data stays read-only.
+        runAsNonRoot: false
+        runAsUser: 0
+        runAsGroup: 100
+        fsGroup: 100
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: backup
+          image: ghcr.io/cloudnative-pg/postgresql:17.11@sha256:70664ebcfa1100361b5bdc28bbf06fdbe08db2dc4ad7bd14de33c5e05fe8ea8e
+          command: [python3, /scripts/offline_backup.py]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+              add: [DAC_OVERRIDE]
+          env:
+            - name: PGHOST
+              value: forgejo-postgres-rw.forgejo.svc.cluster.local
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-postgres-app
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-postgres-app
+                  key: password
+            - name: PGDATABASE
+              value: forgejo
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+              readOnly: true
+            - name: backups
+              mountPath: /backups
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: forgejo-data-pvc
+            readOnly: true
+        - name: backups
+          persistentVolumeClaim:
+            claimName: forgejo-maintenance-backups
+        - name: scripts
+          configMap:
+            name: forgejo-maintenance-code
+{{- end }}

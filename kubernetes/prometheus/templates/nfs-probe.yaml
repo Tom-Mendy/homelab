@@ -84,10 +84,11 @@ spec:
               drop: [ALL]
           resources:
             requests:
-              cpu: 10m
+              cpu: 50m
               memory: 32Mi
             limits:
-              cpu: 100m
+              # Interpreter startup must not consume the 20s storage deadline.
+              cpu: 500m
               memory: 96Mi
           # Only process/HTTP health: storage failure must not trigger restarts.
           readinessProbe:

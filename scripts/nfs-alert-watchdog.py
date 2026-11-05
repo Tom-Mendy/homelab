@@ -17,15 +17,16 @@ DEFAULT_URL = "http://prometheus-server.prometheus.svc.cluster.local"
 
 def transition(previous, issue):
     count = previous.get("failures", 0) + 1 if issue else 0
+    healthy = 0 if issue else previous.get("healthy", 0) + 1
     alerted = previous.get("alerted", False)
     message = ""
     if issue and count >= 2 and not alerted:
         message = "⚠️ Alerte NFS persistante : " + issue
         alerted = True
-    elif not issue and alerted:
-        message = "✅ NFS rétabli : les indicateurs surveillés sont revenus sous les seuils d’alerte."
+    elif not issue and alerted and healthy >= 2:
+        message = "✅ NFS rétabli : les indicateurs surveillés sont restés sains sur deux contrôles consécutifs."
         alerted = False
-    return {"failures": count, "alerted": alerted, "issue": issue}, message
+    return {"failures": count, "healthy": healthy, "alerted": alerted, "issue": issue}, message
 
 
 def firing_nfs_alerts(alerts):
@@ -55,7 +56,23 @@ def observe(url):
         if alert_document.get("status") != "success":
             return "lecture des alertes Prometheus en échec"
         failures.extend(firing_nfs_alerts(alert_document["data"]["alerts"]))
-        return "; ".join(failures)
+        # No firing rule may merely mean its `for` timer is pending. Recovery
+        # requires actual successful, fresh batches on both workers as well.
+        query = ('min by(node) (nfs_probe_success{job="nfs-worker-probe"} * '
+                 '(time() - nfs_probe_last_result_timestamp_seconds{job="nfs-worker-probe"} < bool 180))')
+        request_url = url.rstrip("/") + "/api/v1/query?" + urllib.parse.urlencode({"query": query})
+        with urllib.request.urlopen(request_url, timeout=20) as response:
+            probe_document = json.load(response)
+        if probe_document.get("status") != "success":
+            return "lecture des sondes NFS en échec"
+        probes = {item["metric"]["node"]: float(item["value"][1])
+                  for item in probe_document["data"]["result"]}
+        missing = {"node2", "node3"} - set(probes)
+        if missing:
+            failures.append("sondes NFS absentes : " + ", ".join(sorted(missing)))
+        failures.extend(f"{node}: NFSProbeFailed" for node, value in sorted(probes.items())
+                        if not math.isfinite(value) or value != 1)
+        return "; ".join(sorted(set(failures)))
     except Exception as error:
         return "supervision NFS inaccessible (" + type(error).__name__ + ")"
 

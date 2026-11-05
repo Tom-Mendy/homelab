@@ -7,6 +7,38 @@ PATH = pathlib.Path(__file__).resolve().parents[1] / "nfs-alert-watchdog.py"
 
 
 class WatchdogTests(unittest.TestCase):
+    def test_recovery_requires_successful_fresh_probes_even_without_firing_rules(self):
+        import io
+        import json
+        import urllib.parse
+        from unittest.mock import patch
+        spec = importlib.util.spec_from_file_location("watchdog", PATH)
+        assert spec is not None and spec.loader is not None
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        def response(url, timeout):
+            if url.endswith("/api/v1/alerts"):
+                data = {"alerts": []}
+            else:
+                query = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)["query"][0]
+                values = probe_values if "nfs_probe_success" in query else {"node2": "0", "node3": "0"}
+                data = {"result": [{"metric": {"node": node}, "value": [100, value]}
+                                   for node, value in values.items()]}
+            return io.BytesIO(json.dumps({"status": "success", "data": data}).encode())
+        for probe_values, expected in (
+            ({"node2": "0", "node3": "1"}, "node2: NFSProbeFailed"),
+            ({"node2": "NaN", "node3": "1"}, "node2: NFSProbeFailed"),
+            ({}, "sondes NFS absentes"),
+            ({"node2": "1", "node3": "1"}, ""),
+        ):
+            with self.subTest(probes=probe_values):
+                with patch.object(mod.urllib.request, "urlopen", side_effect=response):
+                    issue = mod.observe("http://prometheus.invalid")
+                if expected:
+                    self.assertIn(expected, issue)
+                else:
+                    self.assertEqual(issue, "")
+
     def test_only_firing_nfs_rules_are_forwarded(self):
         spec = importlib.util.spec_from_file_location("watchdog", PATH)
         assert spec is not None and spec.loader is not None
@@ -30,6 +62,8 @@ class WatchdogTests(unittest.TestCase):
         self.assertIn("NFS", message)
         state, message = mod.transition(state, "node3: TEST_STATEID=5000/s")
         self.assertEqual(message, "")
+        state, message = mod.transition(state, "")
+        self.assertEqual(message, "", "One healthy observation must not prematurely announce recovery")
         state, message = mod.transition(state, "")
         self.assertIn("rétabli", message)
         state, message = mod.transition(state, "")

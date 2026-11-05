@@ -9,6 +9,9 @@ metadata:
   {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  # SQLite uses a shared NFS volume; never overlap old and new writers.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: vaultwarden

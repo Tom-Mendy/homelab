@@ -1,0 +1,4 @@
+# Inactive values overlay. Merge into kubernetes/infisical/values.yaml first,
+# retaining chart 1.8.0 and the OLD application image until Pods are all absent.
+infisical:
+  replicaCount: 0

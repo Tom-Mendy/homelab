@@ -37,7 +37,8 @@ spec:
   chart:
     spec:
       chart: harbor
-      version: 1.19.2
+      # Skip regressed 1.19.3; component images remain pinned to 2.15.4.
+      version: 1.19.4
       sourceRef:
         kind: HelmRepository
         name: harbor
@@ -131,7 +132,8 @@ spec:
   chart:
     spec:
       chart: coder
-      version: 2.38.0
+      # Stay on the installed mainline family; this is not the Stable channel.
+      version: 2.38.5
       sourceRef:
         kind: HelmRepository
         name: coder
@@ -157,7 +159,8 @@ spec:
   chart:
     spec:
       chart: grafana
-      version: 13.5.0
+      # Chart 14 validates value types; keep schema validation enabled.
+      version: 14.3.0
       sourceRef:
         kind: HelmRepository
         name: grafana
@@ -407,36 +410,37 @@ spec:
   chart:
     spec:
       chart: newt
-      version: 1.1.0
+      version: 1.5.0
       sourceRef:
         kind: HelmRepository
         name: newt
   valuesFrom:
     - kind: ConfigMap
-      name: newt-values
+      name: newt-upstream-values
   dependsOn:
     - name: traefik
   install:
     createNamespace: true
-    disableSchemaValidation: true
-  upgrade:
-    disableSchemaValidation: true
   driftDetection:
     mode: enabled
   postRenderers:
     - kustomize:
         patches:
           - patch: |
+              - op: add
+                path: /spec/strategy
+                value:
+                  type: Recreate
               - op: replace
                 path: /spec/template/spec/containers/0/livenessProbe/initialDelaySeconds
                 value: 60
-              - op: replace
+              - op: add
                 path: /spec/template/spec/containers/0/livenessProbe/failureThreshold
                 value: 8
               - op: replace
                 path: /spec/template/spec/containers/0/readinessProbe/initialDelaySeconds
                 value: 30
-              - op: replace
+              - op: add
                 path: /spec/template/spec/containers/0/readinessProbe/failureThreshold
                 value: 6
               - op: add
@@ -600,7 +604,7 @@ spec:
   chart:
     spec:
       chart: prometheus
-      version: 29.36.1
+      version: 29.40.3
       sourceRef:
         kind: HelmRepository
         name: prometheus

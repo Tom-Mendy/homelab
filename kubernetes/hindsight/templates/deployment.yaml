@@ -4,7 +4,7 @@ metadata:
   name: hindsight
   namespace: {{ .Values.namespace }}
 spec:
-  replicas: 1
+  replicas: {{ ternary 0 1 .Values.maintenance.enabled }}
   strategy:
     type: Recreate
   selector:
