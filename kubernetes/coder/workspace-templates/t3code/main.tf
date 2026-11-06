@@ -206,6 +206,8 @@ resource "kubernetes_deployment_v1" "workspace" {
         }
       }
       spec {
+        # Keep the machine hostname stable when Kubernetes replaces the Pod.
+        hostname                         = "t3-${data.coder_workspace.me.id}"
         automount_service_account_token  = false
         termination_grace_period_seconds = 60
         # Native sidecar restores settings before startup and flushes after the

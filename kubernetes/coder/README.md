@@ -102,6 +102,14 @@ installations share a lock. Coder refreshes T3 daily at
 `Update T3 daily` in the Coder dashboard.
 
 T3's `~/.t3/runtime` points to `/tmp/t3code-local/runtime` in the container.
+
+The T3 Pod hostname is `t3-<workspace UUID>` and stays the same across Pod
+replacements and workspace restarts. Kubernetes Pod names still change.
+T3's separate `~/.t3/userdata/environment-id` is restored from the settings PVC.
+A saved connection reporting a different environment UUID needs to be paired
+with the replacement environment again; a stable hostname alone does not
+repair that mismatch.
+
 T3, Codex and OpenCode executables, package caches, SQLite session/history
 stores and **all project files** are disposable. They are not included in the
 settings PVC. Applications are reinstalled when the disposable home is replaced.
