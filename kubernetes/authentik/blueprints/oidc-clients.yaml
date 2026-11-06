@@ -103,7 +103,7 @@ entries:
       invalidation_flow: !Find
         - authentik_flows.flow
         - [slug, default-provider-invalidation-flow]
-      external_host: https://radarr.home.tom-mendy.com
+      external_host: https://radarr.tom-mendy.com
       mode: forward_single
   - model: authentik_core.application
     id: radarr-application
@@ -112,7 +112,7 @@ entries:
     attrs:
       name: Radarr
       provider: !KeyOf radarr-provider
-      meta_launch_url: https://radarr.home.tom-mendy.com/
+      meta_launch_url: https://radarr.tom-mendy.com/
       meta_icon: https://raw.githubusercontent.com/Radarr/Radarr/develop/Logo/64.png
       policy_engine_mode: any
   - model: authentik_policies.policybinding
@@ -129,6 +129,11 @@ entries:
       order: 1
     attrs:
       enabled: true
+  - model: authentik_policies.policybinding
+    state: absent
+    identifiers:
+      target: !KeyOf radarr-application
+      group: !KeyOf media-users
 
   - model: authentik_providers_proxy.proxyprovider
     id: sonarr-provider
@@ -144,7 +149,7 @@ entries:
       invalidation_flow: !Find
         - authentik_flows.flow
         - [slug, default-provider-invalidation-flow]
-      external_host: https://sonarr.home.tom-mendy.com
+      external_host: https://sonarr.tom-mendy.com
       mode: forward_single
   - model: authentik_core.application
     id: sonarr-application
@@ -153,7 +158,7 @@ entries:
     attrs:
       name: Sonarr
       provider: !KeyOf sonarr-provider
-      meta_launch_url: https://sonarr.home.tom-mendy.com/
+      meta_launch_url: https://sonarr.tom-mendy.com/
       meta_icon: https://raw.githubusercontent.com/Sonarr/Sonarr/develop/Logo/64.png
       policy_engine_mode: any
   - model: authentik_policies.policybinding
@@ -170,6 +175,11 @@ entries:
       order: 1
     attrs:
       enabled: true
+  - model: authentik_policies.policybinding
+    state: absent
+    identifiers:
+      target: !KeyOf sonarr-application
+      group: !KeyOf media-users
   - model: authentik_providers_proxy.proxyprovider
     id: qbittorrent-provider
     identifiers:

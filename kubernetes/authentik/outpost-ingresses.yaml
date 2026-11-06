@@ -57,9 +57,9 @@ metadata:
 spec:
   tls:
     - hosts:
-        - radarr.home.tom-mendy.com
+        - radarr.tom-mendy.com
   rules:
-    - host: radarr.home.tom-mendy.com
+    - host: radarr.tom-mendy.com
       http:
         paths:
           - path: /outpost.goauthentik.io
@@ -81,9 +81,9 @@ metadata:
 spec:
   tls:
     - hosts:
-        - sonarr.home.tom-mendy.com
+        - sonarr.tom-mendy.com
   rules:
-    - host: sonarr.home.tom-mendy.com
+    - host: sonarr.tom-mendy.com
       http:
         paths:
           - path: /outpost.goauthentik.io

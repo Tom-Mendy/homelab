@@ -84,7 +84,7 @@ apps:
   sonarr:
     image: lscr.io/linuxserver/sonarr:4.0.20@sha256:f247545d23ba8b233d6604575347e48a623fe6ad75dda02348bf81917f3b5c06
     port: 8989
-    host: sonarr.home.tom-mendy.com
+    host: sonarr.tom-mendy.com
     vpn: false
     mounts:
       downloads: true
@@ -94,7 +94,7 @@ apps:
   radarr:
     image: lscr.io/linuxserver/radarr:6.4.4@sha256:adb6c09d6b729ea5e642c99cea35af72702ef476bf4763f153299ac5db9f0b4f
     port: 7878
-    host: radarr.home.tom-mendy.com
+    host: radarr.tom-mendy.com
     vpn: false
     mounts:
       downloads: true

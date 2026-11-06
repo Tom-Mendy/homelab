@@ -90,9 +90,9 @@
         description: Indexer manager
     - Sonarr:
         icon: sonarr.svg
-        href: https://sonarr.home.tom-mendy.com/
+        href: https://sonarr.tom-mendy.com/
         description: TV series manager
     - Radarr:
         icon: radarr.svg
-        href: https://radarr.home.tom-mendy.com/
+        href: https://radarr.tom-mendy.com/
         description: Movies manager

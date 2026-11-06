@@ -15,6 +15,36 @@ newtInstances:
         endpointKey: PANGOLIN_ENDPOINT
         idKey: NEWT_ID
         secretKey: NEWT_SECRET
+    # All public media traffic must pass through Traefik's Authentik middleware.
+    blueprintFile: /etc/newt/blueprint.yaml
+    blueprintData: |
+      public-resources:
+        radarr:
+          name: Radarr
+          mode: http
+          full-domain: radarr.tom-mendy.com
+          ssl: true
+          host-header: radarr.tom-mendy.com
+          tls-server-name: radarr.tom-mendy.com
+          auth:
+            sso-enabled: false
+          targets:
+            - hostname: 10.0.0.60
+              method: https
+              port: 443
+        sonarr:
+          name: Sonarr
+          mode: http
+          full-domain: sonarr.tom-mendy.com
+          ssl: true
+          host-header: sonarr.tom-mendy.com
+          tls-server-name: sonarr.tom-mendy.com
+          auth:
+            sso-enabled: false
+          targets:
+            - hostname: 10.0.0.60
+              method: https
+              port: 443
     # Health probes need a writable file while the image filesystem stays read-only.
     extraVolumes:
       - name: temporary-files

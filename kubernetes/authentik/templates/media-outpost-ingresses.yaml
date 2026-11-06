@@ -1,5 +1,5 @@
 {{- range $app := list "radarr" "sonarr" }}
-{{- $host := printf "%s.home.tom-mendy.com" $app }}
+{{- $host := printf "%s.tom-mendy.com" $app }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
