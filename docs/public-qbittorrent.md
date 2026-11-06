@@ -14,6 +14,14 @@ login callbacks. Existing `homelab-admins` and `qbittorrent-users` access
 bindings remain unchanged. Blocky resolves the public hostname to Traefik
 (`10.0.0.60`) inside the LAN.
 
+qBittorrent bypasses its own login for the connecting pod CIDR only.
+Keep reverse-proxy support enabled for HTTPS headers, but leave its trusted
+reverse-proxy list empty. Otherwise `X-Forwarded-For` replaces the pod address
+with the public client IP and qBittorrent asks for a second login after
+Authentik. The init container sets these keys in the `[WebUI]` section used by
+qBittorrent 5.3. After changing the SSO ConfigMap, restart the Deployment to
+run the init container again.
+
 ## External Pangolin configuration
 
 Pangolin resources are managed outside this Git repository. Configure an HTTPS

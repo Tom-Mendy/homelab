@@ -20,26 +20,27 @@ data:
       export KEY="$key" VALUE="$value"
       if awk 'index($0, ENVIRON["KEY"] "=") == 1 { found=1; exit } END { exit !found }' "$CONF"; then
         awk 'index($0, ENVIRON["KEY"] "=") == 1 { print ENVIRON["KEY"] "=" ENVIRON["VALUE"]; next } { print }' "$CONF" > "$CONF.tmp" && mv "$CONF.tmp" "$CONF"
-      elif grep -q '^\[Preferences\]' "$CONF"; then
+      elif grep -q '^\[WebUI\]' "$CONF"; then
         awk '
           /^\[/ { if (in_prefs && !inserted) { print ENVIRON["KEY"] "=" ENVIRON["VALUE"]; inserted=1 } in_prefs=0 }
-          /^\[Preferences\]/ { in_prefs=1 }
+          /^\[WebUI\]/ { in_prefs=1 }
           { print }
           END { if (!inserted) print ENVIRON["KEY"] "=" ENVIRON["VALUE"] }
         ' "$CONF" > "$CONF.tmp" && mv "$CONF.tmp" "$CONF"
       else
-        printf '\n[Preferences]\n%s=%s\n' "$key" "$value" >> "$CONF"
+        printf '\n[WebUI]\n%s=%s\n' "$key" "$value" >> "$CONF"
       fi
     }
 
-    set_key 'WebUI\AuthSubnetWhitelistEnabled' 'true'
-    set_key 'WebUI\AuthSubnetWhitelist' "$SSO_AUTH_WHITELIST"
-    # qBittorrent must use the proxy address when evaluating the whitelist.
-    # Otherwise it can ignore the forwarded client address and keep its own
-    # authentication challenge in front of the Authentik session.
-    set_key 'WebUI\LocalHostAuth' 'false'
-    set_key 'WebUI\ReverseProxySupportEnabled' 'true'
-    set_key 'WebUI\TrustedReverseProxiesList' "$SSO_AUTH_WHITELIST"
+    # qBittorrent 5.3 stores these keys in [WebUI].
+    set_key 'AuthSubnetWhitelistEnabled' 'true'
+    set_key 'AuthSubnetWhitelist' "$SSO_AUTH_WHITELIST"
+    # Check the connecting pod against the whitelist. Trusting X-Forwarded-For
+    # would check the public client IP and cause a second login after Authentik.
+    # Keep reverse-proxy support for HTTPS headers and secure cookies.
+    set_key 'LocalHostAuth' 'false'
+    set_key 'ReverseProxySupportEnabled' 'true'
+    set_key 'TrustedReverseProxiesList' ''
 ---
 {{- end }}
 {{- if $app.vpn }}
