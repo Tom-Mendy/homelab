@@ -28,6 +28,9 @@ resource "coder_agent" "main" {
     set -euo pipefail
     export BUN_INSTALL="$HOME/.bun"
     export PATH="$BUN_INSTALL/bin:$HOME/.local/bin:$PATH"
+    # Chromium's user-namespace sandbox is blocked by the container security policy.
+    # Keep Kubernetes confinement and use T3's supported container browser mode.
+    export T3CODE_SERVER_BROWSER_SANDBOX=0
     # Only downloadable binaries use disposable storage; userdata stays on NFS.
     python3 - <<'PYTHON'
 ${file("${path.module}/prepare-runtime.py")}
@@ -272,6 +275,10 @@ resource "kubernetes_deployment_v1" "workspace" {
           env {
             name  = "HOME"
             value = "/home/coder"
+          }
+          env {
+            name  = "T3CODE_SERVER_BROWSER_SANDBOX"
+            value = "0"
           }
           env {
             name  = "BUILDAH_ISOLATION"

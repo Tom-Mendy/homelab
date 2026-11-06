@@ -103,6 +103,14 @@ installations share a lock. Coder refreshes T3 daily at
 
 T3's `~/.t3/runtime` points to `/tmp/t3code-local/runtime` in the container.
 
+The integrated browser uses `T3CODE_SERVER_BROWSER_SANDBOX=0`. Chromium's
+user-namespace sandbox cannot start under the workspace's container security
+policy and otherwise exits with `No usable sandbox!`, mentioning AppArmor.
+This disables Chromium's internal sandbox. The workspace retains its non-root
+UID, AppArmor confinement, `RuntimeDefault` seccomp, dropped capabilities and
+disabled privilege escalation. Do not run `t3 browser setup` as root or change
+worker-wide AppArmor/sysctl settings to work around this container restriction.
+
 The T3 Pod hostname is `t3-<workspace UUID>` and stays the same across Pod
 replacements and workspace restarts. Kubernetes Pod names still change.
 T3's separate `~/.t3/userdata/environment-id` is restored from the settings PVC.
