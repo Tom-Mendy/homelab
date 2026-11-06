@@ -22,6 +22,11 @@ class SettingsTests(unittest.TestCase):
                 ".codex/auth.json": '{"test_fixture":true}',
                 ".t3/userdata/settings.json": "{}",
                 ".config/opencode/opencode.json": "{}",
+                ".config/gh/hosts.yml": "github.com: {user: test}",
+                ".config/gh/config.yml": "git_protocol: https",
+                ".gitconfig": "[credential \"https://github.com\"]\n\thelper = !gh auth git-credential\n",
+                ".ssh/known_hosts": "github.com ssh-ed25519 test-fixture",
+                ".ssh/id_ed25519": "excluded-private-key-fixture",
                 ".codex/state_5.sqlite": "not-a-real-database",
                 ".t3/userdata/statev2.sqlite": "not-a-real-database",
                 ".config/opencode/node_modules/dependency/index.js": "dependency",
@@ -34,7 +39,12 @@ class SettingsTests(unittest.TestCase):
                 path.write_text(content)
             module.sync_configs(home, persist)
             copied = {str(p.relative_to(persist)) for p in persist.rglob("*") if p.is_file()}
-            self.assertEqual(copied, {".codex/config.toml", ".codex/auth.json", ".t3/userdata/settings.json", ".config/opencode/opencode.json"})
+            allowed = {
+                ".codex/config.toml", ".codex/auth.json", ".t3/userdata/settings.json",
+                ".config/opencode/opencode.json", ".config/gh/hosts.yml",
+                ".config/gh/config.yml", ".gitconfig", ".ssh/known_hosts",
+            }
+            self.assertEqual(copied, allowed)
             # Model an application's atomic replacement, not an in-place write.
             replacement = home / ".codex/config.new"
             replacement.write_text("model='changed'")
@@ -49,6 +59,14 @@ class SettingsTests(unittest.TestCase):
             module.sync_configs(persist, restored)
             self.assertEqual((restored / ".codex/config.toml").read_text(), "model='changed'")
             self.assertFalse((restored / "projects").exists())
+            for name in (".config/gh/hosts.yml", ".config/gh/config.yml", ".gitconfig", ".ssh/known_hosts"):
+                self.assertEqual((restored / name).read_text(), files[name])
+                self.assertEqual((restored / name).stat().st_mode & 0o777, 0o600)
+            self.assertFalse((restored / ".ssh/id_ed25519").exists())
+            # GitHub logout must also remove saved credentials.
+            (home / ".config/gh/hosts.yml").unlink()
+            module.sync_configs(home, persist)
+            self.assertFalse((persist / ".config/gh/hosts.yml").exists())
 
 
 if __name__ == "__main__":

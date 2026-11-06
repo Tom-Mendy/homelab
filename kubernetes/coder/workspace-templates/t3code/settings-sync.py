@@ -15,6 +15,7 @@ import tempfile
 import threading
 
 FILES = (
+    ".gitconfig", ".ssh/known_hosts",
     ".t3/userdata/settings.json", ".t3/userdata/keybindings.json",
     ".t3/userdata/environment-id", ".t3/userdata/anonymous-id",
     ".t3/userdata/keybindings-migrations",
@@ -22,6 +23,7 @@ FILES = (
     ".local/share/opencode/auth.json", ".local/share/opencode/mcp-auth.json",
 )
 DIRECTORIES = (
+    ".config/gh",
     ".t3/userdata/secrets", ".t3/userdata/themes",
     ".codex/skills", ".codex/rules", ".config/opencode",
 )

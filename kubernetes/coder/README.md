@@ -121,8 +121,14 @@ worker failure can lose changes made during that five-second checkpoint window.
 It copies files rather than symlinking them so atomic application config writes
 remain supported. Credentials remain private and are never logged. The exact
 allowlist is versioned in that helper; it covers T3 settings/keybindings/secrets,
-Codex configuration/authentication/skills/rules, and OpenCode configuration and
-authentication. Dependencies such as `node_modules`, databases, logs, runtimes
+Codex configuration/authentication/skills/rules, OpenCode configuration and
+authentication, GitHub CLI configuration/authentication in `~/.config/gh`,
+`~/.gitconfig`, and SSH host approvals in `~/.ssh/known_hosts`.
+Run `gh auth login` once inside the workspace and accept a verified SSH host key
+on first connection; those settings survive subsequent Pod replacements.
+SSH private keys are excluded; SSH Git access uses Coder's managed key, which
+must be registered with the GitHub account for SSH clones.
+Dependencies such as `node_modules`, databases, logs, runtimes
 and projects are excluded.
 
 The settings PVC requests **1Gi**, while the disposable home is an `emptyDir`
