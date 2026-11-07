@@ -1,0 +1,19 @@
+# Talos cluster only. This file is deliberately outside the Ubuntu GitOps tree.
+# Apply with the dedicated Talos kubeconfig after its controller/CRDs are ready.
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: talos-address-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.0.0.70-10.0.0.89
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: talos-l2
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - talos-address-pool

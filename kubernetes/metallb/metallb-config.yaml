@@ -5,7 +5,8 @@ metadata:
   namespace: metallb-system
 spec:
   addresses:
-  - 10.0.0.60-10.0.0.89
+  # Ubuntu only. Talos API reserves .65; Talos MetalLB reserves .70-.89.
+  - 10.0.0.60-10.0.0.64
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement

@@ -1,0 +1,75 @@
+{
+  "prepared_on": "2026-11-07",
+  "talos_version": "v1.14.5",
+  "kubernetes_version": "v1.36.6",
+  "architecture": "amd64",
+  "tools": {
+    "talosctl": {
+      "version": "v1.14.5",
+      "sha256": "ff432b68986709e6b69c563a08a2ced4232d5196b0dccd6d2e783e9d714d7d7d",
+      "url": "https://github.com/siderolabs/talos/releases/download/v1.14.5/talosctl-linux-amd64"
+    },
+    "kubectl": {
+      "version": "v1.36.6",
+      "sha256": "29818b6729dc9262b692307470d0558d027725e738be5dd47c760261868a2634",
+      "url": "https://dl.k8s.io/release/v1.36.6/bin/linux/amd64/kubectl"
+    }
+  },
+  "installer": {
+    "image": "factory.talos.dev/metal-installer/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba@sha256:4104d57b40ade79b577a7a18224da505df4e1eb9c9bc1a74fe3afcc3e11b4ba7",
+    "schematic": "376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba"
+  },
+  "network": {
+    "lan": "10.0.0.0/24",
+    "gateway": "10.0.0.1",
+    "ubuntu_metallb": [
+      "10.0.0.60",
+      "10.0.0.64"
+    ],
+    "talos_api_vip": "10.0.0.65",
+    "talos_api_hostname": "talos-api.home.tom-mendy.com",
+    "talos_metallb": [
+      "10.0.0.70",
+      "10.0.0.89"
+    ],
+    "talos_ingress_reserved": "10.0.0.70",
+    "talos_dns_reserved": "10.0.0.71",
+    "pod_cidr": "10.244.0.0/16",
+    "service_cidr": "10.96.0.0/12",
+    "ubuntu_pod_cidr": "10.233.64.0/18",
+    "ubuntu_service_cidr": "10.233.0.0/18"
+  },
+  "nodes": [
+    {
+      "node": "node1",
+      "ip": "10.0.0.21",
+      "mac": "10:60:4b:75:4d:00",
+      "ubuntu_interface": "enp4s0",
+      "talos_alias": "lan0",
+      "schema_valid": true
+    },
+    {
+      "node": "node2",
+      "ip": "10.0.0.22",
+      "mac": "10:7b:44:18:50:de",
+      "ubuntu_interface": "enp0s31f6",
+      "talos_alias": "lan0",
+      "schema_valid": true
+    },
+    {
+      "node": "node3",
+      "ip": "10.0.0.23",
+      "mac": "18:c0:4d:a5:82:00",
+      "ubuntu_interface": "enp6s0",
+      "talos_alias": "lan0",
+      "schema_valid": true
+    }
+  ],
+  "installation_approved": false,
+  "remaining_installation_gates": [
+    "Drain prerequisites and maintenance window",
+    "Confirm disk and NIC identity from the ISO before applying a configuration",
+    "node3 GPU extensions before its later conversion",
+    "Bootstrap and test real API, CNI, storage and failover"
+  ]
+}

@@ -34,7 +34,7 @@
      - node2 : 10.0.0.22
      - node3 : 10.0.0.23
      - Blocky : 10.0.0.53
-     - MetalLB : 10.0.0.60-10.0.0.89
+     - Ubuntu MetalLB : 10.0.0.60-10.0.0.64
 
    DNS DHCP temporaire : Netgear ou Bbox, pas encore Blocky.
 
@@ -161,7 +161,7 @@
 - Traefik et Blocky sont sains avant changement.
 
   Modifs repo :
-- MetalLB : 10.0.0.60-10.0.0.89
+- Ubuntu MetalLB : 10.0.0.60-10.0.0.64
 - Blocky service IP : 10.0.0.53
 - DNS mappings *.home.tom-mendy.com vers l’IP Traefik choisie, par exemple 10.0.0.60
 

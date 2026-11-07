@@ -19,7 +19,7 @@ box means the work was verified, not merely planned.
      outside Git.
    - [x] Create and verify an external-to-cluster Git bundle.
    - [x] Run the repository storage policy check.
-   - [ ] Validate capacity and placement for operation without node2, including
+   - [x] Validate capacity and placement for operation without node2, including
      peak demand and workloads with missing resource requests.
    - [x] Complete current application-native backups and isolated restore tests.
    - [x] Securely preserve bootstrap credentials, encryption keys, administrator
@@ -28,8 +28,10 @@ box means the work was verified, not merely planned.
      the existing default context used by other tools.
    - [ ] Pin the migration baseline and suspend relevant image automation before
      the maintenance window. The inventory export alone does not freeze versions.
-   - [ ] Revalidate Talos configuration, supported versions, installation disks,
-     API endpoint, and separate load-balancer address allocation.
+   - [x] Revalidate Talos configuration and supported versions; prepare a
+     Talos-only API endpoint and separate load-balancer allocation.
+   - [x] Prepare the mandatory ISO disk/NIC inspection procedure. Actual disk
+     selection remains a hard stop immediately before installation in step 3.
    - Gate: tested recoverability and sufficient remaining Ubuntu capacity.
      Do not drain or reinstall node2 until this gate passes.
 2. Release node2. Status: not started.
@@ -184,10 +186,30 @@ the cluster. Bulk NAS media libraries and downloads are excluded except the
 recorded NZBGet queue directories. This application recovery set is independent
 of Synology, but is not off-site. UI/SSO and final cutover checks remain required.
 
-Step 1 remains in progress. Remaining work includes the temporary CI/workspace
-capacity plan, explicit target context, version freeze, and Talos hardware,
-version, API endpoint, and address-allocation validation. Do not drain node2
-until those gates pass. Repeat each application's stopped-writer backup at its
+The [node2 capacity plan](talos-node2-capacity.md) passes its static assessment
+with CI runners, all three workspaces, Ollama inference, and bulk downloaders
+paused for the full one-worker Ubuntu period. A 21.875 GiB workload budget plus
+2 GiB system allowance and 4 GiB operational margin fits node3's 30.435 GiB,
+leaving 2.560 GiB. Node1's taint remains unchanged. The plan checks placement,
+portable storage, Pod count, init/sidecar requests, and historical memory peaks.
+The six singleton CNPG PDBs still require separate relocation handling.
+No workloads were stopped and no node was drained for this assessment.
+
+The [Talos network preparation](talos-network-preparation.md) pins Talos v1.14.5
+and Kubernetes v1.36.6. All three revised candidates pass strict validation with
+the checksum-verified matching client. The new DNS-only API hostname is
+`talos-api.home.tom-mendy.com`, resolving only to reserved VIP 10.0.0.65.
+Ubuntu's live MetalLB pool was reduced to .60-.64 without changing Traefik .60
+or Blocky .61. Talos reserves .70-.89 in a separate staged manifest outside
+Ubuntu GitOps. The new candidates and recovery credentials passed encrypted
+archive readback and per-file checksums. No Talos configuration was applied.
+The installation disk remains unselected until physical ISO inspection, and
+live VIP/API health and failover remain installation checks.
+
+Step 1 remains in progress. Remaining work includes the explicit target
+Kubernetes context and version freeze. Do not drain node2 until those gates
+and the capacity-profile maintenance conditions pass.
+Repeat each application's stopped-writer backup at its
 actual cutover; these preparatory snapshots were taken at different times.
 
 Storage rules for every subsequent operation:

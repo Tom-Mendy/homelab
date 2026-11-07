@@ -71,7 +71,9 @@ graph TB
 ### Network Specifications
 
 - **Network Range**: 10.0.0.0/24
-- **LoadBalancer Range**: 10.0.0.60-10.0.0.89
+- **Ubuntu LoadBalancer Range**: 10.0.0.60-10.0.0.64
+- **Reserved Talos API VIP**: 10.0.0.65
+- **Reserved Talos LoadBalancer Range**: 10.0.0.70-10.0.0.89
 - **SSH User**: tmendy (with sudo privileges)
 - **Management**: Kubernetes plus Flux GitOps
 
