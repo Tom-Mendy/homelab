@@ -26,8 +26,9 @@ box means the work was verified, not merely planned.
      recovery access, and Talos configurations outside the cluster.
    - [ ] Prepare explicit Ubuntu and Talos kubeconfig contexts without changing
      the existing default context used by other tools.
-   - [ ] Pin the migration baseline and suspend relevant image automation before
-     the maintenance window. The inventory export alone does not freeze versions.
+   - [x] Prepare the version baseline and suspend/protect image update automation.
+     Pin the final reviewed Git revision and satisfy publisher/digest gates at
+     the maintenance window; an inventory export alone does not freeze versions.
    - [x] Revalidate Talos configuration and supported versions; prepare a
      Talos-only API endpoint and separate load-balancer allocation.
    - [x] Prepare the mandatory ISO disk/NIC inspection procedure. Actual disk
@@ -206,9 +207,16 @@ archive readback and per-file checksums. No Talos configuration was applied.
 The installation disk remains unselected until physical ISO inspection, and
 live VIP/API health and failover remain installation checks.
 
+The [version-freeze preparation](talos-version-freeze.md) suspended both image
+writers and both registry scanners and verified that their guards survive parent
+reconciliation. The prior job-search-manager incident hold is preserved. Flux
+was pinned to its unchanged deployed v2.9.6 release. No workload image reference
+changed, and the final baseline drift check passed. CI drain, final Git-commit
+pinning, immutable cutover images, and publisher controls remain window gates.
+
 Step 1 remains in progress. Remaining work includes the explicit target
-Kubernetes context and version freeze. Do not drain node2 until those gates
-and the capacity-profile maintenance conditions pass.
+Kubernetes context. Do not drain node2 until that gate, the version-freeze window
+gates, and the capacity-profile maintenance conditions pass.
 Repeat each application's stopped-writer backup at its
 actual cutover; these preparatory snapshots were taken at different times.
 

@@ -12,7 +12,8 @@ spec:
     - image-reflector-controller
     - image-automation-controller
   distribution:
-    version: 2.9.x
+    # Keep the currently deployed release fixed during the Talos migration.
+    version: 2.9.6
     registry: ghcr.io/fluxcd
   sync:
     kind: GitRepository
