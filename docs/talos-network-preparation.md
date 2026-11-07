@@ -64,8 +64,9 @@ before boot. No ping response is not proof that an address is unreserved.
 The new DNS-only Cloudflare A record is
 `talos-api.home.tom-mendy.com -> 10.0.0.65`, TTL 300. Both 1.1.1.1 and current
 Blocky at 10.0.0.61 returned only that address. No round-robin node records or
-Ubuntu backend are used by this endpoint. The old `kube.home.tom-mendy.com`
-record was left unchanged and must not be used for Talos bootstrap.
+Ubuntu backend are used by this endpoint. During node2 release, the Ubuntu
+`kube.home.tom-mendy.com` record was moved from .22 to node1 at 10.0.0.21,
+removing its dependency on node2's API proxy. Never use it for Talos bootstrap.
 No application ingress or Authentik hostname was changed.
 
 All candidates use a Talos-owned Layer2VIPConfig on alias `lan0`. Each alias

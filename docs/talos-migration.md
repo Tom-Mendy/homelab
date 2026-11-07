@@ -1,7 +1,8 @@
 # Talos migration tracker
 
 Last updated: 2026-11-07. This file is the migration progress record.
-Step 1 is in progress. Node maintenance has not started.
+Steps 1 and 2 are complete. Node2 evacuation passed its 30-minute observation.
+Node2 is ready for manual ISO inspection. Talos installation has not started.
 
 Build a separate Talos cluster on node2, migrate applications individually,
 then convert node3 and finally node1. The target is three control-plane nodes
@@ -12,7 +13,7 @@ Keep application versions unchanged during migration. Record each operation,
 validation result, rollback decision, and remaining dependency here. A checked
 box means the work was verified, not merely planned.
 
-1. Prepare without disrupting production. Status: in progress.
+1. Prepare without disrupting production. Status: complete.
    - [x] Inspect live nodes, workloads, storage, placement, PDBs, databases,
      scheduled jobs, and GitOps state.
    - [x] Export current PVC/PV/NFS bindings and workload image versions
@@ -24,8 +25,9 @@ box means the work was verified, not merely planned.
    - [x] Complete current application-native backups and isolated restore tests.
    - [x] Securely preserve bootstrap credentials, encryption keys, administrator
      recovery access, and Talos configurations outside the cluster.
-   - [ ] Prepare explicit Ubuntu and Talos kubeconfig contexts without changing
-     the existing default context used by other tools.
+   - [x] Prepare isolated Ubuntu and Talos access files without changing the
+     existing default context. Talos Kubernetes credentials fail closed until
+     real bootstrap authentication can be retrieved and validated in step 3.
    - [x] Prepare the version baseline and suspend/protect image update automation.
      Pin the final reviewed Git revision and satisfy publisher/digest gates at
      the maintenance window; an inventory export alone does not freeze versions.
@@ -35,7 +37,7 @@ box means the work was verified, not merely planned.
      selection remains a hard stop immediately before installation in step 3.
    - Gate: tested recoverability and sufficient remaining Ubuntu capacity.
      Do not drain or reinstall node2 until this gate passes.
-2. Release node2. Status: not started.
+2. Release node2. Status: complete.
    - Move workloads in a maintenance window, handling singleton databases and
      their PDBs explicitly. Do not bypass every PDB by default.
    - Verify application access and observe Ubuntu without node2 before erasing it.
@@ -214,9 +216,17 @@ was pinned to its unchanged deployed v2.9.6 release. No workload image reference
 changed, and the final baseline drift check passed. CI drain, final Git-commit
 pinning, immutable cutover images, and publisher controls remain window gates.
 
-Step 1 remains in progress. Remaining work includes the explicit target
-Kubernetes context. Do not drain node2 until that gate, the version-freeze window
-gates, and the capacity-profile maintenance conditions pass.
+Step 1 completed during the explicitly authorized maintenance execution.
+See [the node2 release record](talos-node2-release.md) for the isolated access
+files, final Git baseline, CI and workspace holds, six database switchovers,
+17 workload moves, and rollback state. Node2 is cordoned, excluded from VIP
+announcements, and its kubelet is stopped. No disks were changed. The accepted
+observation lasted 1,829.9 seconds, from 18:18:28 to 18:48:58 UTC, with every
+sample healthy. The workstation sleep gap was excluded and the healthy timer
+restarted after wake. Node1 and node3 are Ready; all retained services and six
+database primaries are on node3. Two daily backup schedules are restored; the
+capacity and application-update holds remain in place. The next action is the
+physical ISO boot, disk/NIC inspection, and manual Talos installation in step 3.
 Repeat each application's stopped-writer backup at its
 actual cutover; these preparatory snapshots were taken at different times.
 
