@@ -260,3 +260,22 @@ The Infisical administrator action is complete; its identity and Kubernetes
 authentication settings are recorded in the
 [administrator handoff](talos-infisical-admin-handoff.md). Continue with the
 next application individually. Do not boot node3 into an installer yet.
+
+Atuin was migrated to the Talos cluster with its existing application config on
+the approved NFS path and a fresh dynamic `nfs-k8s` volume for PostgreSQL. The
+Ubuntu HelmRelease remains suspended. After stopping the Ubuntu Atuin writer, a
+final custom-format `pg_dump` was encrypted outside Git, decrypted for catalog
+verification, and restored with `pg_restore` into the target PostgreSQL 16.15
+instance. The source and target both reported six public tables. Atuin uses the
+unchanged 18.24.4 image and synchronized database credentials.
+
+The Talos Atuin Pod and PostgreSQL are Ready with no restarts. Direct Talos
+ingress and the Ubuntu ingress bridge both return HTTP 200 with the
+`talos-atuin` route marker; HTTP redirects to HTTPS. Eleven healthy samples over
+306 seconds passed. The Ubuntu Atuin Deployment stays at zero, while its old
+PostgreSQL remains available for rollback. Because the target now accepts
+writes, rollback to Ubuntu requires either accepting loss of writes since
+cutover or first exporting and restoring the target database into the source
+PostgreSQL. Do not start both application writers. Keep the ingress bridge and
+suspended Ubuntu release until public traffic no longer depends on Ubuntu
+Traefik.

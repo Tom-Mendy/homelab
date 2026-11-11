@@ -95,6 +95,26 @@
       "keepSuspended": true,
       "singleWriterSharedNfs": true,
       "rollback": "docs/talos-service-migrations.md"
+    },
+    {
+      "namespace": "atuin",
+      "deployment": "atuin",
+      "replicas": 0,
+      "helmRelease": "atuin",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "rollback": "docs/talos-service-migrations.md",
+      "singleWriterSharedNfs": true
+    },
+    {
+      "namespace": "atuin",
+      "deployment": "postgres",
+      "replicas": 0,
+      "helmRelease": "atuin",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "rollback": "docs/talos-service-migrations.md",
+      "logicalRestoreRequired": true
     }
   ]
 }
