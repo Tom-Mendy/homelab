@@ -1,0 +1,7 @@
+{
+  "applications": [
+    "portfolio"
+  ],
+  "automaticImageUpdates": false,
+  "productionTraffic": "requires per-application cutover"
+}
