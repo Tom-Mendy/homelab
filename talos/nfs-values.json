@@ -1,0 +1,26 @@
+{
+  "replicaCount": 1,
+  "nfs": {
+    "server": "10.0.0.11",
+    "path": "/volume1/k8s/talos"
+  },
+  "storageClass": {
+    "create": true,
+    "name": "nfs-k8s",
+    "defaultClass": false,
+    "archiveOnDelete": true,
+    "reclaimPolicy": "Retain",
+    "accessModes": "ReadWriteMany",
+    "volumeBindingMode": "Immediate",
+    "provisionerName": "homelab-talos/nfs-k8s"
+  },
+  "resources": {
+    "requests": {
+      "cpu": "10m",
+      "memory": "64Mi"
+    },
+    "limits": {
+      "memory": "128Mi"
+    }
+  }
+}

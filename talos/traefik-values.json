@@ -1,0 +1,43 @@
+{
+  "deployment": {
+    "replicas": 1
+  },
+  "image": {
+    "registry": "mirror.gcr.io",
+    "repository": "library/traefik",
+    "tag": "v3.7.17@sha256:30ff62491aacdb862ceb8c9edcf2627da638d7deafdd4b6dab32fe34f8aa3e90"
+  },
+  "service": {
+    "annotations": {
+      "metallb.io/loadBalancerIPs": "10.0.0.70"
+    },
+    "spec": {
+      "externalTrafficPolicy": "Local"
+    }
+  },
+  "ingressClass": {
+    "enabled": true,
+    "isDefaultClass": false,
+    "name": "talos-traefik"
+  },
+  "providers": {
+    "kubernetesIngress": {
+      "ingressClass": "talos-traefik"
+    },
+    "kubernetesCRD": {
+      "ingressClass": "talos-traefik"
+    }
+  },
+  "persistence": {
+    "enabled": false
+  },
+  "resources": {
+    "requests": {
+      "cpu": "50m",
+      "memory": "64Mi"
+    },
+    "limits": {
+      "memory": "256Mi"
+    }
+  }
+}

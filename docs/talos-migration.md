@@ -1,8 +1,11 @@
 # Talos migration tracker
 
-Last updated: 2026-11-07. This file is the migration progress record.
-Steps 1 and 2 are complete. Node2 evacuation passed its 30-minute observation.
-Node2 is ready for manual ISO inspection. Talos installation has not started.
+Last updated: 2026-11-11. This file is the migration progress record.
+Steps 1 and 2 are complete. Talos v1.14.5 is installed and bootstrapped on
+node2 (Kubernetes v1.36.6, node Ready). Step 3 foundation validation is
+complete, including Cilium NetworkPolicy enforcement, DNS, isolated NFS,
+MetalLB, HTTPS ingress, and recovery after reboot. Step 4, selective GitOps,
+has a validated restricted bootstrap. Production applications remain on Ubuntu.
 
 Build a separate Talos cluster on node2, migrate applications individually,
 then convert node3 and finally node1. The target is three control-plane nodes
@@ -42,15 +45,39 @@ box means the work was verified, not merely planned.
      their PDBs explicitly. Do not bypass every PDB by default.
    - Verify application access and observe Ubuntu without node2 before erasing it.
    - Rollback before reinstall: restore scheduling on node2 and verify services.
-3. Install Talos on node2. Status: not started.
-   - Confirm the physical installation disk from the ISO before applying config.
-   - Bootstrap the new cluster once. Install and validate CNI, DNS, nfs-k8s,
-     ingress, and required operators separately with disposable test data.
-   - Use an API endpoint that reaches Talos only. Allocate non-overlapping
+3. Install Talos on node2. Status: foundation complete.
+   - [x] Confirm the physical installation disk from the ISO before applying
+     config. Inspection on 2026-11-08: NIC `enp0s31f6`, MAC
+     `10:7b:44:18:50:de`, disk Kingston SNVS250G serial
+     `50026B73811E4F0E`. Evidence in the private
+     `20261108T1052-node2-final/iso-inspection.json`.
+   - [x] Install Talos v1.14.5 with `wipe: true` (approved) via
+     UnattendedInstallConfig; the initial `disk.dev_path` selector matched no
+     disk and was corrected in the node config to
+     `disk.serial == "50026B73811E4F0E" && disk.transport == "nvme"`.
+   - [x] Bootstrap the new cluster once; node2 is Ready on Kubernetes v1.36.6
+     with etcd member `node2`, flannel/kube-proxy/CoreDNS running, and the
+     10.0.0.65 API VIP announced. The real kubeconfig was retrieved into a
+     private file with context `talos-homelab`, endpoint
+     `https://talos-api.home.tom-mendy.com:6443`, and validated (TLS SAN,
+     `/readyz`). Ubuntu access files and the default context are unchanged.
+   - [x] Validate Cilium 1.20.4, DNS, NetworkPolicy deny/allow, isolated
+     nfs-k8s persistence, MetalLB, and HTTPS ingress with disposable test data.
+     Flannel was replaced; kube-proxy remains. Application operators will be
+     introduced individually with selective GitOps. See the
+     [foundation validation record](talos-foundation-validation.md).
+   - [x] Use an API endpoint that reaches Talos only. Allocate non-overlapping
      MetalLB pools and ingress addresses across both clusters.
-   - Reboot node2 and verify network, NFS permissions, and persistence before
-     migrating production data. A one-member control plane has no failover.
-4. Prepare selective GitOps. Status: not started.
+   - [x] Reboot node2 and verify network, NFS permissions, and persistence
+     before migrating production data. A one-member control plane has no
+     failover.
+4. Prepare selective GitOps. Status: restricted bootstrap complete.
+   - [x] Install pinned Flux without image automation and validate a dedicated
+     read-only Forgejo source, commit pin, artifact filter, and restricted RBAC.
+   - [x] Reconcile the isolated validation-only root from the migration branch.
+     See [selective GitOps](talos-selective-gitops.md).
+   - [ ] Prepare application-specific credentials, operators, target ingress,
+     and the first production traffic cutover.
    - Use an explicit Talos application allowlist. Do not reconcile the complete
      production application tree into the new cluster.
    - Prepare an external Git bootstrap source or temporary reachable Ubuntu
@@ -219,14 +246,16 @@ pinning, immutable cutover images, and publisher controls remain window gates.
 Step 1 completed during the explicitly authorized maintenance execution.
 See [the node2 release record](talos-node2-release.md) for the isolated access
 files, final Git baseline, CI and workspace holds, six database switchovers,
-17 workload moves, and rollback state. Node2 is cordoned, excluded from VIP
-announcements, and its kubelet is stopped. No disks were changed. The accepted
+17 workload moves, and rollback state. At that pre-installation checkpoint,
+node2 was cordoned, excluded from VIP announcements, and its kubelet was
+stopped. Its disks were still untouched. The accepted
 observation lasted 1,829.9 seconds, from 18:18:28 to 18:48:58 UTC, with every
 sample healthy. The workstation sleep gap was excluded and the healthy timer
 restarted after wake. Node1 and node3 are Ready; all retained services and six
 database primaries are on node3. Two daily backup schedules are restored; the
-capacity and application-update holds remain in place. The next action is the
-physical ISO boot, disk/NIC inspection, and manual Talos installation in step 3.
+capacity and application-update holds remain in place. Talos installation and
+foundation checks subsequently completed on
+2026-11-08. The next action is selective GitOps preparation in step 4.
 Repeat each application's stopped-writer backup at its
 actual cutover; these preparatory snapshots were taken at different times.
 

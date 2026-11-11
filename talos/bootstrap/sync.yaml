@@ -1,0 +1,36 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: talos-bootstrap
+  namespace: flux-system
+spec:
+  interval: 5m
+  timeout: 60s
+  url: ssh://git@10.0.0.62/Tom-Mendy/homelab.git
+  ref:
+    branch: migration/talos-bootstrap-20261111
+    commit: 8ab8a9cea3955ba5418ac2c2c6fff7f59af0e7e8
+  secretRef:
+    name: talos-forgejo-readonly
+  ignore: |
+    /*
+    !/talos/
+    /talos/*
+    !/talos/gitops/
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: talos-bootstrap
+  namespace: flux-system
+spec:
+  interval: 5m
+  retryInterval: 30s
+  timeout: 2m
+  sourceRef:
+    kind: GitRepository
+    name: talos-bootstrap
+  path: ./talos/gitops/root
+  serviceAccountName: talos-bootstrap-reconciler
+  prune: false
+  wait: true
