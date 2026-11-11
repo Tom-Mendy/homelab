@@ -65,6 +65,16 @@
       "keepSuspended": true,
       "singleWriterSharedNfs": true,
       "rollback": "docs/talos-service-migrations.md"
+    },
+    {
+      "namespace": "media",
+      "deployment": "prowlarr",
+      "replicas": 0,
+      "helmRelease": "media",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "singleWriterSharedNfs": true,
+      "rollback": "docs/talos-service-migrations.md"
     }
   ]
 }

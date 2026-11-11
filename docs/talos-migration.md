@@ -85,7 +85,7 @@ box means the work was verified, not merely planned.
    - Replace temporary cross-cluster service dependencies with reachable
      endpoints. Cluster-local service names do not span clusters.
 5. Migrate applications individually. Status: Portfolio, Cinny, Navidrome,
-   SearXNG, Homepage, Radarr, and Sonarr complete.
+   SearXNG, Homepage, Radarr, Sonarr, and Prowlarr complete.
    - [x] Move Cinny with its unchanged image and homeserver, verify routing
      rollback, and observe public HTML/config plus Matrix discovery.
    - [x] Move Navidrome after native SQLite/file recovery checks, preserve
@@ -95,6 +95,10 @@ box means the work was verified, not merely planned.
      connected Swiss egress and five-minute routing stability. See the
      [admin handoff](talos-infisical-admin-handoff.md) and
      [service execution record](talos-service-migrations.md).
+   - [x] Move Prowlarr with the stopped-writer SQLite snapshot, verify both
+     Radarr/Sonarr application connections, preserve its login route, and pass
+     a five-minute observation. Talos-wide HTTP-to-HTTPS redirection must be
+     validated before external traffic bypasses Ubuntu Traefik.
    - [ ] Continue remaining services individually. See the
      [service execution record](talos-service-migrations.md).
    - [x] Move Homepage with the unchanged image and configuration; preserve

@@ -14,6 +14,7 @@ reviewed and explicitly selected.
 | Homepage | Migrated and observed | Stateless config on Talos; Ubuntu ingress bridges to Talos .70 |
 | Radarr | Migrated and observed | Existing Synology config and media paths mounted by Talos; Ubuntu ingress bridges to Talos .70 |
 | Sonarr | Migrated and observed | Existing Synology config, downloads, and series paths mounted by Talos; Ubuntu ingress bridges to Talos .70 |
+| Prowlarr | Migrated and observed | Existing Synology config on Talos; Ubuntu ingress bridges to Talos .70; Radarr and Sonarr app connections validated |
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
@@ -100,6 +101,23 @@ A browser-authenticated session was not exercised. Roll back by setting the
 Talos Deployment to zero and waiting for its Pod to exit, restoring the source
 Sonarr Ingress snapshot, then scaling Ubuntu Sonarr to one. Do not run both
 Sonarr writers against the shared config path.
+
+Prowlarr now runs on Talos using the existing Synology configuration path and
+its pinned production image. Its final stopped-writer snapshot is encrypted;
+archive decryption and SQLite quick checks for `prowlarr.db` and `logs.db`
+passed. Ubuntu was stopped before the Talos writer started. Prowlarr API
+`applications/testall` returned two valid connections to Talos Radarr and Sonarr.
+Ten checks over 302 seconds passed: the Talos and Ubuntu-bridged HTTPS routes
+reached the Talos target, its login page returned successfully, HTTP through
+Ubuntu redirected to HTTPS, and the target had no restarts or source Pod.
+Prowlarr uses its own login, so no Authentik browser session applies. Its
+application redirects to its own HTTP login path; while public traffic still
+passes through Ubuntu, Ubuntu Traefik enforces HTTPS. Before moving external
+HTTP traffic directly to Talos ingress, enable and validate a Talos-wide
+HTTP-to-HTTPS redirect. Roll back by stopping the Talos Deployment, restoring
+the source Ingress snapshot, then starting Ubuntu Prowlarr. Never run both
+writers against the shared config path. Keep the Ubuntu bridge and suspended
+release until traffic no longer uses Ubuntu Traefik.
 
 To roll back, suspend the Talos SearXNG Kustomization and stop its Deployment,
 then wait until its Pod is gone before starting the Ubuntu Deployment against
