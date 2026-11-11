@@ -1,0 +1,86 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "nzbget",
+    "namespace": "nzbget",
+    "labels": { "app": "nzbget" }
+  },
+  "spec": {
+    "replicas": 0,
+    "progressDeadlineSeconds": 600,
+    "revisionHistoryLimit": 10,
+    "selector": { "matchLabels": { "app": "nzbget" } },
+    "strategy": { "type": "Recreate" },
+    "template": {
+      "metadata": { "labels": { "app": "nzbget" } },
+      "spec": {
+        "automountServiceAccountToken": false,
+        "imagePullSecrets": [{ "name": "media-harbor-pull" }],
+        "dnsPolicy": "None",
+        "dnsConfig": { "nameservers": ["127.0.0.1"] },
+        "initContainers": [
+          {
+            "name": "nymvpn-state-init",
+            "image": "harbor.home.tom-mendy.com/homelab/nymvpn-sidecar:2026.12.4-2@sha256:e150c901b5750e9dadfaacd5808a2ae6bdcbb0012e0a5a2685c32f7bb85e9c0e",
+            "imagePullPolicy": "IfNotPresent",
+            "command": ["/bin/sh", "-c", "mkdir -p /nym/config /nym/state"],
+            "volumeMounts": [{ "name": "nymvpn-state", "mountPath": "/nym" }]
+          },
+          {
+            "name": "nymvpn",
+            "image": "harbor.home.tom-mendy.com/homelab/nymvpn-sidecar:2026.12.4-2@sha256:e150c901b5750e9dadfaacd5808a2ae6bdcbb0012e0a5a2685c32f7bb85e9c0e",
+            "imagePullPolicy": "IfNotPresent",
+            "restartPolicy": "Always",
+            "securityContext": { "capabilities": { "add": ["NET_ADMIN"] } },
+            "env": [
+              { "name": "NYMVPN_ENTRY_COUNTRY", "value": "FR" },
+              { "name": "NYMVPN_EXIT_COUNTRY", "value": "CH" },
+              { "name": "NYMVPN_POD_CIDR", "value": "10.244.0.0/16" }
+            ],
+            "startupProbe": { "exec": { "command": ["/usr/local/bin/nymvpn-entrypoint", "startup"] }, "failureThreshold": 60, "periodSeconds": 5 },
+            "readinessProbe": { "exec": { "command": ["/usr/local/bin/nymvpn-entrypoint", "startup"] }, "periodSeconds": 10 },
+            "livenessProbe": { "exec": { "command": ["/usr/local/bin/nymvpn-entrypoint", "startup"] }, "failureThreshold": 3, "periodSeconds": 20 },
+            "volumeMounts": [
+              { "name": "tun", "mountPath": "/dev/net/tun" },
+              { "name": "nymvpn-state", "mountPath": "/etc/nym", "subPath": "config" },
+              { "name": "nymvpn-state", "mountPath": "/var/lib/nym-vpnd", "subPath": "state" },
+              { "name": "nymvpn-access-code", "mountPath": "/run/secrets/nymvpn", "readOnly": true }
+            ]
+          }
+        ],
+        "containers": [
+          {
+            "name": "nzbget",
+            "image": "lscr.io/linuxserver/nzbget:26.3.20260925@sha256:ac88c1293bec960e287bdaaca174020fab4c0f179f739e26f500d3def8015ed7",
+            "imagePullPolicy": "IfNotPresent",
+            "env": [
+              { "name": "PUID", "value": "1023" },
+              { "name": "PGID", "value": "100" },
+              { "name": "TZ", "value": "Europe/Paris" }
+            ],
+            "ports": [{ "containerPort": 6789, "name": "http", "protocol": "TCP" }],
+            "volumeMounts": [
+              { "name": "config", "mountPath": "/config" },
+              { "name": "downloads", "mountPath": "/data/downloads" }
+            ]
+          }
+        ],
+        "volumes": [
+          { "name": "config", "persistentVolumeClaim": { "claimName": "nzbget-config-pvc" } },
+          { "name": "nymvpn-state", "persistentVolumeClaim": { "claimName": "nzbget-nymvpn-pvc" } },
+          { "name": "downloads", "persistentVolumeClaim": { "claimName": "nzbget-downloads-pvc" } },
+          { "name": "tun", "hostPath": { "path": "/dev/net/tun", "type": "CharDevice" } },
+          {
+            "name": "nymvpn-access-code",
+            "secret": {
+              "secretName": "nymvpn-credentials",
+              "defaultMode": 256,
+              "items": [{ "key": "NYM_ACCESS_CODE", "path": "access-code" }]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

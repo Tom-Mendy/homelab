@@ -1,0 +1,83 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolume",
+      "metadata": {
+        "name": "nzbget-config-pv",
+        "labels": { "migration": "talos-nzbget" }
+      },
+      "spec": {
+        "accessModes": ["ReadWriteOnce"],
+        "capacity": { "storage": "5Gi" },
+        "claimRef": {
+          "apiVersion": "v1",
+          "kind": "PersistentVolumeClaim",
+          "name": "nzbget-config-pvc",
+          "namespace": "nzbget"
+        },
+        "mountOptions": ["nfsvers=4.1"],
+        "nfs": {
+          "path": "/volume1/k8s/media-nzbget-config-pvc-pvc-e119f4ef-5a79-4ea5-aeb9-2751d913241b",
+          "server": "10.0.0.11"
+        },
+        "persistentVolumeReclaimPolicy": "Retain",
+        "storageClassName": "nfs-k8s",
+        "volumeMode": "Filesystem"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolume",
+      "metadata": {
+        "name": "nzbget-nymvpn-pv",
+        "labels": { "migration": "talos-nzbget" }
+      },
+      "spec": {
+        "accessModes": ["ReadWriteOnce"],
+        "capacity": { "storage": "1Gi" },
+        "claimRef": {
+          "apiVersion": "v1",
+          "kind": "PersistentVolumeClaim",
+          "name": "nzbget-nymvpn-pvc",
+          "namespace": "nzbget"
+        },
+        "mountOptions": ["nfsvers=4.1"],
+        "nfs": {
+          "path": "/volume1/k8s/media-nzbget-nymvpn-pvc-pvc-ad777bd2-99d2-4af8-9ca3-3c1c6e3275e3",
+          "server": "10.0.0.11"
+        },
+        "persistentVolumeReclaimPolicy": "Retain",
+        "storageClassName": "nfs-k8s",
+        "volumeMode": "Filesystem"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolume",
+      "metadata": {
+        "name": "nzbget-downloads-pv",
+        "labels": { "migration": "talos-nzbget" }
+      },
+      "spec": {
+        "accessModes": ["ReadWriteMany"],
+        "capacity": { "storage": "2Ti" },
+        "nfs": {
+          "path": "/volume1/Downloads",
+          "server": "10.0.0.11"
+        },
+        "persistentVolumeReclaimPolicy": "Retain",
+        "storageClassName": "nfs-k8s",
+        "volumeMode": "Filesystem",
+        "claimRef": {
+          "apiVersion": "v1",
+          "kind": "PersistentVolumeClaim",
+          "name": "nzbget-downloads-pvc",
+          "namespace": "nzbget"
+        }
+      }
+    }
+  ]
+}
