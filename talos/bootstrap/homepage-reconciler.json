@@ -130,7 +130,7 @@
       "subjects": [
         {
           "kind": "ServiceAccount",
-          "name": "talos-searxng-reconciler",
+          "name": "talos-homepage-reconciler",
           "namespace": "flux-system"
         }
       ]
