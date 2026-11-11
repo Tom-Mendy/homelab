@@ -10,7 +10,7 @@ reviewed and explicitly selected.
 | Portfolio | Migrated and observed | Public Pangolin route to Talos .70 |
 | Cinny | Migrated and observed | Public chat route to Talos .70; Matrix backend remains Ubuntu |
 | Navidrome | Migrated and observed | Single writer on existing Synology paths; Ubuntu ingress bridge retained |
-| SearXNG | Migrated and observed | NymVPN state kept on the same Synology NFS path; Ubuntu ingress bridges to Talos .70 |
+| SearXNG | Migrated and observed | NymVPN state kept on the same Synology NFS path; Ubuntu ingress and in-cluster consumer bridges reach Talos .70 |
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
@@ -26,6 +26,17 @@ seconds of observation (31 samples). One request immediately after the
 Ingress backend patch returned 503 while routing updated; subsequent checks
 and the full observation window passed. Ubuntu SearXNG remains at zero
 replicas and its HelmRelease remains suspended.
+
+OpenWebUI in the Ubuntu `ollama` namespace still uses the cluster-local URL
+`http://searxng.searxng.svc.cluster.local:8080/search`. After the SearXNG
+cutover, that URL failed because Kubernetes Service DNS is cluster-scoped. The
+Ubuntu Service now has no selector and an EndpointSlice targets Talos ingress
+`.70:80`; a second Talos Ingress host rule accepts the unchanged service FQDN.
+The actual OpenWebUI pod returned HTTP 200 JSON from its configured URL after
+the bridge. Keep this bridge until OpenWebUI moves, then remove the Ubuntu
+selectorless Service/EndpointSlice and the internal Talos host rule in the same
+reviewed Git change. The original Ubuntu Service selector and port are in the
+private rollback snapshot `searxng/source-service-before-internal-bridge.json`.
 
 To roll back, suspend the Talos SearXNG Kustomization and stop its Deployment,
 then wait until its Pod is gone before starting the Ubuntu Deployment against
