@@ -51,7 +51,8 @@ OpenWebUI-to-SearXNG connectivity also passed during observation. Roll back by
 restoring the Ubuntu Ingress backend from the private snapshot
 `homepage/ubuntu-ingress-before-cutover.json` and scaling the Ubuntu Deployment
 to one; keep the Talos copy available until the old route is healthy. Remove
-the Ubuntu Talos-bridge Service/EndpointSlice after the migration is accepted.
+the Ubuntu Talos-bridge Service/EndpointSlice only after the hostname no longer
+routes through Ubuntu Traefik.
 
 To roll back, suspend the Talos SearXNG Kustomization and stop its Deployment,
 then wait until its Pod is gone before starting the Ubuntu Deployment against
