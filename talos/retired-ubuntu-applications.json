@@ -17,6 +17,15 @@
       "helmRelease": "matrix",
       "helmReleaseNamespace": "flux-system",
       "keepSuspended": true
+    },
+    {
+      "namespace": "navidrome",
+      "deployment": "navidrome",
+      "replicas": 0,
+      "helmRelease": "navidrome",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "singleWriterSharedNfs": true
     }
   ]
 }

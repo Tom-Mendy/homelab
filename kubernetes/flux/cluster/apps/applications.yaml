@@ -234,6 +234,8 @@ kind: HelmRelease
 metadata:
   name: navidrome
 spec:
+  # Migrated to Talos; retain the stopped Ubuntu rollback release.
+  suspend: true
   interval: 30m
   timeout: 10m
   releaseName: navidrome
