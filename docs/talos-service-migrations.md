@@ -298,3 +298,30 @@ redirecting to HTTPS. Update DHCP and any statically configured clients to use
 the Ubuntu Deployment, waiting for it to become Ready, restoring the Service
 selector, and deleting the migration EndpointSlice. Blocky has no persistent
 application data.
+
+Grafana was moved to Talos with the exact running image digest and the existing
+SQLite database on the same Synology NFS path. Its static PV uses `nfs-k8s`,
+Retain, and no node affinity. The final stopped-writer archive decrypted and
+passed a full tar readback; SQLite integrity passed with 95 application tables.
+The Talos read-only NFS preflight returned the same integrity result and table
+count before Grafana started. The Talos config keeps the existing dashboards
+and OIDC settings. Its Prometheus datasource uses the HTTPS Prometheus ingress
+because the Ubuntu service DNS name is cluster-local; an HTTPS API probe from a
+Talos Pod returned HTTP 200.
+
+Public ingress remains on Ubuntu `.60` and forwards through a temporary
+selectorless Service to Talos Grafana `.72:3000`. The Ubuntu Deployment is at
+zero and its HelmRelease remains suspended. Talos `/api/health` returned 200;
+the public response matched it, the login route entered Grafana's generic OIDC
+flow, and HTTP redirected to HTTPS. Eleven checks over 308 seconds passed with
+no target restarts. An API request using the copied Grafana admin Secret was
+rejected, so no admin API or authenticated datasource-health check is claimed.
+Please verify the browser OIDC login and that dashboards display current
+Prometheus data. The copied OIDC Secret is not Infisical-synced; arrange that
+source before rotating or rebuilding the credential.
+
+To roll back, stop Talos Grafana, start the Ubuntu Deployment against the same
+NFS database, wait for it to become Ready, restore the Ubuntu Service selector,
+and remove the temporary EndpointSlice and Talos `.72` LoadBalancer. Never run
+both Grafana writers at once. Remove the Ubuntu ingress and backend bridge only
+after DNS and ingress clients use Talos directly.

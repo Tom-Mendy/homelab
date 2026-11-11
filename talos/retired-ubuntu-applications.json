@@ -130,6 +130,20 @@
         "talosAddress": "10.0.0.71",
         "removeAfter": "DHCP and statically configured DNS clients point directly to Talos"
       }
+    },
+    {
+      "namespace": "grafana",
+      "deployment": "grafana",
+      "replicas": 0,
+      "helmRelease": "grafana",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "singleWriterSharedNfs": true,
+      "rollback": "docs/talos-service-migrations.md",
+      "temporaryServiceBridge": {
+        "talosAddress": "10.0.0.72:3000",
+        "removeAfter": "Ubuntu ingress no longer fronts Grafana"
+      }
     }
   ]
 }

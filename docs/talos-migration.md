@@ -110,6 +110,11 @@ box means the work was verified, not merely planned.
      pass a five-minute observation. Update DHCP/static DNS clients to `.71`
      before removing that bridge. See the
      [service execution record](talos-service-migrations.md).
+   - [x] Move Grafana with its stopped-writer SQLite snapshot and same NFS
+     database path; keep Prometheus reachable over HTTPS, bridge public ingress,
+     and pass a five-minute observation.
+   - [ ] Verify Grafana OIDC login and dashboard queries in a browser. Atuin
+     client synchronization also needs an end-to-end check.
    - [ ] Continue remaining services individually. See the
      [service execution record](talos-service-migrations.md).
    - [x] Move Homepage with the unchanged image and configuration; preserve
