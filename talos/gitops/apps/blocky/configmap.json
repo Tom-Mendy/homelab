@@ -1,0 +1,11 @@
+{
+  "apiVersion": "v1",
+  "kind": "ConfigMap",
+  "metadata": {
+    "name": "blocky-config",
+    "namespace": "blocky"
+  },
+  "data": {
+    "config.yml": "upstreams:\n  groups:\n    default:\n      - 9.9.9.9\n      - 2620:fe::fe\n      - 1.1.1.2\n      - 2606:4700:4700::1112\n      - 1.1.1.1\n      - 2606:4700:4700::1111\n      - 8.8.8.8\n      - 10.0.0.1\n      - 2001:861:5285:37e3:ca9e:43ff:fedf:9926\n      - 192.168.1.254\ncustomDNS:\n  mapping:\n    prowlarr.home.tom-mendy.com: 10.0.0.60\n    sonarr.tom-mendy.com: 10.0.0.60\n    radarr.tom-mendy.com: 10.0.0.60\n    torrent.tom-mendy.com: 10.0.0.60\n    nzbget.home.tom-mendy.com: 10.0.0.60\n    blocky.home.tom-mendy.com: 10.0.0.60\n    ollama.home.tom-mendy.com: 10.0.0.60\n    openwebui.home.tom-mendy.com: 10.0.0.60\n    searxng.home.tom-mendy.com: 10.0.0.60\n    navidrome.home.tom-mendy.com: 10.0.0.60\n    vaultwarden.home.tom-mendy.com: 10.0.0.60\n    homepage.home.tom-mendy.com: 10.0.0.60\n    prometheus.home.tom-mendy.com: 10.0.0.60\n    forgejo.tom-mendy.com: 10.0.0.60\n    forgejo.home.tom-mendy.com: 10.0.0.60\n    coder.tom-mendy.com: 10.0.0.60\n    grafana.home.tom-mendy.com: 10.0.0.60\n    atuin.home.tom-mendy.com: 10.0.0.60\n    infisical.home.tom-mendy.com: 10.0.0.60\n    flux.home.tom-mendy.com: 10.0.0.60\n    harbor.home.tom-mendy.com: 10.0.0.60\n    suivi-stage.home.tom-mendy.com: 10.0.0.60\n    authentik.tom-mendy.com: 10.0.0.60\n    matrix.tom-mendy.com: 10.0.0.60\n    chat.tom-mendy.com: 10.0.0.60\nblocking:\n  denylists:\n    strict:\n      - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro-onlydomains.txt\n  clientGroupsBlock:\n    default:\n      - strict\nprometheus:\n  enable: true\n  path: /metrics\nports:\n  dns: 53\n  http: 4000\n"
+  }
+}

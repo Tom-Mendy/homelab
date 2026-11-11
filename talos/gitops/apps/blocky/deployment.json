@@ -1,0 +1,83 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "blocky",
+    "namespace": "blocky",
+    "labels": {
+      "app": "blocky"
+    }
+  },
+  "spec": {
+    "replicas": 1,
+    "strategy": {
+      "type": "Recreate"
+    },
+    "selector": {
+      "matchLabels": {
+        "app": "blocky"
+      }
+    },
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "blocky"
+        },
+        "annotations": {
+          "prometheus.io/scrape": "true",
+          "prometheus.io/path": "/metrics",
+          "prometheus.io/port": "4000"
+        }
+      },
+      "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+          {
+            "name": "blocky",
+            "image": "spx01/blocky:v0.35.0@sha256:4f165b63db0d76c96ecc47c7a8f57caeedc003a912bdce29abb0e283ce02e16b",
+            "imagePullPolicy": "IfNotPresent",
+            "ports": [
+              {
+                "containerPort": 53,
+                "name": "dns",
+                "protocol": "UDP"
+              },
+              {
+                "containerPort": 4000,
+                "name": "http",
+                "protocol": "TCP"
+              }
+            ],
+            "readinessProbe": {
+              "tcpSocket": {
+                "port": 4000
+              },
+              "periodSeconds": 10
+            },
+            "livenessProbe": {
+              "tcpSocket": {
+                "port": 4000
+              },
+              "periodSeconds": 20
+            },
+            "volumeMounts": [
+              {
+                "name": "config",
+                "mountPath": "/app/config.yml",
+                "subPath": "config.yml"
+              }
+            ]
+          }
+        ],
+        "volumes": [
+          {
+            "name": "config",
+            "configMap": {
+              "name": "blocky-config"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
