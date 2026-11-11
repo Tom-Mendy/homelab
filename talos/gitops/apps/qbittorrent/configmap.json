@@ -6,6 +6,6 @@
   "kind": "ConfigMap",
   "metadata": {
     "name": "qbittorrent-sso",
-    "namespace": "media"
+    "namespace": "qbittorrent"
   }
 }

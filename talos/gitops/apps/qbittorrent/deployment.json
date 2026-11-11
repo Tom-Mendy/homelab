@@ -3,14 +3,14 @@
   "kind": "Deployment",
   "metadata": {
     "name": "qbittorrent",
-    "namespace": "media",
+    "namespace": "qbittorrent",
     "labels": {
       "app": "qbittorrent"
     }
   },
   "spec": {
     "progressDeadlineSeconds": 600,
-    "replicas": 1,
+    "replicas": 0,
     "revisionHistoryLimit": 10,
     "selector": {
       "matchLabels": {
@@ -234,7 +234,7 @@
           {
             "name": "downloads",
             "persistentVolumeClaim": {
-              "claimName": "media-downloads-pvc"
+              "claimName": "qbittorrent-downloads-pvc"
             }
           },
           {

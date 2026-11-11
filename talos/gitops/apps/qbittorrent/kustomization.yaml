@@ -5,6 +5,7 @@ resources:
   - persistentvolumeclaims.json
   - deployment.json
   - service.json
+  - media-service-alias.json
   - ingress.json
   - ingress-secure.json
   - route-proof.json

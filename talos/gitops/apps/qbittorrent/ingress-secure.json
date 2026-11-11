@@ -3,7 +3,7 @@
   "kind": "Ingress",
   "metadata": {
     "name": "qbittorrent-secure",
-    "namespace": "media",
+    "namespace": "qbittorrent",
     "annotations": {
       "traefik.ingress.kubernetes.io/router.entrypoints": "websecure",
       "traefik.ingress.kubernetes.io/router.middlewares": "media-qbittorrent-route-proof@kubernetescrd,media-qbittorrent-authentik@kubernetescrd"

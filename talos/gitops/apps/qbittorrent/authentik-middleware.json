@@ -3,7 +3,7 @@
   "kind": "Middleware",
   "metadata": {
     "name": "qbittorrent-authentik",
-    "namespace": "media"
+    "namespace": "qbittorrent"
   },
   "spec": {
     "forwardAuth": {

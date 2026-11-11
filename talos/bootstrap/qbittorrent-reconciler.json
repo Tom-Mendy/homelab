@@ -15,7 +15,7 @@
       "kind": "Role",
       "metadata": {
         "name": "talos-qbittorrent-reconciler",
-        "namespace": "media"
+        "namespace": "qbittorrent"
       },
       "rules": [
         {
@@ -121,17 +121,17 @@
       "kind": "RoleBinding",
       "metadata": {
         "name": "talos-qbittorrent-reconciler",
-        "namespace": "media"
+        "namespace": "qbittorrent"
       },
       "roleRef": {
         "apiGroup": "rbac.authorization.k8s.io",
         "kind": "Role",
-        "name": "talos-prowlarr-reconciler"
+        "name": "talos-qbittorrent-reconciler"
       },
       "subjects": [
         {
           "kind": "ServiceAccount",
-          "name": "talos-qbittorrent-reconciler",
+          "name": "talos-prowlarr-reconciler",
           "namespace": "flux-system"
         }
       ]
@@ -153,16 +153,64 @@
         },
         "path": "./talos/gitops/apps/qbittorrent",
         "serviceAccountName": "talos-prowlarr-reconciler",
-        "prune": false,
+        "prune": true,
         "healthChecks": [
           {
             "apiVersion": "apps/v1",
             "kind": "Deployment",
             "name": "qbittorrent",
-            "namespace": "media"
+            "namespace": "qbittorrent"
           }
-        ]
+        ],
+        "wait": true
       }
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "Role",
+      "metadata": {
+        "name": "talos-qbittorrent-media-alias",
+        "namespace": "media"
+      },
+      "rules": [
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "services"
+          ],
+          "verbs": [
+            "get",
+            "list",
+            "watch",
+            "create",
+            "update",
+            "patch",
+            "delete"
+          ]
+        }
+      ]
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "RoleBinding",
+      "metadata": {
+        "name": "talos-qbittorrent-media-alias",
+        "namespace": "media"
+      },
+      "roleRef": {
+        "apiGroup": "rbac.authorization.k8s.io",
+        "kind": "Role",
+        "name": "talos-qbittorrent-media-alias"
+      },
+      "subjects": [
+        {
+          "kind": "ServiceAccount",
+          "name": "talos-qbittorrent-reconciler",
+          "namespace": "flux-system"
+        }
+      ]
     }
   ]
 }

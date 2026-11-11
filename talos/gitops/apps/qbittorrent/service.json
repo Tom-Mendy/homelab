@@ -3,7 +3,7 @@
   "kind": "Service",
   "metadata": {
     "name": "qbittorrent",
-    "namespace": "media"
+    "namespace": "qbittorrent"
   },
   "spec": {
     "ports": [

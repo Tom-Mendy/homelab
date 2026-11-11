@@ -3,7 +3,7 @@
   "kind": "Middleware",
   "metadata": {
     "name": "qbittorrent-route-proof",
-    "namespace": "media"
+    "namespace": "qbittorrent"
   },
   "spec": {
     "headers": {

@@ -7,7 +7,7 @@
       "kind": "PersistentVolumeClaim",
       "metadata": {
         "name": "qbittorrent-config-pvc",
-        "namespace": "media",
+        "namespace": "qbittorrent",
         "labels": {
           "migration": "talos-qbittorrent"
         }
@@ -23,7 +23,7 @@
         },
         "storageClassName": "nfs-k8s",
         "volumeMode": "Filesystem",
-        "volumeName": "qbittorrent-config-talos-pv"
+        "volumeName": "qbittorrent-config-qb-pv"
       }
     },
     {
@@ -31,7 +31,7 @@
       "kind": "PersistentVolumeClaim",
       "metadata": {
         "name": "qbittorrent-nymvpn-pvc",
-        "namespace": "media",
+        "namespace": "qbittorrent",
         "labels": {
           "migration": "talos-qbittorrent"
         }
@@ -47,7 +47,30 @@
         },
         "storageClassName": "nfs-k8s",
         "volumeMode": "Filesystem",
-        "volumeName": "qbittorrent-nymvpn-talos-pv"
+        "volumeName": "qbittorrent-nymvpn-qb-pv"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "qbittorrent-downloads-pvc",
+        "namespace": "qbittorrent",
+        "labels": {
+          "migration": "talos-qbittorrent"
+        }
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteMany"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "2Ti"
+          }
+        },
+        "storageClassName": "nfs-k8s",
+        "volumeName": "qbittorrent-downloads-qb-pv"
       }
     }
   ]
