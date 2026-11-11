@@ -6,7 +6,7 @@
     "namespace": "media",
     "annotations": {
       "traefik.ingress.kubernetes.io/router.entrypoints": "websecure",
-      "traefik.ingress.kubernetes.io/router.middlewares": "media-authentik@kubernetescrd,media-radarr-route-proof@kubernetescrd"
+      "traefik.ingress.kubernetes.io/router.middlewares": "media-authentik-media@kubernetescrd,media-radarr-route-proof@kubernetescrd"
     }
   },
   "spec": {

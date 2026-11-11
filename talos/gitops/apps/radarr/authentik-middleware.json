@@ -2,7 +2,7 @@
   "apiVersion": "traefik.io/v1alpha1",
   "kind": "Middleware",
   "metadata": {
-    "name": "radarr-authentik",
+    "name": "authentik-media",
     "namespace": "media"
   },
   "spec": {
