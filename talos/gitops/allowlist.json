@@ -2,7 +2,8 @@
   "applications": [
     "portfolio",
     "cinny",
-    "navidrome"
+    "navidrome",
+    "searxng"
   ],
   "automaticImageUpdates": false,
   "productionTraffic": "requires per-application cutover"
