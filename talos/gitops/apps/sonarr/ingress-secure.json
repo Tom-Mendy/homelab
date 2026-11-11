@@ -1,0 +1,44 @@
+{
+  "apiVersion": "networking.k8s.io/v1",
+  "kind": "Ingress",
+  "metadata": {
+    "name": "sonarr-secure",
+    "namespace": "media",
+    "annotations": {
+      "traefik.ingress.kubernetes.io/router.entrypoints": "websecure",
+      "traefik.ingress.kubernetes.io/router.middlewares": "media-sonarr-route-proof@kubernetescrd,media-authentik-sonarr@kubernetescrd"
+    }
+  },
+  "spec": {
+    "ingressClassName": "talos-traefik",
+    "rules": [
+      {
+        "host": "sonarr.tom-mendy.com",
+        "http": {
+          "paths": [
+            {
+              "path": "/",
+              "pathType": "Prefix",
+              "backend": {
+                "service": {
+                  "name": "sonarr",
+                  "port": {
+                    "number": 8989
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "tls": [
+      {
+        "hosts": [
+          "sonarr.tom-mendy.com"
+        ],
+        "secretName": "sonarr-tls"
+      }
+    ]
+  }
+}

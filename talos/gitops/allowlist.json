@@ -5,7 +5,8 @@
     "navidrome",
     "portfolio",
     "radarr",
-    "searxng"
+    "searxng",
+    "sonarr"
   ],
   "automaticImageUpdates": false,
   "productionTraffic": "requires per-application cutover"

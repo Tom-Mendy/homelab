@@ -1,0 +1,111 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "sonarr",
+    "namespace": "media"
+  },
+  "spec": {
+    "progressDeadlineSeconds": 600,
+    "replicas": 0,
+    "revisionHistoryLimit": 10,
+    "selector": {
+      "matchLabels": {
+        "app": "sonarr"
+      }
+    },
+    "strategy": {
+      "type": "Recreate"
+    },
+    "template": {
+      "metadata": {
+        "annotations": {
+          "homelab.tom-mendy.com/node2-release": "2026-11-07T17:31:27.555999+00:00"
+        },
+        "labels": {
+          "app": "sonarr"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "env": [
+              {
+                "name": "PUID",
+                "value": "1023"
+              },
+              {
+                "name": "PGID",
+                "value": "100"
+              },
+              {
+                "name": "TZ",
+                "value": "Europe/Paris"
+              },
+              {
+                "name": "SONARR__AUTH__METHOD",
+                "value": "External"
+              },
+              {
+                "name": "SONARR__AUTH__REQUIRED",
+                "value": "Enabled"
+              }
+            ],
+            "image": "lscr.io/linuxserver/sonarr@sha256:f247545d23ba8b233d6604575347e48a623fe6ad75dda02348bf81917f3b5c06",
+            "imagePullPolicy": "IfNotPresent",
+            "name": "sonarr",
+            "ports": [
+              {
+                "containerPort": 8989,
+                "name": "http",
+                "protocol": "TCP"
+              }
+            ],
+            "resources": {},
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "volumeMounts": [
+              {
+                "mountPath": "/config",
+                "name": "config"
+              },
+              {
+                "mountPath": "/data/downloads",
+                "name": "downloads"
+              },
+              {
+                "mountPath": "/data/media/tv",
+                "name": "series"
+              }
+            ]
+          }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {},
+        "terminationGracePeriodSeconds": 30,
+        "volumes": [
+          {
+            "name": "config",
+            "persistentVolumeClaim": {
+              "claimName": "sonarr-config-pvc"
+            }
+          },
+          {
+            "name": "downloads",
+            "persistentVolumeClaim": {
+              "claimName": "media-downloads-pvc"
+            }
+          },
+          {
+            "name": "series",
+            "persistentVolumeClaim": {
+              "claimName": "media-series-pvc"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
