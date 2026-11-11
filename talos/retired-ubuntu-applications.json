@@ -1,0 +1,13 @@
+{
+  "retired": [
+    {
+      "namespace": "portfolio",
+      "helmReleaseNamespace": "flux-system",
+      "helmRelease": "portfolio",
+      "deployment": "portfolio",
+      "replicas": 0,
+      "keepSuspended": true,
+      "rollback": "docs/talos-portfolio-migration.md"
+    }
+  ]
+}

@@ -520,6 +520,8 @@ kind: HelmRelease
 metadata:
   name: portfolio
 spec:
+  # Migrated to Talos; preserve the Ubuntu rollback release without restarting it.
+  suspend: true
   interval: 30m
   timeout: 10m
   releaseName: portfolio

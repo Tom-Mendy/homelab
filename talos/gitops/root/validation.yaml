@@ -4,6 +4,6 @@ metadata:
   name: selective-gitops-proof
   namespace: talos-gitops-validation
 data:
-  stage: foundation-only
-  productionApplications: "none"
+  stage: first-application
+  productionApplications: "portfolio"
   allowedPath: talos/gitops/root

@@ -19,6 +19,18 @@ newtInstances:
     blueprintFile: /etc/newt/blueprint.yaml
     blueprintData: |
       public-resources:
+        portfolio:
+          name: Portfolio
+          mode: http
+          full-domain: tom-mendy.com
+          ssl: true
+          host-header: tom-mendy.com
+          auth:
+            sso-enabled: false
+          targets:
+            - hostname: 10.0.0.70
+              method: http
+              port: 80
         radarr:
           name: Radarr
           mode: http
