@@ -42,7 +42,8 @@
           "resources": [
             "services",
             "configmaps",
-            "persistentvolumeclaims"
+            "persistentvolumeclaims",
+            "serviceaccounts"
           ],
           "verbs": [
             "get",
