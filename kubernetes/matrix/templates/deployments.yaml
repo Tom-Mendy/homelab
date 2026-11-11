@@ -95,7 +95,7 @@ metadata:
   name: cinny
   namespace: {{ .Values.namespace }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.cinny.replicas }}
   selector:
     matchLabels:
       app.kubernetes.io/name: cinny

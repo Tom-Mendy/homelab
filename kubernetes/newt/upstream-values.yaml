@@ -19,6 +19,15 @@ newtInstances:
     blueprintFile: /etc/newt/blueprint.yaml
     blueprintData: |
       public-resources:
+        gaseous-carphophis-vermis:
+          targets:
+          - hostname: 10.0.0.70
+            method: http
+            port: 80
+          name: Cinny
+          mode: http
+          full-domain: chat.tom-mendy.com
+          ssl: true
         portfolio:
           name: Portfolio
           mode: http

@@ -8,6 +8,15 @@
       "replicas": 0,
       "keepSuspended": true,
       "rollback": "docs/talos-portfolio-migration.md"
+    },
+    {
+      "namespace": "matrix",
+      "deployment": "cinny",
+      "replicas": 0,
+      "componentOnly": true,
+      "helmRelease": "matrix",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true
     }
   ]
 }
