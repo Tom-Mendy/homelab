@@ -1,0 +1,32 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "vaultwarden",
+    "namespace": "vaultwarden",
+    "labels": { "app": "vaultwarden" }
+  },
+  "spec": {
+    "replicas": 0,
+    "strategy": { "type": "Recreate" },
+    "selector": { "matchLabels": { "app": "vaultwarden" } },
+    "template": {
+      "metadata": { "labels": { "app": "vaultwarden" } },
+      "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [{
+          "name": "vaultwarden",
+          "image": "vaultwarden/server:1.37.5-alpine@sha256:bbe684a02d6b0db54256ff88eac9754f4519284a7b26314afc241fd7d0918191",
+          "imagePullPolicy": "IfNotPresent",
+          "ports": [{ "containerPort": 80, "name": "http", "protocol": "TCP" }],
+          "env": [{ "name": "DOMAIN", "value": "https://vaultwarden.home.tom-mendy.com" }],
+          "volumeMounts": [{ "name": "data", "mountPath": "/data" }]
+        }],
+        "volumes": [{
+          "name": "data",
+          "persistentVolumeClaim": { "claimName": "vaultwarden-data-pvc" }
+        }]
+      }
+    }
+  }
+}
