@@ -1,14 +1,18 @@
 {
   "applications": [
+    "atuin",
+    "blocky",
     "cinny",
     "homepage",
     "navidrome",
+    "nzbget",
     "portfolio",
     "prowlarr",
     "qbittorrent",
     "radarr",
     "searxng",
-    "sonarr"
+    "sonarr",
+    "vaultwarden"
   ],
   "automaticImageUpdates": false,
   "productionTraffic": "requires per-application cutover"
