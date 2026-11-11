@@ -1,0 +1,35 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "atuin-config-v2",
+        "namespace": "atuin",
+        "labels": { "migration": "talos-atuin" }
+      },
+      "spec": {
+        "accessModes": ["ReadWriteMany"],
+        "resources": { "requests": { "storage": "20Gi" } },
+        "storageClassName": "nfs-k8s",
+        "volumeName": "atuin-config-static-pv"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "postgres-data-v2",
+        "namespace": "atuin",
+        "labels": { "migration": "talos-atuin" }
+      },
+      "spec": {
+        "accessModes": ["ReadWriteOnce"],
+        "resources": { "requests": { "storage": "10Gi" } },
+        "storageClassName": "nfs-k8s"
+      }
+    }
+  ]
+}
