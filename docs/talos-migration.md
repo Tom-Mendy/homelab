@@ -5,7 +5,8 @@ Steps 1 and 2 are complete. Talos v1.14.5 is installed and bootstrapped on
 node2 (Kubernetes v1.36.6, node Ready). Step 3 foundation validation is
 complete, including Cilium NetworkPolicy enforcement, DNS, isolated NFS,
 MetalLB, HTTPS ingress, and recovery after reboot. Step 4, selective GitOps,
-has a validated restricted bootstrap. Production applications remain on Ubuntu.
+has a validated restricted bootstrap. Production applications are migrating
+individually; see step 5.
 
 Build a separate Talos cluster on node2, migrate applications individually,
 then convert node3 and finally node1. The target is three control-plane nodes
@@ -76,8 +77,8 @@ box means the work was verified, not merely planned.
      read-only Forgejo source, commit pin, artifact filter, and restricted RBAC.
    - [x] Reconcile the isolated validation-only root from the migration branch.
      See [selective GitOps](talos-selective-gitops.md).
-   - [ ] Prepare application-specific credentials, operators, target ingress,
-     and the first production traffic cutover.
+   - [x] Prepare application-specific credentials and operators, establish
+     target ingress, and complete production traffic cutovers individually.
    - Use an explicit Talos application allowlist. Do not reconcile the complete
      production application tree into the new cluster.
    - Prepare an external Git bootstrap source or temporary reachable Ubuntu
@@ -85,7 +86,7 @@ box means the work was verified, not merely planned.
    - Replace temporary cross-cluster service dependencies with reachable
      endpoints. Cluster-local service names do not span clusters.
 5. Migrate applications individually. Status: Portfolio, Cinny, Navidrome,
-   SearXNG, Homepage, Radarr, Sonarr, and Prowlarr complete.
+   SearXNG, Homepage, Radarr, Sonarr, Prowlarr, and qBittorrent complete.
    - [x] Move Cinny with its unchanged image and homeserver, verify routing
      rollback, and observe public HTML/config plus Matrix discovery.
    - [x] Move Navidrome after native SQLite/file recovery checks, preserve
@@ -110,6 +111,10 @@ box means the work was verified, not merely planned.
    - [x] Move Sonarr with the existing Synology config, downloads, and series
      paths; verify SQLite integrity, preserve Authentik routing, and pass a
      five-minute observation.
+   - [x] Move qBittorrent with its existing Synology config, NymVPN state, and
+     downloads; preserve Radarr/Sonarr DNS and Authentik routing, then pass a
+     five-minute observation. Its Harbor pull secret still needs an Infisical
+     source scoped to the `homelab` repository before rotation.
    - [x] Deploy Portfolio on Talos with the identical production image digest,
      scoped registry credentials, separate RBAC, and verified local TLS.
    - [x] Restore its absent Pangolin resource, rehearse routing rollback to

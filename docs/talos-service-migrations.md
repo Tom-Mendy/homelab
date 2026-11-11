@@ -15,6 +15,7 @@ reviewed and explicitly selected.
 | Radarr | Migrated and observed | Existing Synology config and media paths mounted by Talos; Ubuntu ingress bridges to Talos .70 |
 | Sonarr | Migrated and observed | Existing Synology config, downloads, and series paths mounted by Talos; Ubuntu ingress bridges to Talos .70 |
 | Prowlarr | Migrated and observed | Existing Synology config on Talos; Ubuntu ingress bridges to Talos .70; Radarr and Sonarr app connections validated |
+| qBittorrent | Migrated and observed | Existing config, NymVPN state, and downloads remain on Synology NFS; Ubuntu HTTPS ingress bridges to Talos .70 |
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
@@ -118,6 +119,35 @@ HTTP-to-HTTPS redirect. Roll back by stopping the Talos Deployment, restoring
 the source Ingress snapshot, then starting Ubuntu Prowlarr. Never run both
 writers against the shared config path. Keep the Ubuntu bridge and suspended
 release until traffic no longer uses Ubuntu Traefik.
+
+qBittorrent now runs on Talos with its production image and the stopped-writer
+configuration and NymVPN state preserved on their existing Synology NFS paths.
+Downloads remain on the shared `/volume1/Downloads` export. The target PVCs use
+Retain PVs without node affinity. The source Deployment was stopped before the
+Talos writer started; a final encrypted config/VPN-state snapshot passed
+decryption and archive integrity checks. The app has an isolated `qbittorrent`
+namespace with privileged Pod Security labels because the NymVPN sidecar needs
+`NET_ADMIN` and `/dev/net/tun`; the shared `media` namespace remains baseline.
+
+The `media/qbittorrent` DNS name is preserved as an ExternalName alias to the
+Talos service so Radarr and Sonarr did not need a configuration change. Their
+download-client tests both passed. The existing Ubuntu ingress now bridges
+HTTPS traffic to Talos ingress `.70:80`; Authentik challenges are handled on the
+Talos route and HTTP traffic continues to redirect to HTTPS at Ubuntu. Ten
+checks over 325 seconds passed with the Talos route marker, zero Ubuntu Pods,
+zero Talos restarts, and NymVPN ready. The Ubuntu `media` HelmRelease remains
+suspended because other media workloads still depend on it.
+
+The Harbor pull secret was copied directly from the working Ubuntu `media`
+Secret into Talos after the existing `/harbor/portfolio` credential was denied
+access to the `homelab/nymvpn-sidecar` repository. Secret data was not written
+to Git or printed. The target secret is not currently synchronized from
+Infisical; add a credential with access to the homelab repository in Infisical
+before rotating this pull secret or rebuilding Talos. Roll back by stopping
+the Talos Deployment first, restoring the Ubuntu ingress backend and its
+Authentik middleware, then starting Ubuntu qBittorrent. Both deployments share
+the same NFS paths, so never run both as writers. Keep the bridge and Ubuntu
+release suspended until external traffic no longer uses Ubuntu Traefik.
 
 To roll back, suspend the Talos SearXNG Kustomization and stop its Deployment,
 then wait until its Pod is gone before starting the Ubuntu Deployment against
