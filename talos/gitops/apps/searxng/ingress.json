@@ -30,6 +30,25 @@
             }
           ]
         }
+      },
+      {
+        "host": "searxng.searxng.svc.cluster.local",
+        "http": {
+          "paths": [
+            {
+              "path": "/",
+              "pathType": "Prefix",
+              "backend": {
+                "service": {
+                  "name": "searxng",
+                  "port": {
+                    "number": 8080
+                  }
+                }
+              }
+            }
+          ]
+        }
       }
     ]
   }
