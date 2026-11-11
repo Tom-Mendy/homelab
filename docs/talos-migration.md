@@ -86,7 +86,8 @@ box means the work was verified, not merely planned.
    - Replace temporary cross-cluster service dependencies with reachable
      endpoints. Cluster-local service names do not span clusters.
 5. Migrate applications individually. Status: Portfolio, Cinny, Navidrome,
-   SearXNG, Homepage, Radarr, Sonarr, Prowlarr, qBittorrent, NZBGet, and Atuin complete.
+   SearXNG, Homepage, Radarr, Sonarr, Prowlarr, qBittorrent, NZBGet, Atuin,
+   and Blocky complete.
    - [x] Move Cinny with its unchanged image and homeserver, verify routing
      rollback, and observe public HTML/config plus Matrix discovery.
    - [x] Move Navidrome after native SQLite/file recovery checks, preserve
@@ -104,6 +105,11 @@ box means the work was verified, not merely planned.
      preserve its existing config path, bridge HTTPS through Ubuntu, and pass
      a five-minute observation. Rollback after target writes requires a reverse
      database restore. See the [service execution record](talos-service-migrations.md).
+   - [x] Move Blocky with its unchanged config and image; retain the stable
+     Ubuntu DNS IP as a tested UDP bridge to Talos, validate HTTPS and DNS, and
+     pass a five-minute observation. Update DHCP/static DNS clients to `.71`
+     before removing that bridge. See the
+     [service execution record](talos-service-migrations.md).
    - [ ] Continue remaining services individually. See the
      [service execution record](talos-service-migrations.md).
    - [x] Move Homepage with the unchanged image and configuration; preserve

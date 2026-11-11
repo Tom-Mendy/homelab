@@ -279,3 +279,22 @@ cutover or first exporting and restoring the target database into the source
 PostgreSQL. Do not start both application writers. Keep the ingress bridge and
 suspended Ubuntu release until public traffic no longer depends on Ubuntu
 Traefik.
+
+Blocky now runs on Talos with the unchanged v0.35.0 image and configuration.
+The target has a restricted namespace and uses `10.0.0.71` as its DNS
+LoadBalancer. Direct Talos DNS matched Ubuntu for an internal name, a public
+name, and a blocklisted name. HTTPS content matched through Talos ingress and
+the retained Ubuntu ingress. HTTP redirects to HTTPS, and the metrics endpoint
+works through the bridge.
+
+The existing Ubuntu DNS address `10.0.0.61` remains available as a temporary
+selectorless Service whose only ready EndpointSlice address is `10.0.0.71`.
+The Ubuntu Blocky Deployment is stopped and its HelmRelease remains suspended.
+An isolated relay check on `.63` passed before the service cutover. Eleven
+checks over 307 seconds passed with the Talos Pod Ready, zero restarts, matching
+DNS responses through `.61` and `.71`, public HTTPS returning 200, and HTTP
+redirecting to HTTPS. Update DHCP and any statically configured clients to use
+`.71` before removing the `.61` relay or retiring Ubuntu. Roll back by starting
+the Ubuntu Deployment, waiting for it to become Ready, restoring the Service
+selector, and deleting the migration EndpointSlice. Blocky has no persistent
+application data.

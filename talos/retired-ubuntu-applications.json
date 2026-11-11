@@ -116,6 +116,20 @@
       "rollback": "docs/talos-service-migrations.md",
       "logicalRestoreRequired": true,
       "keepAvailableForRollback": true
+    },
+    {
+      "namespace": "blocky",
+      "deployment": "blocky",
+      "replicas": 0,
+      "helmRelease": "blocky",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "rollback": "docs/talos-service-migrations.md",
+      "temporaryServiceBridge": {
+        "ubuntuAddress": "10.0.0.61",
+        "talosAddress": "10.0.0.71",
+        "removeAfter": "DHCP and statically configured DNS clients point directly to Talos"
+      }
     }
   ]
 }
