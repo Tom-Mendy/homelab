@@ -6,7 +6,7 @@
     "namespace": "blocky",
     "annotations": {
       "traefik.ingress.kubernetes.io/router.entrypoints": "web",
-      "traefik.ingress.kubernetes.io/router.middlewares": "blocky-blocky-route-proof@kubernetescrd"
+      "traefik.ingress.kubernetes.io/router.middlewares": "blocky-blocky-https-redirect@kubernetescrd,blocky-blocky-route-proof@kubernetescrd"
     }
   },
   "spec": {
