@@ -1,0 +1,11 @@
+{
+  "apiVersion": "v1",
+  "kind": "ConfigMap",
+  "metadata": {
+    "name": "searxng-settings",
+    "namespace": "searxng"
+  },
+  "data": {
+    "settings.yml": "use_default_settings: true\nsearch:\n  # OpenWebUI consumes the JSON search API.\n  formats:\n    - html\n    - json\n"
+  }
+}

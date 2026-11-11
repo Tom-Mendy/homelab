@@ -1,0 +1,271 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "searxng",
+    "namespace": "searxng"
+  },
+  "spec": {
+    "progressDeadlineSeconds": 600,
+    "replicas": 0,
+    "revisionHistoryLimit": 10,
+    "selector": {
+      "matchLabels": {
+        "app": "searxng"
+      }
+    },
+    "strategy": {
+      "type": "Recreate"
+    },
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "searxng"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "env": [
+              {
+                "name": "INSTANCE_NAME",
+                "value": "SearXNG"
+              },
+              {
+                "name": "BASE_URL",
+                "value": "https://searxng.home.tom-mendy.com/"
+              },
+              {
+                "name": "AUTOCOMPLETE",
+                "value": "duckduckgo"
+              },
+              {
+                "name": "SEARXNG_SECRET",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "key": "server-secret-key",
+                    "name": "searxng-secret"
+                  }
+                }
+              }
+            ],
+            "image": "searxng/searxng@sha256:63f50f92d266cd2859193ed46c10de9f39d4e44fc24344b2f2f1d2a80ba3689c",
+            "imagePullPolicy": "IfNotPresent",
+            "livenessProbe": {
+              "exec": {
+                "command": [
+                  "python",
+                  "-c",
+                  "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=5)"
+                ]
+              },
+              "failureThreshold": 3,
+              "periodSeconds": 10,
+              "successThreshold": 1,
+              "timeoutSeconds": 5
+            },
+            "name": "searxng",
+            "ports": [
+              {
+                "containerPort": 8080,
+                "name": "http",
+                "protocol": "TCP"
+              }
+            ],
+            "readinessProbe": {
+              "exec": {
+                "command": [
+                  "python",
+                  "-c",
+                  "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=5)"
+                ]
+              },
+              "failureThreshold": 3,
+              "periodSeconds": 10,
+              "successThreshold": 1,
+              "timeoutSeconds": 5
+            },
+            "resources": {},
+            "startupProbe": {
+              "exec": {
+                "command": [
+                  "python",
+                  "-c",
+                  "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=5)"
+                ]
+              },
+              "failureThreshold": 30,
+              "periodSeconds": 10,
+              "successThreshold": 1,
+              "timeoutSeconds": 5
+            },
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "volumeMounts": [
+              {
+                "mountPath": "/etc/searxng/settings.yml",
+                "name": "settings",
+                "readOnly": true,
+                "subPath": "settings.yml"
+              }
+            ]
+          }
+        ],
+        "dnsConfig": {
+          "nameservers": [
+            "127.0.0.1"
+          ]
+        },
+        "dnsPolicy": "None",
+        "enableServiceLinks": false,
+        "initContainers": [
+          {
+            "command": [
+              "/bin/sh",
+              "-c",
+              "mkdir -p /nym/config /nym/state"
+            ],
+            "image": "forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.3-3@sha256:0728350cf1d4012b09a8674f58d6ad4290da11cf8db115ceb051fe91dfba25d6",
+            "imagePullPolicy": "IfNotPresent",
+            "name": "nymvpn-state-init",
+            "resources": {},
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "volumeMounts": [
+              {
+                "mountPath": "/nym",
+                "name": "nymvpn-state"
+              }
+            ]
+          },
+          {
+            "env": [
+              {
+                "name": "NYMVPN_ENTRY_COUNTRY",
+                "value": "FR"
+              },
+              {
+                "name": "NYMVPN_EXIT_COUNTRY",
+                "value": "CH"
+              },
+              {
+                "name": "NYMVPN_POD_CIDR",
+                "value": "10.244.0.0/16"
+              }
+            ],
+            "image": "forgejo.tom-mendy.com/tom-mendy/nymvpn-sidecar:2026.11.3-3@sha256:0728350cf1d4012b09a8674f58d6ad4290da11cf8db115ceb051fe91dfba25d6",
+            "imagePullPolicy": "IfNotPresent",
+            "livenessProbe": {
+              "exec": {
+                "command": [
+                  "/usr/local/bin/nymvpn-entrypoint",
+                  "startup"
+                ]
+              },
+              "failureThreshold": 3,
+              "periodSeconds": 20,
+              "successThreshold": 1,
+              "timeoutSeconds": 1
+            },
+            "name": "nymvpn",
+            "readinessProbe": {
+              "exec": {
+                "command": [
+                  "/usr/local/bin/nymvpn-entrypoint",
+                  "startup"
+                ]
+              },
+              "failureThreshold": 3,
+              "periodSeconds": 10,
+              "successThreshold": 1,
+              "timeoutSeconds": 1
+            },
+            "resources": {},
+            "restartPolicy": "Always",
+            "securityContext": {
+              "capabilities": {
+                "add": [
+                  "NET_ADMIN"
+                ]
+              }
+            },
+            "startupProbe": {
+              "exec": {
+                "command": [
+                  "/usr/local/bin/nymvpn-entrypoint",
+                  "startup"
+                ]
+              },
+              "failureThreshold": 60,
+              "periodSeconds": 5,
+              "successThreshold": 1,
+              "timeoutSeconds": 1
+            },
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "volumeMounts": [
+              {
+                "mountPath": "/dev/net/tun",
+                "name": "tun"
+              },
+              {
+                "mountPath": "/etc/nym",
+                "name": "nymvpn-state",
+                "subPath": "config"
+              },
+              {
+                "mountPath": "/var/lib/nym-vpnd",
+                "name": "nymvpn-state",
+                "subPath": "state"
+              },
+              {
+                "mountPath": "/run/secrets/nymvpn",
+                "name": "nymvpn-access-code",
+                "readOnly": true
+              }
+            ]
+          }
+        ],
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {},
+        "terminationGracePeriodSeconds": 30,
+        "volumes": [
+          {
+            "configMap": {
+              "defaultMode": 420,
+              "name": "searxng-settings"
+            },
+            "name": "settings"
+          },
+          {
+            "hostPath": {
+              "path": "/dev/net/tun",
+              "type": "CharDevice"
+            },
+            "name": "tun"
+          },
+          {
+            "name": "nymvpn-state",
+            "persistentVolumeClaim": {
+              "claimName": "searxng-nymvpn-pvc"
+            }
+          },
+          {
+            "name": "nymvpn-access-code",
+            "secret": {
+              "defaultMode": 256,
+              "items": [
+                {
+                  "key": "NYM_ACCESS_CODE",
+                  "path": "access-code"
+                }
+              ],
+              "secretName": "searxng-nymvpn-credentials"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
