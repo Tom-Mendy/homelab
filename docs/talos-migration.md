@@ -86,7 +86,7 @@ box means the work was verified, not merely planned.
    - Replace temporary cross-cluster service dependencies with reachable
      endpoints. Cluster-local service names do not span clusters.
 5. Migrate applications individually. Status: Portfolio, Cinny, Navidrome,
-   SearXNG, Homepage, Radarr, Sonarr, Prowlarr, and qBittorrent complete.
+   SearXNG, Homepage, Radarr, Sonarr, Prowlarr, qBittorrent, and NZBGet complete.
    - [x] Move Cinny with its unchanged image and homeserver, verify routing
      rollback, and observe public HTML/config plus Matrix discovery.
    - [x] Move Navidrome after native SQLite/file recovery checks, preserve
@@ -115,6 +115,10 @@ box means the work was verified, not merely planned.
      downloads; preserve Radarr/Sonarr DNS and Authentik routing, then pass a
      five-minute observation. Its Harbor pull secret still needs an Infisical
      source scoped to the `homelab` repository before rotation.
+   - [x] Move NZBGet with its existing Synology config, NymVPN state, and
+     downloads; preserve its authenticated UI, media service DNS, and HTTPS
+     route, then pass a five-minute observation. It shares qBittorrent's
+     outstanding Infisical registry-credential follow-up.
    - [x] Deploy Portfolio on Talos with the identical production image digest,
      scoped registry credentials, separate RBAC, and verified local TLS.
    - [x] Restore its absent Pangolin resource, rehearse routing rollback to

@@ -16,6 +16,7 @@ reviewed and explicitly selected.
 | Sonarr | Migrated and observed | Existing Synology config, downloads, and series paths mounted by Talos; Ubuntu ingress bridges to Talos .70 |
 | Prowlarr | Migrated and observed | Existing Synology config on Talos; Ubuntu ingress bridges to Talos .70; Radarr and Sonarr app connections validated |
 | qBittorrent | Migrated and observed | Existing config, NymVPN state, and downloads remain on Synology NFS; Ubuntu HTTPS ingress bridges to Talos .70 |
+| NZBGet | Migrated and observed | Existing config, NymVPN state, and downloads remain on Synology NFS; Ubuntu HTTPS ingress bridges to Talos .70 |
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
@@ -148,6 +149,35 @@ the Talos Deployment first, restoring the Ubuntu ingress backend and its
 Authentik middleware, then starting Ubuntu qBittorrent. Both deployments share
 the same NFS paths, so never run both as writers. Keep the bridge and Ubuntu
 release suspended until external traffic no longer uses Ubuntu Traefik.
+
+NZBGet now runs on Talos with its existing configuration, NymVPN state, and
+download directory on Synology NFS. The final stopped-writer snapshot contains
+18 files (2 config and 16 VPN-state files); Age decryption and tar/gzip
+integrity verification passed. All three target PVs are Retain NFS volumes
+without node affinity. The app runs in a dedicated privileged namespace for
+the VPN sidecar's `NET_ADMIN` capability and `/dev/net/tun` device. Radarr and
+Sonarr have qBittorrent as their only enabled download client, so moving NZBGet
+did not change their active download path.
+
+The `media/nzbget` service name is preserved as an ExternalName alias. The
+Ubuntu ingress bridges `nzbget.home.tom-mendy.com` to Talos ingress `.70:80`;
+the original NZBGet HTTP authentication remains enabled. Direct and bridged
+HTTPS returned HTTP 401 with the expected application authentication challenge
+and `talos-nzbget` route marker; an authenticated JSON-RPC version request
+returned HTTP 200. Eleven checks over 300.6 seconds passed with HTTP-to-HTTPS
+redirects at Ubuntu, zero Ubuntu Pods, no Talos restarts, the target GitOps
+Kustomization Ready, and NymVPN ready. The Ubuntu `media` HelmRelease remains
+suspended for other workloads.
+
+NZBGet uses the existing Harbor pull secret copied into the Talos cluster for
+qBittorrent. The `/harbor/portfolio` Infisical credential cannot pull the
+homelab NymVPN sidecar image. No pull-secret value is in Git; add a credential
+scoped to that repository in Infisical before rotating the secret or rebuilding
+Talos. Roll back by stopping Talos NZBGet, restoring the Ubuntu Ingress backend
+to its `nzbget` Service, then scaling the Ubuntu Deployment to one. The config
+and VPN-state paths are shared, so never run both instances as writers. Keep
+the bridge and suspended release until public traffic no longer uses Ubuntu
+Traefik.
 
 To roll back, suspend the Talos SearXNG Kustomization and stop its Deployment,
 then wait until its Pod is gone before starting the Ubuntu Deployment against
