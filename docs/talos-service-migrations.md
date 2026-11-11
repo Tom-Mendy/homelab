@@ -10,7 +10,29 @@ reviewed and explicitly selected.
 | Portfolio | Migrated and observed | Public Pangolin route to Talos .70 |
 | Cinny | Migrated and observed | Public chat route to Talos .70; Matrix backend remains Ubuntu |
 | Navidrome | Migrated and observed | Single writer on existing Synology paths; Ubuntu ingress bridge retained |
-| SearXNG | Inert target prepared | Source VPN remains on Ubuntu; new Infisical identity requires administrator |
+| SearXNG | Migrated and observed | NymVPN state kept on the same Synology NFS path; Ubuntu ingress bridges to Talos .70 |
+
+SearXNG now runs on Talos with the same application and NymVPN image digests.
+The source Deployment was stopped before the Talos writer started. A read-only
+inspection Pod captured the quiesced VPN state (13 files, 245,574 bytes) into
+an encrypted Age archive; decryption and gzip/tar integrity checks passed in
+memory. Infisical now authenticates the dedicated Talos ServiceAccount through
+the Talos API with CA verification, and both synchronized application Secrets
+match Ubuntu. NymVPN reports Connected and the application reports Swiss
+egress. The unchanged LAN hostname reaches Talos through an Ubuntu
+Service/EndpointSlice bridge from Traefik .60 to Talos ingress .70. Direct and
+bridged HTTPS, health, route marker, and response body matched during 313
+seconds of observation (31 samples). One request immediately after the
+Ingress backend patch returned 503 while routing updated; subsequent checks
+and the full observation window passed. Ubuntu SearXNG remains at zero
+replicas and its HelmRelease remains suspended.
+
+To roll back, suspend the Talos SearXNG Kustomization and stop its Deployment,
+then wait until its Pod is gone before starting the Ubuntu Deployment against
+the shared NFS path. Restore the Ubuntu Ingress backend to its original
+`searxng` Service only after Ubuntu VPN connectivity and health pass. Do not
+restore the older pre-cutover archive over state written by Talos; both
+clusters use the same NFS directory.
 
 Cinny retained its exact image, configuration, and Matrix homeserver
 `matrix.tom-mendy.com`. Public HTML and configuration hashes matched the
@@ -69,9 +91,7 @@ native backup there before activating Talos. No manual source database edits
 were made. The incomplete initial file-transfer artifact and plaintext restore
 checks were removed after the verified encrypted backups were available.
 
-The next step is blocked by a confirmed Infisical administration permission,
-not Talos connectivity. See the
-[administrator handoff](talos-infisical-admin-handoff.md). The target operator
-and reviewer are prepared, and TokenReview from the current Infisical server
-to Talos passed with CA verification. SearXNG remains on Ubuntu until its new
-Talos identity is authorized. Do not boot node3 into an installer yet.
+The Infisical administrator action is complete; its identity and Kubernetes
+authentication settings are recorded in the
+[administrator handoff](talos-infisical-admin-handoff.md). Continue with the
+next application individually. Do not boot node3 into an installer yet.

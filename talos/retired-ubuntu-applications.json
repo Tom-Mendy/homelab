@@ -26,6 +26,16 @@
       "helmReleaseNamespace": "flux-system",
       "keepSuspended": true,
       "singleWriterSharedNfs": true
+    },
+    {
+      "namespace": "searxng",
+      "deployment": "searxng",
+      "replicas": 0,
+      "helmRelease": "searxng",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "singleWriterSharedNfs": true,
+      "rollback": "docs/talos-service-migrations.md"
     }
   ]
 }
