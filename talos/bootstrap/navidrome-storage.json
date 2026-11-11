@@ -1,0 +1,92 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolume",
+      "metadata": {
+        "name": "talos-navidrome-data-pvc"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "capacity": {
+          "storage": "5Gi"
+        },
+        "mountOptions": [
+          "nfsvers=4.1"
+        ],
+        "nfs": {
+          "path": "/volume1/k8s/navidrome-navidrome-data-pvc-pvc-1f866e9a-7c31-4550-8080-37fda981fe6e",
+          "server": "10.0.0.11"
+        },
+        "persistentVolumeReclaimPolicy": "Retain",
+        "storageClassName": "nfs-k8s",
+        "volumeMode": "Filesystem"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "navidrome-data-pvc",
+        "namespace": "navidrome"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "5Gi"
+          }
+        },
+        "storageClassName": "nfs-k8s",
+        "volumeName": "talos-navidrome-data-pvc"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolume",
+      "metadata": {
+        "name": "talos-navidrome-music-pvc"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadOnlyMany"
+        ],
+        "capacity": {
+          "storage": "200Gi"
+        },
+        "nfs": {
+          "path": "/volume1/music",
+          "server": "10.0.0.11"
+        },
+        "persistentVolumeReclaimPolicy": "Retain",
+        "volumeMode": "Filesystem"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "navidrome-music-pvc",
+        "namespace": "navidrome"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadOnlyMany"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "200Gi"
+          }
+        },
+        "storageClassName": "",
+        "volumeName": "talos-navidrome-music-pvc"
+      }
+    }
+  ]
+}
