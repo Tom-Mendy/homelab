@@ -1,8 +1,9 @@
 {
   "applications": [
-    "portfolio",
     "cinny",
+    "homepage",
     "navidrome",
+    "portfolio",
     "searxng"
   ],
   "automaticImageUpdates": false,

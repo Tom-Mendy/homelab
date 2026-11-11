@@ -1,0 +1,68 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "homepage",
+    "namespace": "homepage"
+  },
+  "spec": {
+    "replicas": 1,
+    "strategy": {
+      "type": "RollingUpdate",
+      "rollingUpdate": {
+        "maxSurge": "25%",
+        "maxUnavailable": "25%"
+      }
+    },
+    "selector": {
+      "matchLabels": {
+        "app": "homepage"
+      }
+    },
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "homepage"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "homepage",
+            "image": "ghcr.io/gethomepage/homepage:v2.7.0@sha256:19c5c09184458a41b7b5915e71463a39f36cd33540f41bdbed008791b8182d5f",
+            "imagePullPolicy": "IfNotPresent",
+            "env": [
+              {
+                "name": "HOMEPAGE_ALLOWED_HOSTS",
+                "value": "homepage.home.tom-mendy.com"
+              }
+            ],
+            "ports": [
+              {
+                "name": "http",
+                "containerPort": 3000,
+                "protocol": "TCP"
+              }
+            ],
+            "volumeMounts": [
+              {
+                "name": "config",
+                "mountPath": "/app/config/services.yaml",
+                "subPath": "services.yaml"
+              }
+            ]
+          }
+        ],
+        "volumes": [
+          {
+            "name": "config",
+            "configMap": {
+              "name": "homepage-config",
+              "defaultMode": 420
+            }
+          }
+        ]
+      }
+    }
+  }
+}
