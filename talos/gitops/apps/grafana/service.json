@@ -7,13 +7,17 @@
     "labels": {
       "app.kubernetes.io/instance": "grafana",
       "app.kubernetes.io/name": "grafana"
+    },
+    "annotations": {
+      "metallb.io/loadBalancerIPs": "10.0.0.72",
+      "homelab.tom-mendy.com/temporary": "Internal backend bridge during Grafana migration; remove after the Ubuntu ingress no longer needs it"
     }
   },
   "spec": {
     "ports": [
       {
-        "name": "service",
-        "port": 80,
+        "name": "http",
+        "port": 3000,
         "protocol": "TCP",
         "targetPort": "grafana"
       }
@@ -22,7 +26,7 @@
       "app.kubernetes.io/instance": "grafana",
       "app.kubernetes.io/name": "grafana"
     },
-    "type": "ClusterIP"
+    "type": "LoadBalancer"
   },
   "status": {
     "loadBalancer": {}
