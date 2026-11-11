@@ -1,0 +1,87 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "pushgateway",
+    "namespace": "pushgateway",
+    "labels": {
+      "app": "pushgateway"
+    }
+  },
+  "spec": {
+    "replicas": 1,
+    "strategy": {
+      "type": "Recreate"
+    },
+    "selector": {
+      "matchLabels": {
+        "app": "pushgateway"
+      }
+    },
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "pushgateway",
+          "app.kubernetes.io/name": "prometheus-pushgateway"
+        }
+      },
+      "spec": {
+        "automountServiceAccountToken": false,
+        "serviceAccountName": "pushgateway",
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 65534,
+          "runAsGroup": 65534,
+          "fsGroup": 65534,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "containers": [
+          {
+            "name": "pushgateway",
+            "image": "quay.io/prometheus/pushgateway@sha256:91a56b89b97dd8a5e1e4fa8b5bbbd86dd57a87a2a3cee3a3ce3368b40ef158ef",
+            "imagePullPolicy": "IfNotPresent",
+            "ports": [
+              {
+                "containerPort": 9091,
+                "name": "metrics",
+                "protocol": "TCP"
+              }
+            ],
+            "readinessProbe": {
+              "tcpSocket": {
+                "port": 9091
+              },
+              "periodSeconds": 10
+            },
+            "livenessProbe": {
+              "tcpSocket": {
+                "port": 9091
+              },
+              "periodSeconds": 20
+            },
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              },
+              "readOnlyRootFilesystem": true
+            },
+            "resources": {
+              "requests": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              },
+              "limits": {
+                "memory": "256Mi"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
