@@ -13,6 +13,7 @@ reviewed and explicitly selected.
 | SearXNG | Migrated and observed | NymVPN state kept on the same Synology NFS path; Ubuntu ingress and in-cluster consumer bridges reach Talos .70 |
 | Homepage | Migrated and observed | Stateless config on Talos; Ubuntu ingress bridges to Talos .70 |
 | Radarr | Migrated and observed | Existing Synology config and media paths mounted by Talos; Ubuntu ingress bridges to Talos .70 |
+| Sonarr | Migrated and observed | Existing Synology config, downloads, and series paths mounted by Talos; Ubuntu ingress bridges to Talos .70 |
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
@@ -81,6 +82,24 @@ session was not exercised. Rollback by setting the Talos Deployment to zero
 and waiting for its Pod to exit, restoring the private Ubuntu Ingress snapshot
 and its original Authentik middleware, then scaling Ubuntu Radarr to one. Both
 clusters reference the same NFS paths, so never run both copies as writers.
+
+Sonarr now runs on Talos with its exact production image digest. Its config PV
+binds the existing provisioner-managed Synology directory; the existing
+downloads PVC is shared with Talos Radarr, and the series PV binds the existing
+Synology `/volume1/video/Serie` export. These Retain PVs have no node affinity.
+Node2 pulled the image and mounted all three paths read-only before the source
+was stopped. The stopped-writer encrypted snapshot contains the database,
+SQLite WAL/SHM files, log database, and application config; archive decryption
+and both SQLite quick checks passed. Ubuntu Sonarr was stopped before Talos
+started. The Talos API returned version 4.0.20.3014, 27 series, one root
+folder, one indexer, and two disk entries. The same two qBittorrent maintenance
+warnings are present. Direct and Ubuntu-bridged HTTPS returned the Talos route
+marker and an Authentik redirect, and the outpost callback passed from Talos.
+Eleven checks over 301.4 seconds passed without an Ubuntu Pod or Talos restart.
+A browser-authenticated session was not exercised. Roll back by setting the
+Talos Deployment to zero and waiting for its Pod to exit, restoring the source
+Sonarr Ingress snapshot, then scaling Ubuntu Sonarr to one. Do not run both
+Sonarr writers against the shared config path.
 
 To roll back, suspend the Talos SearXNG Kustomization and stop its Deployment,
 then wait until its Pod is gone before starting the Ubuntu Deployment against
