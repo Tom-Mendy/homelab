@@ -1,0 +1,36 @@
+{
+  "apiVersion": "networking.k8s.io/v1",
+  "kind": "Ingress",
+  "metadata": {
+    "name": "cinny",
+    "namespace": "matrix",
+    "annotations": {
+      "traefik.ingress.kubernetes.io/router.entrypoints": "web",
+      "traefik.ingress.kubernetes.io/router.middlewares": "matrix-cinny-route-proof@kubernetescrd"
+    }
+  },
+  "spec": {
+    "ingressClassName": "talos-traefik",
+    "rules": [
+      {
+        "host": "chat.tom-mendy.com",
+        "http": {
+          "paths": [
+            {
+              "path": "/",
+              "pathType": "Prefix",
+              "backend": {
+                "service": {
+                  "name": "cinny",
+                  "port": {
+                    "number": 80
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

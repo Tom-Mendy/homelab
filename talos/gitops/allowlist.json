@@ -1,6 +1,7 @@
 {
   "applications": [
-    "portfolio"
+    "portfolio",
+    "cinny"
   ],
   "automaticImageUpdates": false,
   "productionTraffic": "requires per-application cutover"

@@ -1,0 +1,15 @@
+{
+  "apiVersion": "traefik.io/v1alpha1",
+  "kind": "Middleware",
+  "metadata": {
+    "name": "cinny-route-proof",
+    "namespace": "matrix"
+  },
+  "spec": {
+    "headers": {
+      "customResponseHeaders": {
+        "X-Migration-Route": "talos-cinny"
+      }
+    }
+  }
+}
