@@ -8,4 +8,3 @@ resources:
   - ingress-secure.json
   - route-proof.json
   - media-nymvpn-secret.json
-  - qbittorrent-registry-secret.json
