@@ -17,6 +17,7 @@ reviewed and explicitly selected.
 | Prowlarr | Migrated and observed | Existing Synology config on Talos; Ubuntu ingress bridges to Talos .70; Radarr and Sonarr app connections validated |
 | qBittorrent | Migrated and observed | Existing config, NymVPN state, and downloads remain on Synology NFS; Ubuntu HTTPS ingress bridges to Talos .70 |
 | NZBGet | Migrated and observed | Existing config, NymVPN state, and downloads remain on Synology NFS; Ubuntu HTTPS ingress bridges to Talos .70 |
+| Vaultwarden | Prepared; rolled back | Target uses the existing Synology `/volume1/vaultwarden` path; investigate the SQLite pool failure before retrying |
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
@@ -178,6 +179,18 @@ to its `nzbget` Service, then scaling the Ubuntu Deployment to one. The config
 and VPN-state paths are shared, so never run both instances as writers. Keep
 the bridge and suspended release until public traffic no longer uses Ubuntu
 Traefik.
+
+Vaultwarden was prepared on Talos with the existing static Synology NFS path and
+an encrypted final snapshot of 736 files. Age decryption, archive integrity,
+and SQLite integrity checks passed. After the source writer was stopped, the
+Talos Pod reached Running/Ready but repeatedly failed to create the SQLite
+pool; both direct and bridged `/alive` requests returned HTTP 502, and a
+port-forward to the Pod reset. The Talos mount used NFSv4.1 with the same
+locking options as Ubuntu, and the data directory was writable. The Talos
+Deployment is pinned at zero replicas; the public Ingress backend was restored
+to Ubuntu, the source Deployment is back at one replica, and `/alive` returns
+HTTP 200. No writer overlap occurred. Keep the encrypted snapshot and inspect
+SQLite/NFS locking or application startup behavior before another attempt.
 
 To roll back, suspend the Talos SearXNG Kustomization and stop its Deployment,
 then wait until its Pod is gone before starting the Ubuntu Deployment against
