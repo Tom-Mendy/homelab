@@ -12,6 +12,7 @@ reviewed and explicitly selected.
 | Navidrome | Migrated and observed | Single writer on existing Synology paths; Ubuntu ingress bridge retained |
 | SearXNG | Migrated and observed | NymVPN state kept on the same Synology NFS path; Ubuntu ingress and in-cluster consumer bridges reach Talos .70 |
 | Homepage | Migrated and observed | Stateless config on Talos; Ubuntu ingress bridges to Talos .70 |
+| Radarr | Migrated and observed | Existing Synology config and media paths mounted by Talos; Ubuntu ingress bridges to Talos .70 |
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
@@ -53,6 +54,33 @@ restoring the Ubuntu Ingress backend from the private snapshot
 to one; keep the Talos copy available until the old route is healthy. Remove
 the Ubuntu Talos-bridge Service/EndpointSlice only after the hostname no longer
 routes through Ubuntu Traefik.
+
+Radarr now runs on Talos with its exact production image digest and current
+configuration/database preserved on the same Synology NFS paths. The config
+PV is a pre-bound `nfs-k8s` PV to the existing provisioner-managed directory;
+download and movie-library PVs point to the existing Synology exports. All
+three target PVs use Retain, have no node affinity, and were verified mounted
+read-only from node2 before cutover. The image was also pulled on node2 ahead
+of downtime. Ubuntu Radarr was stopped before the target Deployment started;
+there was no overlapping writer. A stopped-writer snapshot of the active
+database, log database, and application config was encrypted and verified; both
+SQLite quick checks returned `ok`. Historical `.corrupt-*` files in the source
+config directory were left untouched.
+
+Radarr's authenticated route uses the existing per-app Authentik outpost path
+on its application hostname; the unauthenticated redirect target remains
+`authentik.tom-mendy.com`. Both the direct Talos URL and the existing Ubuntu
+ingress returned HTTP 302 through Talos with the `talos-radarr` marker. The
+outpost callback returned HTTP 302 from a Talos workload. Radarr's API returned
+version 6.4.4.10685, 515 movies, one root folder, one indexer, and five disk
+entries. Eleven checks over 301.6 seconds passed with no source Pod and no
+target restart. Its two API health warnings are the expected missing
+qBittorrent download client while the maintenance profile keeps qBittorrent
+stopped; do not thaw it as part of this service cutover. A browser-authenticated
+session was not exercised. Rollback by setting the Talos Deployment to zero
+and waiting for its Pod to exit, restoring the private Ubuntu Ingress snapshot
+and its original Authentik middleware, then scaling Ubuntu Radarr to one. Both
+clusters reference the same NFS paths, so never run both copies as writers.
 
 To roll back, suspend the Talos SearXNG Kustomization and stop its Deployment,
 then wait until its Pod is gone before starting the Ubuntu Deployment against
