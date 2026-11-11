@@ -1,7 +1,8 @@
 {
   "applications": [
     "portfolio",
-    "cinny"
+    "cinny",
+    "navidrome"
   ],
   "automaticImageUpdates": false,
   "productionTraffic": "requires per-application cutover"
