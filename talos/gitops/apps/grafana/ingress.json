@@ -1,0 +1,36 @@
+{
+  "apiVersion": "networking.k8s.io/v1",
+  "kind": "Ingress",
+  "metadata": {
+    "name": "grafana",
+    "namespace": "grafana",
+    "annotations": {
+      "traefik.ingress.kubernetes.io/router.entrypoints": "web",
+      "traefik.ingress.kubernetes.io/router.middlewares": "grafana-grafana-https-redirect@kubernetescrd,grafana-grafana-route-proof@kubernetescrd"
+    }
+  },
+  "spec": {
+    "ingressClassName": "talos-traefik",
+    "rules": [
+      {
+        "host": "grafana.home.tom-mendy.com",
+        "http": {
+          "paths": [
+            {
+              "path": "/",
+              "pathType": "Prefix",
+              "backend": {
+                "service": {
+                  "name": "grafana",
+                  "port": {
+                    "number": 80
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

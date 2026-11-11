@@ -1,0 +1,13 @@
+{
+  "apiVersion": "v1",
+  "kind": "ConfigMap",
+  "metadata": {
+    "name": "grafana",
+    "namespace": "grafana"
+  },
+  "data": {
+    "dashboardproviders.yaml": "apiVersion: 1\nproviders:\n- disableDeletion: false\n  editable: true\n  folder: \"\"\n  name: default\n  options:\n    path: /var/lib/grafana/dashboards/default\n  orgId: 1\n  type: file\n",
+    "datasources.yaml": "apiVersion: 1\ndatasources:\n- access: proxy\n  editable: true\n  isDefault: true\n  name: Prometheus\n  type: prometheus\n  url: https://prometheus.home.tom-mendy.com\n",
+    "grafana.ini": "[analytics]\ncheck_for_updates = true\n[auth.generic_oauth]\nallow_sign_up = true\napi_url = https://authentik.tom-mendy.com/application/o/userinfo/\nauth_url = https://authentik.tom-mendy.com/application/o/authorize/\nauto_login = true\nclient_id = grafana\nclient_secret = $__env{GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}\nenabled = true\nname = Authentik\nrole_attribute_path = contains(groups[*], 'homelab-admins') && 'Admin' || 'Viewer'\nrole_attribute_strict = true\nscopes = openid profile email offline_access\ntoken_url = https://authentik.tom-mendy.com/application/o/token/\nuse_pkce = true\n[log]\nmode = console\n[paths]\ndata = /var/lib/grafana/\nlogs = /var/log/grafana\nplugins = /var/lib/grafana/plugins\nprovisioning = /etc/grafana/provisioning\n[plugins]\npreinstall_auto_update = false\n[server]\ndomain = grafana.home.tom-mendy.com\nroot_url = https://grafana.home.tom-mendy.com\n[unified_storage]\nindex_path = /var/lib/grafana-search/bleve\n"
+  }
+}
