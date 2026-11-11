@@ -1,12 +1,17 @@
 # Talos selective GitOps
 
 Executed on 2026-11-11. Production applications remain on Ubuntu.
-The Talos application allowlist is empty. The initial reconciliation manages
-only a validation ConfigMap and cannot deploy an application.
+The initial Talos application allowlist was empty. Its root reconciliation
+manages only a validation ConfigMap and cannot deploy an application.
+Portfolio was subsequently added through its own restricted reconciler; see
+the [Portfolio migration record](talos-portfolio-migration.md).
 
-The dedicated branch is `migration/talos-bootstrap-20261111`. Talos reads
-commit `8ab8a9cea3955ba5418ac2c2c6fff7f59af0e7e8`, rather than tracking branch
-updates automatically. The workstation branch and Ubuntu's pinned Git source
+The dedicated branch is `migration/talos-bootstrap-20261111`. The initial
+validation used
+commit `8ab8a9cea3955ba5418ac2c2c6fff7f59af0e7e8`. Subsequent approved pins
+are recorded per application. Talos reads an explicit reviewed commit rather
+than tracking branch updates automatically. The workstation branch and Ubuntu's
+pinned Git source
 were not changed. The migration commit contains only the isolated bootstrap
 and validation manifests added for this stage.
 
@@ -40,7 +45,8 @@ Talos root or deploy it using the Talos context.
 
 The bridge SSH host key was compared with Ubuntu Flux's trusted Forgejo key
 before use. Forgejo deploy key ID 3, `talos-flux-readonly-20261111`, is a
-separate read-only repository key. Talos Secret `flux-system/talos-forgejo-readonly`
+separate read-only repository key. Talos Secret
+`flux-system/talos-forgejo-readonly`
 contains its private key and verified known_hosts. The Ubuntu key was not
 reused. Neither private key nor a credential-bearing Secret belongs in Git.
 Forgejo Actions remain disabled during the maintenance hold.

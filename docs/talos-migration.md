@@ -84,7 +84,14 @@ box means the work was verified, not merely planned.
      Forgejo endpoint. Prepare Infisical credentials for the new Kubernetes identity.
    - Replace temporary cross-cluster service dependencies with reachable
      endpoints. Cluster-local service names do not span clusters.
-5. Migrate applications individually. Status: not started.
+5. Migrate applications individually. Status: Portfolio complete; others pending.
+   - [x] Deploy Portfolio on Talos with the identical production image digest,
+     scoped registry credentials, separate RBAC, and verified local TLS.
+   - [x] Restore its absent Pangolin resource, rehearse routing rollback to
+     Ubuntu, switch to Talos, and stop the Ubuntu copy.
+   - [x] Pass 606.8 seconds of public HTTPS/content observation after stopping
+     Ubuntu Portfolio, with 58 healthy samples and no target Pod restarts.
+     See [Portfolio migration](talos-portfolio-migration.md).
    - Start with a low-risk stateless application such as portfolio, then a
      service whose persistent data is easy to restore. Move dependency groups
      together only when required.
