@@ -84,7 +84,15 @@ box means the work was verified, not merely planned.
      Forgejo endpoint. Prepare Infisical credentials for the new Kubernetes identity.
    - Replace temporary cross-cluster service dependencies with reachable
      endpoints. Cluster-local service names do not span clusters.
-5. Migrate applications individually. Status: Portfolio complete; others pending.
+5. Migrate applications individually. Status: Portfolio, Cinny, and Navidrome complete.
+   - [x] Move Cinny with its unchanged image and homeserver, verify routing
+     rollback, and observe public HTML/config plus Matrix discovery.
+   - [x] Move Navidrome after native SQLite/file recovery checks, preserve
+     users/playlists/shares, and pass a five-minute observation.
+   - [ ] Authorize the new Infisical identity before activating SearXNG on
+     Talos. See the [admin handoff](talos-infisical-admin-handoff.md).
+   - [ ] Continue remaining services individually. See the
+     [service execution record](talos-service-migrations.md).
    - [x] Deploy Portfolio on Talos with the identical production image digest,
      scoped registry credentials, separate RBAC, and verified local TLS.
    - [x] Restore its absent Pangolin resource, rehearse routing rollback to
