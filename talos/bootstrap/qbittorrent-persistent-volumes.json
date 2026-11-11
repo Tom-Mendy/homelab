@@ -1,0 +1,74 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolume",
+      "metadata": {
+        "name": "qbittorrent-config-talos-pv",
+        "labels": {
+          "migration": "talos-qbittorrent"
+        }
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "capacity": {
+          "storage": "5Gi"
+        },
+        "claimRef": {
+          "apiVersion": "v1",
+          "kind": "PersistentVolumeClaim",
+          "name": "qbittorrent-config-pvc",
+          "namespace": "media"
+        },
+        "mountOptions": [
+          "nfsvers=4.1"
+        ],
+        "nfs": {
+          "path": "/volume1/k8s/media-qbittorrent-config-pvc-pvc-6f588b16-79b2-437b-8c90-8bcf180e93e4",
+          "server": "10.0.0.11"
+        },
+        "persistentVolumeReclaimPolicy": "Retain",
+        "storageClassName": "nfs-k8s",
+        "volumeMode": "Filesystem"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolume",
+      "metadata": {
+        "name": "qbittorrent-nymvpn-talos-pv",
+        "labels": {
+          "migration": "talos-qbittorrent"
+        }
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "capacity": {
+          "storage": "1Gi"
+        },
+        "claimRef": {
+          "apiVersion": "v1",
+          "kind": "PersistentVolumeClaim",
+          "name": "qbittorrent-nymvpn-pvc",
+          "namespace": "media"
+        },
+        "mountOptions": [
+          "nfsvers=4.1"
+        ],
+        "nfs": {
+          "path": "/volume1/k8s/media-qbittorrent-nymvpn-pvc-pvc-3916ca04-05ea-4606-bf16-086ddd56f790",
+          "server": "10.0.0.11"
+        },
+        "persistentVolumeReclaimPolicy": "Retain",
+        "storageClassName": "nfs-k8s",
+        "volumeMode": "Filesystem"
+      }
+    }
+  ]
+}

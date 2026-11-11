@@ -1,0 +1,44 @@
+{
+  "apiVersion": "networking.k8s.io/v1",
+  "kind": "Ingress",
+  "metadata": {
+    "name": "qbittorrent-secure",
+    "namespace": "media",
+    "annotations": {
+      "traefik.ingress.kubernetes.io/router.entrypoints": "websecure",
+      "traefik.ingress.kubernetes.io/router.middlewares": "media-qbittorrent-route-proof@kubernetescrd,media-qbittorrent-authentik@kubernetescrd"
+    }
+  },
+  "spec": {
+    "ingressClassName": "talos-traefik",
+    "rules": [
+      {
+        "host": "torrent.tom-mendy.com",
+        "http": {
+          "paths": [
+            {
+              "path": "/",
+              "pathType": "Prefix",
+              "backend": {
+                "service": {
+                  "name": "qbittorrent",
+                  "port": {
+                    "number": 8080
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "tls": [
+      {
+        "hosts": [
+          "torrent.tom-mendy.com"
+        ],
+        "secretName": "qbittorrent-tls"
+      }
+    ]
+  }
+}

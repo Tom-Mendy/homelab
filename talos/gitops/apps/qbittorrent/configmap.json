@@ -1,0 +1,11 @@
+{
+  "apiVersion": "v1",
+  "data": {
+    "ensure-sso-auth.sh": "#!/bin/bash\nset -e\n\nCONF=/config/qBittorrent/qBittorrent.conf\nmkdir -p /config/qBittorrent\ntouch \"$CONF\"\n\nset_key() {\n  key=\"$1\"\n  value=\"$2\"\n  export KEY=\"$key\" VALUE=\"$value\"\n  if awk 'index($0, ENVIRON[\"KEY\"] \"=\") == 1 { found=1; exit } END { exit !found }' \"$CONF\"; then\n    awk 'index($0, ENVIRON[\"KEY\"] \"=\") == 1 { print ENVIRON[\"KEY\"] \"=\" ENVIRON[\"VALUE\"]; next } { print }' \"$CONF\" > \"$CONF.tmp\" && mv \"$CONF.tmp\" \"$CONF\"\n  elif grep -q '^\\[WebUI\\]' \"$CONF\"; then\n    awk '\n      /^\\[/ { if (in_prefs && !inserted) { print ENVIRON[\"KEY\"] \"=\" ENVIRON[\"VALUE\"]; inserted=1 } in_prefs=0 }\n      /^\\[WebUI\\]/ { in_prefs=1 }\n      { print }\n      END { if (!inserted) print ENVIRON[\"KEY\"] \"=\" ENVIRON[\"VALUE\"] }\n    ' \"$CONF\" > \"$CONF.tmp\" && mv \"$CONF.tmp\" \"$CONF\"\n  else\n    printf '\\n[WebUI]\\n%s=%s\\n' \"$key\" \"$value\" >> \"$CONF\"\n  fi\n}\n\n# qBittorrent 5.3 stores these keys in [WebUI].\nset_key 'AuthSubnetWhitelistEnabled' 'true'\nset_key 'AuthSubnetWhitelist' \"$SSO_AUTH_WHITELIST\"\n# Check the connecting pod against the whitelist. Trusting X-Forwarded-For\n# would check the public client IP and cause a second login after Authentik.\n# Keep reverse-proxy support for HTTPS headers and secure cookies.\nset_key 'LocalHostAuth' 'false'\nset_key 'ReverseProxySupportEnabled' 'true'\nset_key 'TrustedReverseProxiesList' ''\n"
+  },
+  "kind": "ConfigMap",
+  "metadata": {
+    "name": "qbittorrent-sso",
+    "namespace": "media"
+  }
+}

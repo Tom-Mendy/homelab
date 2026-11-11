@@ -112,6 +112,23 @@
             "list",
             "watch"
           ]
+        },
+        {
+          "apiGroups": [
+            "secrets.infisical.com"
+          ],
+          "resources": [
+            "infisicalstaticsecrets"
+          ],
+          "verbs": [
+            "get",
+            "list",
+            "watch",
+            "create",
+            "update",
+            "patch",
+            "delete"
+          ]
         }
       ]
     },

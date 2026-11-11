@@ -1,0 +1,278 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "qbittorrent",
+    "namespace": "media",
+    "labels": {
+      "app": "qbittorrent"
+    }
+  },
+  "spec": {
+    "progressDeadlineSeconds": 600,
+    "replicas": 0,
+    "revisionHistoryLimit": 10,
+    "selector": {
+      "matchLabels": {
+        "app": "qbittorrent"
+      }
+    },
+    "strategy": {
+      "type": "Recreate"
+    },
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "qbittorrent"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "env": [
+              {
+                "name": "PUID",
+                "value": "1023"
+              },
+              {
+                "name": "PGID",
+                "value": "100"
+              },
+              {
+                "name": "TZ",
+                "value": "Europe/Paris"
+              },
+              {
+                "name": "WEBUI_PORT",
+                "value": "8080"
+              }
+            ],
+            "image": "lscr.io/linuxserver/qbittorrent:5.3.0@sha256:05c1454f9a32967affc1f34f67f8cc0cc57dd805dca45489fe797095a6286556",
+            "imagePullPolicy": "IfNotPresent",
+            "name": "qbittorrent",
+            "ports": [
+              {
+                "containerPort": 8080,
+                "name": "http",
+                "protocol": "TCP"
+              }
+            ],
+            "resources": {},
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "volumeMounts": [
+              {
+                "mountPath": "/config",
+                "name": "config"
+              },
+              {
+                "mountPath": "/data/downloads",
+                "name": "downloads"
+              }
+            ]
+          }
+        ],
+        "dnsConfig": {
+          "nameservers": [
+            "127.0.0.1"
+          ]
+        },
+        "dnsPolicy": "None",
+        "imagePullSecrets": [
+          {
+            "name": "media-harbor-pull"
+          }
+        ],
+        "initContainers": [
+          {
+            "command": [
+              "/bin/sh",
+              "-c",
+              "mkdir -p /nym/config /nym/state"
+            ],
+            "image": "harbor.home.tom-mendy.com/homelab/nymvpn-sidecar:2026.12.4-2@sha256:e150c901b5750e9dadfaacd5808a2ae6bdcbb0012e0a5a2685c32f7bb85e9c0e",
+            "imagePullPolicy": "IfNotPresent",
+            "name": "nymvpn-state-init",
+            "resources": {},
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "volumeMounts": [
+              {
+                "mountPath": "/nym",
+                "name": "nymvpn-state"
+              }
+            ]
+          },
+          {
+            "env": [
+              {
+                "name": "NYMVPN_ENTRY_COUNTRY",
+                "value": "FR"
+              },
+              {
+                "name": "NYMVPN_EXIT_COUNTRY",
+                "value": "CH"
+              },
+              {
+                "name": "NYMVPN_POD_CIDR",
+                "value": "10.244.0.0/16"
+              }
+            ],
+            "image": "harbor.home.tom-mendy.com/homelab/nymvpn-sidecar:2026.12.4-2@sha256:e150c901b5750e9dadfaacd5808a2ae6bdcbb0012e0a5a2685c32f7bb85e9c0e",
+            "imagePullPolicy": "IfNotPresent",
+            "livenessProbe": {
+              "exec": {
+                "command": [
+                  "/usr/local/bin/nymvpn-entrypoint",
+                  "startup"
+                ]
+              },
+              "failureThreshold": 3,
+              "periodSeconds": 20,
+              "successThreshold": 1,
+              "timeoutSeconds": 1
+            },
+            "name": "nymvpn",
+            "readinessProbe": {
+              "exec": {
+                "command": [
+                  "/usr/local/bin/nymvpn-entrypoint",
+                  "startup"
+                ]
+              },
+              "failureThreshold": 3,
+              "periodSeconds": 10,
+              "successThreshold": 1,
+              "timeoutSeconds": 1
+            },
+            "resources": {},
+            "restartPolicy": "Always",
+            "securityContext": {
+              "capabilities": {
+                "add": [
+                  "NET_ADMIN"
+                ]
+              }
+            },
+            "startupProbe": {
+              "exec": {
+                "command": [
+                  "/usr/local/bin/nymvpn-entrypoint",
+                  "startup"
+                ]
+              },
+              "failureThreshold": 60,
+              "periodSeconds": 5,
+              "successThreshold": 1,
+              "timeoutSeconds": 1
+            },
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "volumeMounts": [
+              {
+                "mountPath": "/dev/net/tun",
+                "name": "tun"
+              },
+              {
+                "mountPath": "/etc/nym",
+                "name": "nymvpn-state",
+                "subPath": "config"
+              },
+              {
+                "mountPath": "/var/lib/nym-vpnd",
+                "name": "nymvpn-state",
+                "subPath": "state"
+              },
+              {
+                "mountPath": "/run/secrets/nymvpn",
+                "name": "nymvpn-access-code",
+                "readOnly": true
+              }
+            ]
+          },
+          {
+            "command": [
+              "/bin/bash",
+              "/scripts/ensure-sso-auth.sh"
+            ],
+            "env": [
+              {
+                "name": "SSO_AUTH_WHITELIST",
+                "value": "10.244.0.0/16"
+              }
+            ],
+            "image": "lscr.io/linuxserver/qbittorrent:5.3.0@sha256:05c1454f9a32967affc1f34f67f8cc0cc57dd805dca45489fe797095a6286556",
+            "imagePullPolicy": "IfNotPresent",
+            "name": "sso-config",
+            "resources": {},
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "volumeMounts": [
+              {
+                "mountPath": "/config",
+                "name": "config"
+              },
+              {
+                "mountPath": "/scripts",
+                "name": "sso-script",
+                "readOnly": true
+              }
+            ]
+          }
+        ],
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {},
+        "terminationGracePeriodSeconds": 30,
+        "volumes": [
+          {
+            "name": "config",
+            "persistentVolumeClaim": {
+              "claimName": "qbittorrent-config-pvc"
+            }
+          },
+          {
+            "name": "downloads",
+            "persistentVolumeClaim": {
+              "claimName": "media-downloads-pvc"
+            }
+          },
+          {
+            "hostPath": {
+              "path": "/dev/net/tun",
+              "type": "CharDevice"
+            },
+            "name": "tun"
+          },
+          {
+            "name": "nymvpn-state",
+            "persistentVolumeClaim": {
+              "claimName": "qbittorrent-nymvpn-pvc"
+            }
+          },
+          {
+            "name": "nymvpn-access-code",
+            "secret": {
+              "defaultMode": 256,
+              "items": [
+                {
+                  "key": "NYM_ACCESS_CODE",
+                  "path": "access-code"
+                }
+              ],
+              "secretName": "nymvpn-credentials"
+            }
+          },
+          {
+            "configMap": {
+              "defaultMode": 365,
+              "name": "qbittorrent-sso"
+            },
+            "name": "sso-script"
+          }
+        ],
+        "automountServiceAccountToken": false
+      }
+    }
+  }
+}

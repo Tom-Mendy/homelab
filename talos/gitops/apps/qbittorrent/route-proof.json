@@ -1,0 +1,15 @@
+{
+  "apiVersion": "traefik.io/v1alpha1",
+  "kind": "Middleware",
+  "metadata": {
+    "name": "qbittorrent-route-proof",
+    "namespace": "media"
+  },
+  "spec": {
+    "headers": {
+      "customResponseHeaders": {
+        "X-Migration-Route": "talos-qbittorrent"
+      }
+    }
+  }
+}
