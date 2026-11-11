@@ -11,6 +11,7 @@ reviewed and explicitly selected.
 | Cinny | Migrated and observed | Public chat route to Talos .70; Matrix backend remains Ubuntu |
 | Navidrome | Migrated and observed | Single writer on existing Synology paths; Ubuntu ingress bridge retained |
 | SearXNG | Migrated and observed | NymVPN state kept on the same Synology NFS path; Ubuntu ingress and in-cluster consumer bridges reach Talos .70 |
+| Homepage | Migrated and observed | Stateless config on Talos; Ubuntu ingress bridges to Talos .70 |
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
@@ -37,6 +38,20 @@ the bridge. Keep this bridge until OpenWebUI moves, then remove the Ubuntu
 selectorless Service/EndpointSlice and the internal Talos host rule in the same
 reviewed Git change. The original Ubuntu Service selector and port are in the
 private rollback snapshot `searxng/source-service-before-internal-bridge.json`.
+
+Homepage uses the unchanged production image digest and the repository's
+services configuration; it has no PVC or external secret dependency. The
+Talos response through both `.70` and the retained Ubuntu ingress `.60` matched
+the pre-cutover HTTPS body exactly (79,530 bytes; SHA-256
+`2256b0053eff37d108337d869aee87d1c2c75ab0efb8c627abb9f60b5bdfc59a`). After
+the route switch, Ubuntu's Deployment was scaled to zero while its HelmRelease
+remained suspended. Eleven checks over 300.7 seconds returned the expected
+Talos route marker and identical body, with no Ubuntu pod and no Talos restart.
+OpenWebUI-to-SearXNG connectivity also passed during observation. Roll back by
+restoring the Ubuntu Ingress backend from the private snapshot
+`homepage/ubuntu-ingress-before-cutover.json` and scaling the Ubuntu Deployment
+to one; keep the Talos copy available until the old route is healthy. Remove
+the Ubuntu Talos-bridge Service/EndpointSlice after the migration is accepted.
 
 To roll back, suspend the Talos SearXNG Kustomization and stop its Deployment,
 then wait until its Pod is gone before starting the Ubuntu Deployment against

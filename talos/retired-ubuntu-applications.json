@@ -36,6 +36,15 @@
       "keepSuspended": true,
       "singleWriterSharedNfs": true,
       "rollback": "docs/talos-service-migrations.md"
+    },
+    {
+      "namespace": "homepage",
+      "deployment": "homepage",
+      "replicas": 0,
+      "helmRelease": "homepage",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "rollback": "docs/talos-service-migrations.md"
     }
   ]
 }

@@ -84,8 +84,8 @@ box means the work was verified, not merely planned.
      Forgejo endpoint. Prepare Infisical credentials for the new Kubernetes identity.
    - Replace temporary cross-cluster service dependencies with reachable
      endpoints. Cluster-local service names do not span clusters.
-5. Migrate applications individually. Status: Portfolio, Cinny, Navidrome, and
-   SearXNG complete.
+5. Migrate applications individually. Status: Portfolio, Cinny, Navidrome,
+   SearXNG, and Homepage complete.
    - [x] Move Cinny with its unchanged image and homeserver, verify routing
      rollback, and observe public HTML/config plus Matrix discovery.
    - [x] Move Navidrome after native SQLite/file recovery checks, preserve
@@ -97,6 +97,9 @@ box means the work was verified, not merely planned.
      [service execution record](talos-service-migrations.md).
    - [ ] Continue remaining services individually. See the
      [service execution record](talos-service-migrations.md).
+   - [x] Move Homepage with the unchanged image and configuration; preserve
+     its URL through the Ubuntu ingress bridge and pass a five-minute
+     observation.
    - [x] Deploy Portfolio on Talos with the identical production image digest,
      scoped registry credentials, separate RBAC, and verified local TLS.
    - [x] Restore its absent Pangolin resource, rehearse routing rollback to
