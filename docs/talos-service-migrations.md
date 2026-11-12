@@ -201,7 +201,13 @@ A one-time encrypted custom-format PostgreSQL dump was also created and its
 `pg_restore` catalog validated before user validation. It remains outside Git
 in the private migration state. There is not yet a recurring PostgreSQL plus
 `/data` backup job; choose a durable destination and test a full restore before
-closing Vaultwarden's migration follow-up.
+closing Vaultwarden's backup follow-up. The user confirmed login and vault
+synchronization on 2026-11-12.
+
+Atuin client synchronization was checked from the workstation on 2026-11-12.
+The CLI completed sync against `https://atuin.home.tom-mendy.com` with 14,931
+history items and no records pending upload or download. Grafana OIDC login and
+live dashboard queries still require a user browser session.
 
 To roll back, suspend the Talos SearXNG Kustomization and stop its Deployment,
 then wait until its Pod is gone before starting the Ubuntu Deployment against

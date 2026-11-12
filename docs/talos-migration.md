@@ -116,8 +116,10 @@ box means the work was verified, not merely planned.
    - [x] Move Pushgateway without persistent data; preserve its Ubuntu Service
      address through a selectorless bridge to Talos and pass a five-minute
      Prometheus scrape observation.
-   - [ ] Verify Grafana OIDC login and dashboard queries in a browser. Atuin
-     client synchronization also needs an end-to-end check.
+   - [x] Verify Atuin client synchronization from the workstation CLI on
+     2026-11-12; sync completed with 14,931 history items and no records
+     pending upload or download.
+   - [ ] Verify Grafana OIDC login and dashboard queries in a browser.
    - [ ] Continue remaining services individually. See the
      [service execution record](talos-service-migrations.md).
    - [x] Move Homepage with the unchanged image and configuration; preserve
@@ -137,8 +139,9 @@ box means the work was verified, not merely planned.
      downloads; preserve its authenticated UI, media service DNS, and HTTPS
      route, then pass a five-minute observation. It shares qBittorrent's
      outstanding Infisical registry-credential follow-up.
-   - [ ] Verify Vaultwarden login and vault sync after its PostgreSQL cutover.
-     The final SQLite import, route checks, and five-minute observation passed.
+   - [x] User confirmed Vaultwarden login and vault synchronization after its
+     PostgreSQL cutover. The final SQLite import, route checks, and observation
+     passed.
      A one-time encrypted PostgreSQL dump is catalog-verified; recurring
      database and `/data` backups still need a destination and restore test.
    - [x] Deploy Portfolio on Talos with the identical production image digest,
