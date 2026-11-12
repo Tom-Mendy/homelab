@@ -144,6 +144,20 @@
         "talosAddress": "10.0.0.72:3000",
         "removeAfter": "Ubuntu ingress no longer fronts Grafana"
       }
+    },
+    {
+      "namespace": "prometheus",
+      "deployment": "prometheus-prometheus-pushgateway",
+      "replicas": 0,
+      "helmRelease": "prometheus",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "rollback": "docs/talos-service-migrations.md",
+      "temporaryServiceBridge": {
+        "ubuntuService": "prometheus/prometheus-prometheus-pushgateway",
+        "talosAddress": "10.0.0.73:9091",
+        "removeAfter": "Prometheus has moved to Talos and its Pushgateway scrape is validated"
+      }
     }
   ]
 }

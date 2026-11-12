@@ -87,7 +87,7 @@ box means the work was verified, not merely planned.
      endpoints. Cluster-local service names do not span clusters.
 5. Migrate applications individually. Status: Portfolio, Cinny, Navidrome,
    SearXNG, Homepage, Radarr, Sonarr, Prowlarr, qBittorrent, NZBGet, Atuin,
-   and Blocky complete.
+   Blocky, and Pushgateway complete.
    - [x] Move Cinny with its unchanged image and homeserver, verify routing
      rollback, and observe public HTML/config plus Matrix discovery.
    - [x] Move Navidrome after native SQLite/file recovery checks, preserve
@@ -113,6 +113,9 @@ box means the work was verified, not merely planned.
    - [x] Move Grafana with its stopped-writer SQLite snapshot and same NFS
      database path; keep Prometheus reachable over HTTPS, bridge public ingress,
      and pass a five-minute observation.
+   - [x] Move Pushgateway without persistent data; preserve its Ubuntu Service
+     address through a selectorless bridge to Talos and pass a five-minute
+     Prometheus scrape observation.
    - [ ] Verify Grafana OIDC login and dashboard queries in a browser. Atuin
      client synchronization also needs an end-to-end check.
    - [ ] Continue remaining services individually. See the

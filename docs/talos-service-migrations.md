@@ -326,14 +326,20 @@ and remove the temporary EndpointSlice and Talos `.72` LoadBalancer. Never run
 both Grafana writers at once. Remove the Ubuntu ingress and backend bridge only
 after DNS and ingress clients use Talos directly.
 
-Pushgateway is prepared on Talos with the source image digest and no persistent
-data, but it has not been cut over. Its Deployment and ClusterIP work, and the
-Talos Pod and LoadBalancer paths passed after narrowing ingress policy to the
-Pushgateway and Prometheus namespaces plus the expected Ubuntu sources. From
-Ubuntu, `.73:9091` and a temporary `.74:3000` test both timed out, while the
-existing Grafana `.72:3000` path worked. The temporary test Service and probe
-Pods were removed; the Ubuntu Pushgateway remains at one Ready replica and
-Prometheus still scrapes it. Before cutover, investigate why Ubuntu cannot
-reach the new Talos LoadBalancer addresses and confirm the route from the
-Prometheus Pod. Do not stop the Ubuntu Pushgateway until that scrape path is
-verified.
+Pushgateway now runs on Talos with the exact source image digest and no
+persistent data. There were no pushed job groups at cutover. The Talos Service
+uses `externalTrafficPolicy: Local` so Cilium sees the original Ubuntu Pod
+source address and the restricted ingress policy can allow Prometheus. The
+Ubuntu Service name and ClusterIP remain stable but are selectorless; its
+migration-managed Endpoints object and mirrored EndpointSlice route to
+`10.0.0.73:9091`. The Ubuntu Deployment is at zero and its HelmRelease remains
+suspended. Eleven checks over five minutes passed with HTTP 200 through the
+stable Ubuntu Service, the Prometheus scrape target `up`, the Talos endpoint
+ready, and no target restarts. To roll back, scale the Ubuntu Deployment to
+one and wait for readiness, restore its original Service selector
+(`app.kubernetes.io/instance=prometheus` and
+`app.kubernetes.io/name=prometheus-pushgateway`), then verify the Ubuntu Pod
+is the sole endpoint and Prometheus is `up`. Keep the HelmRelease suspended
+until the rollback is verified. Remove the Ubuntu Service and migration
+Endpoints after Prometheus itself has moved to Talos and its scrape is
+validated.
