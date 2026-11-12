@@ -13,7 +13,8 @@
       "metadata": { "name": "talos-vaultwarden-reconciler", "namespace": "vaultwarden" },
       "rules": [
         { "apiGroups": ["apps"], "resources": ["deployments"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
-        { "apiGroups": [""], "resources": ["services", "persistentvolumeclaims"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
+        { "apiGroups": [""], "resources": ["services", "persistentvolumeclaims", "configmaps"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
+        { "apiGroups": ["batch"], "resources": ["cronjobs"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
         { "apiGroups": ["secrets.infisical.com"], "resources": ["infisicalstaticsecrets"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
         { "apiGroups": ["networking.k8s.io"], "resources": ["ingresses"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
         { "apiGroups": ["traefik.io"], "resources": ["middlewares"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
