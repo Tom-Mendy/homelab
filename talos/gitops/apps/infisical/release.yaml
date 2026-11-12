@@ -50,6 +50,10 @@ spec:
     redis:
       enabled: false
       architecture: standalone
+      image:
+        registry: mirror.gcr.io
+        repository: bitnamilegacy/redis
+        digest: sha256:b7460c9b5a848e1c06111d267b2cfbe94d3272b246fe91c62e579fafdcc0560f
       usePassword: false
       auth:
         enabled: false
