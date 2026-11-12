@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: job-search-manager
+  namespace: job-search-manager
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: job-search-manager-authentik-job-search-manager@kubernetescrd
+spec:
+  ingressClassName: talos-traefik
+  tls:
+    - hosts: [suivi-stage.home.tom-mendy.com]
+      secretName: suivi-stage-home-tom-mendy-com-tls
+  rules:
+    - host: suivi-stage.home.tom-mendy.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: job-search-manager
+                port:
+                  name: http

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: job-search-manager
+  namespace: job-search-manager
+spec:
+  selector:
+    app: job-search-manager
+  ports:
+    - {name: http, port: 80, targetPort: http}

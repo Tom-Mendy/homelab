@@ -1,0 +1,72 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Namespace",
+      "metadata": { "name": "cnpg-system" }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": { "name": "talos-cnpg-reconciler", "namespace": "flux-system" }
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "Role",
+      "metadata": { "name": "talos-cnpg-reconciler", "namespace": "cnpg-system" },
+      "rules": [
+        {
+          "apiGroups": ["source.toolkit.fluxcd.io"],
+          "resources": ["helmrepositories"],
+          "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"]
+        },
+        {
+          "apiGroups": ["helm.toolkit.fluxcd.io"],
+          "resources": ["helmreleases"],
+          "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"]
+        },
+        {
+          "apiGroups": ["apps"],
+          "resources": ["deployments", "replicasets"],
+          "verbs": ["get", "list", "watch"]
+        },
+        {
+          "apiGroups": [""],
+          "resources": ["pods"],
+          "verbs": ["get", "list", "watch"]
+        }
+      ]
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "RoleBinding",
+      "metadata": { "name": "talos-cnpg-reconciler", "namespace": "cnpg-system" },
+      "roleRef": { "apiGroup": "rbac.authorization.k8s.io", "kind": "Role", "name": "talos-cnpg-reconciler" },
+      "subjects": [{ "kind": "ServiceAccount", "name": "talos-cnpg-reconciler", "namespace": "flux-system" }]
+    },
+    {
+      "apiVersion": "source.toolkit.fluxcd.io/v1",
+      "kind": "HelmRepository",
+      "metadata": { "name": "cloudnative-pg", "namespace": "cnpg-system" },
+      "spec": { "interval": "30m", "url": "https://cloudnative-pg.github.io/charts" }
+    },
+    {
+      "apiVersion": "kustomize.toolkit.fluxcd.io/v1",
+      "kind": "Kustomization",
+      "metadata": { "name": "cnpg", "namespace": "flux-system" },
+      "spec": {
+        "interval": "5m",
+        "retryInterval": "30s",
+        "timeout": "10m",
+        "sourceRef": { "kind": "GitRepository", "name": "talos-bootstrap" },
+        "path": "./talos/gitops/platform/cnpg",
+        "serviceAccountName": "talos-cnpg-reconciler",
+        "prune": true,
+        "healthChecks": [{ "apiVersion": "apps/v1", "kind": "Deployment", "name": "cloudnative-pg", "namespace": "cnpg-system" }],
+        "wait": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: job-search-manager
+  namespace: job-search-manager
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: job-search-manager
+  template:
+    metadata:
+      labels:
+        app: job-search-manager
+    spec:
+      automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: job-search-manager-registry
+      containers:
+        - name: api
+          image: harbor.home.tom-mendy.com/job-search-manager/job-search-manager:latest@sha256:01ffd107020bef0d1d5dbb33f1632f854e877357978fe41851e59b2e18cecd07
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8765
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: job-search-manager-postgres-app
+                  key: uri
+            - name: HERMES_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: job-search-manager-runtime
+                  key: HERMES_API_TOKEN
+            - {name: S3_ENDPOINT_URL, value: "http://job-search-manager-garage:3900"}
+            - {name: S3_BUCKET, value: job-search-documents}
+            - {name: S3_REGION, value: garage}
+            - name: S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: job-search-manager-runtime
+                  key: S3_ACCESS_KEY_ID
+            - name: S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: job-search-manager-runtime
+                  key: S3_SECRET_ACCESS_KEY
+          readinessProbe:
+            httpGet: {path: /health/ready, port: http}
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet: {path: /health/live, port: http}
+            initialDelaySeconds: 15
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {memory: 512Mi}

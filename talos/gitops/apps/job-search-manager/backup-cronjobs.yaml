@@ -1,0 +1,78 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: job-search-manager-postgres-backup
+  namespace: job-search-manager
+spec:
+  suspend: true
+  schedule: "30 2 * * *"
+  timeZone: Europe/Paris
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 86400
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: ghcr.io/cloudnative-pg/postgresql:18.6-system-bullseye@sha256:899d3ed526b659d77935dde0e6bf2d69dbbf17d3d8c6486ca8cfd04bd3c18533
+              command: ["/bin/sh", "-ec"]
+              args:
+                - stamp=$(date -u +%Y%m%dT%H%M%SZ); tmp=$(mktemp /backups/.pgdump.XXXXXX); trap 'rm -f "$tmp" "$tmp.gz"' EXIT; pg_dump "$DATABASE_URL" > "$tmp"; gzip -c "$tmp" > "$tmp.gz"; mv "$tmp.gz" "/backups/postgres-$stamp.sql.gz"; rm -f "$tmp"; trap - EXIT; find /backups -maxdepth 1 -type f -name 'postgres-*.sql.gz' -mtime +30 -delete
+              env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: job-search-manager-postgres-app
+                      key: uri
+              volumeMounts:
+                - {name: backups, mountPath: /backups}
+          volumes:
+            - name: backups
+              persistentVolumeClaim: {claimName: job-search-manager-backups}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: job-search-manager-objects-backup
+  namespace: job-search-manager
+spec:
+  suspend: true
+  schedule: "0 3 * * *"
+  timeZone: Europe/Paris
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 86400
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: public.ecr.aws/aws-cli/aws-cli:2.37.9@sha256:92de75724b6a746951f0e8b915d86bbccd7cb55aff96cd0cb4f7017272160780
+              command: ["aws"]
+              args: ["s3", "sync", "s3://job-search-documents", "/backups/objects", "--endpoint-url", "http://job-search-manager-garage:3900"]
+              env:
+                - {name: AWS_DEFAULT_REGION, value: garage}
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: job-search-manager-runtime
+                      key: S3_ACCESS_KEY_ID
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: job-search-manager-runtime
+                      key: S3_SECRET_ACCESS_KEY
+              volumeMounts:
+                - {name: backups, mountPath: /backups}
+          volumes:
+            - name: backups
+              persistentVolumeClaim: {claimName: job-search-manager-backups}

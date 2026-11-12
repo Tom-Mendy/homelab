@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: job-search-manager-garage
+  namespace: job-search-manager
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: job-search-manager-garage
+  template:
+    metadata:
+      labels:
+        app: job-search-manager-garage
+    spec:
+      automountServiceAccountToken: false
+      initContainers:
+        - name: render-config
+          image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
+          command: ["/bin/sh", "-ec"]
+          args:
+            - sed "s/__RPC_SECRET__/$GARAGE_RPC_SECRET/" /config/garage.toml.template > /runtime/garage.toml
+          env:
+            - name: GARAGE_RPC_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: job-search-manager-runtime
+                  key: GARAGE_RPC_SECRET
+          volumeMounts:
+            - {name: config, mountPath: /config, readOnly: true}
+            - {name: rendered-config, mountPath: /runtime}
+      containers:
+        - name: garage
+          image: dxflrs/garage:v2.4.1@sha256:9c96caa2612d3411acc5b0e6701fb238dbfba33e533a6d7d3d811a4b12d0d020
+          command: ["/garage", "server"]
+          env:
+            - {name: GARAGE_CONFIG_FILE, value: /runtime/garage.toml}
+          ports:
+            - {name: s3, containerPort: 3900}
+            - {name: rpc, containerPort: 3901}
+          volumeMounts:
+            - {name: rendered-config, mountPath: /runtime, readOnly: true}
+            - {name: data, mountPath: /var/lib/garage}
+          readinessProbe:
+            tcpSocket: {port: 3900}
+            initialDelaySeconds: 10
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {memory: 512Mi}
+      volumes:
+        - name: config
+          configMap: {name: job-search-manager-garage-config}
+        - name: rendered-config
+          emptyDir: {}
+        - name: data
+          persistentVolumeClaim: {claimName: job-search-manager-garage-data}

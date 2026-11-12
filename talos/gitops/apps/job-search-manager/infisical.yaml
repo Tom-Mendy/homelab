@@ -1,0 +1,50 @@
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalConnection
+metadata:
+  name: job-search-manager-infisical
+  namespace: job-search-manager
+spec:
+  address: https://infisical.home.tom-mendy.com
+---
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalAuth
+metadata:
+  name: job-search-manager-infisical
+  namespace: job-search-manager
+spec:
+  method: kubernetes
+  infisicalConnectionRef:
+    name: job-search-manager-infisical
+    namespace: job-search-manager
+  kubernetes:
+    identityIdRef:
+      name: talos-job-search-manager-infisical-identity
+      namespace: job-search-manager
+      key: identityId
+    serviceAccountRef:
+      name: job-search-manager-infisical-sync
+      namespace: job-search-manager
+---
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalStaticSecret
+metadata:
+  name: job-search-manager-runtime
+  namespace: job-search-manager
+spec:
+  infisicalAuthRef:
+    name: job-search-manager-infisical
+    namespace: job-search-manager
+  sources:
+    - projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+      environmentSlug: prod
+      secretPath: /job-search-manager
+      recursive: false
+  targets:
+    - name: job-search-manager-runtime
+      namespace: job-search-manager
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+  syncOptions:
+    refreshInterval: 1m
+    instantUpdates: false

@@ -1,0 +1,19 @@
+{
+  "apiVersion": "v1",
+  "kind": "PersistentVolume",
+  "metadata": { "name": "job-search-manager-garage-data" },
+  "spec": {
+    "capacity": { "storage": "20Gi" },
+    "accessModes": ["ReadWriteOnce"],
+    "persistentVolumeReclaimPolicy": "Retain",
+    "storageClassName": "",
+    "volumeMode": "Filesystem",
+    "mountOptions": ["nfsvers=4.1"],
+    "nfs": {
+      "server": "10.0.0.11",
+      "path": "/volume1/k8s/job-search-manager-job-search-manager-garage-data-pvc-89a32c68-db96-482a-b0c6-a2e09b87194c",
+      "readOnly": false
+    },
+    "claimRef": { "namespace": "job-search-manager", "name": "job-search-manager-garage-data" }
+  }
+}
