@@ -87,7 +87,7 @@ box means the work was verified, not merely planned.
      endpoints. Cluster-local service names do not span clusters.
 5. Migrate applications individually. Status: Portfolio, Cinny, Navidrome,
    SearXNG, Homepage, Radarr, Sonarr, Prowlarr, qBittorrent, NZBGet, Atuin,
-   Blocky, and Pushgateway complete.
+   Blocky, Pushgateway, and the MatrixRTC component complete.
    - [x] Move Cinny with its unchanged image and homeserver, verify routing
      rollback, and observe public HTML/config plus Matrix discovery.
    - [x] Move Navidrome after native SQLite/file recovery checks, preserve
@@ -119,7 +119,13 @@ box means the work was verified, not merely planned.
    - [x] Verify Atuin client synchronization from the workstation CLI on
      2026-11-12; sync completed with 14,931 history items and no records
      pending upload or download.
-   - [ ] Verify Grafana OIDC login and dashboard queries in a browser.
+   - [x] User confirmed Grafana OIDC login and current Prometheus dashboard
+     data in the browser on 2026-11-12.
+   - [x] Move the stateless MatrixRTC LiveKit/JWT component to Talos `.74`;
+     preserve Ubuntu ClusterIP and public ingress through selectorless bridges,
+     then observe HTTP/WebSocket health. A real Element audio/video call is
+     still required before moving Tuwunel. See the
+     [service execution record](talos-service-migrations.md).
    - [ ] Continue remaining services individually. See the
      [service execution record](talos-service-migrations.md).
    - [x] Move Homepage with the unchanged image and configuration; preserve

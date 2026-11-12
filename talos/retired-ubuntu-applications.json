@@ -174,6 +174,24 @@
         "talosAddress": "10.0.0.70:80",
         "removeAfter": "Vaultwarden login is validated and Ubuntu ingress no longer fronts the Talos app"
       }
+    },
+    {
+      "namespace": "matrix",
+      "deployment": "matrix-rtc",
+      "replicas": 0,
+      "componentOnly": true,
+      "helmRelease": "matrix",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "temporaryServiceBridge": {
+        "ubuntuServices": [
+          "matrix/matrix-rtc",
+          "matrix/matrix-rtc-jwt"
+        ],
+        "talosAddress": "10.0.0.74",
+        "removeAfter": "Validate a real Element audio/video call, migrate remaining Matrix traffic, and update Pangolin/Newt raw routes to Talos"
+      },
+      "rollback": "docs/talos-service-migrations.md"
     }
   ]
 }

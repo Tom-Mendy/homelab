@@ -18,8 +18,9 @@ reviewed and explicitly selected.
 | qBittorrent | Migrated and observed | Existing config, NymVPN state, and downloads remain on Synology NFS; Ubuntu HTTPS ingress bridges to Talos .70 |
 | NZBGet | Migrated and observed | Existing config, NymVPN state, and downloads remain on Synology NFS; Ubuntu HTTPS ingress bridges to Talos .70 |
 | Atuin | Migrated, observed, and client sync validated | PostgreSQL and app on Talos; Ubuntu HTTPS bridge retained |
-| Grafana | Migrated and observed; browser OIDC validation pending | SQLite on Talos; Prometheus source remains Ubuntu; Ubuntu ingress bridge retained |
+| Grafana | Migrated, observed, and browser OIDC/dashboard validation confirmed | SQLite on Talos; Prometheus source remains Ubuntu; Ubuntu ingress bridge retained |
 | Vaultwarden | Migrated and user validated | PostgreSQL on Talos; Ubuntu SQLite writer stopped; Ubuntu ingress bridges to Talos .70 |
+| MatrixRTC | LiveKit/JWT component migrated and observed; real call pending | Talos `.74`; Ubuntu Services and public ingress bridge to Talos; Tuwunel and Newt remain Ubuntu |
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
@@ -310,6 +311,26 @@ name, and a blocklisted name. HTTPS content matched through Talos ingress and
 the retained Ubuntu ingress. HTTP redirects to HTTPS, and the metrics endpoint
 works through the bridge.
 
+MatrixRTC LiveKit and its JWT service run on Talos at `10.0.0.74` with the
+same pinned images as the source. Its LoadBalancer exposes TCP 7880, 7881, and
+8081 plus UDP 50100–50110. Ubuntu `matrix-rtc` and `matrix-rtc-jwt` Services
+keep their ClusterIPs and route via selectorless EndpointSlices to `.74`; the
+Ubuntu Deployment is at zero and the `matrix` HelmRelease remains suspended.
+The existing `rtc.tom-mendy.com` ingress and Newt raw routes are unchanged.
+Target and bridged `/healthz` and `/` returned HTTP 200 with matching body
+hashes in 20 checks over 288.4 seconds; the WebSocket port and JWT health check
+also passed, Flux is Ready, and the Talos Pod had no restarts. A real Element
+audio/video call has not yet been tested and must pass before migrating
+Tuwunel. The target `matrix-runtime` Secret was copied from the Ubuntu source
+without logging values; it is not yet synced from Infisical, so establish the
+Talos secret source before credential rotation or rebuild.
+
+To roll back this component, stop the Talos Deployment, restore the Ubuntu
+Deployment to one replica, wait for readiness, restore selectors on both
+Ubuntu Services, and remove the two migration EndpointSlices. Keep the Matrix
+HelmRelease suspended until rollback is verified. Do not move Tuwunel or change
+Newt raw routes until the real call passes.
+
 The existing Ubuntu DNS address `10.0.0.61` remains available as a temporary
 selectorless Service whose only ready EndpointSlice address is `10.0.0.71`.
 The Ubuntu Blocky Deployment is stopped and its HelmRelease remains suspended.
@@ -338,10 +359,10 @@ zero and its HelmRelease remains suspended. Talos `/api/health` returned 200;
 the public response matched it, the login route entered Grafana's generic OIDC
 flow, and HTTP redirected to HTTPS. Eleven checks over 308 seconds passed with
 no target restarts. An API request using the copied Grafana admin Secret was
-rejected, so no admin API or authenticated datasource-health check is claimed.
-Please verify the browser OIDC login and that dashboards display current
-Prometheus data. The copied OIDC Secret is not Infisical-synced; arrange that
-source before rotating or rebuilding the credential.
+rejected, so no admin API check is claimed. The user confirmed browser OIDC
+login and current Prometheus dashboard data on 2026-11-12. The copied OIDC
+Secret is not Infisical-synced; arrange that source before rotating or
+rebuilding the credential.
 
 To roll back, stop Talos Grafana, start the Ubuntu Deployment against the same
 NFS database, wait for it to become Ready, restore the Ubuntu Service selector,
