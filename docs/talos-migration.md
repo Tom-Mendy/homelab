@@ -186,6 +186,10 @@ box means the work was verified, not merely planned.
    - [x] Observe direct Talos and Ubuntu-bridged HTTPS for 309 seconds across
      six healthy samples; all eight target Pods stayed Ready, the source stayed
      at zero Pods, and restart counts did not increase after startup.
+   - [x] Move Hindsight on the same Synology NFS directory and exact production
+     image digests; stop Ubuntu writers first, keep the Ubuntu Authentik outpost
+     and HTTPS bridge, and pass six samples over five minutes. Browser-side
+     authenticated sign-in remains unverified pending an Authentik session.
    - Keep Forgejo and Authentik available on Ubuntu until their separate
      migration windows. Use authentik.tom-mendy.com throughout.
    - For each service: prepare target without writers, suspend its Ubuntu GitOps

@@ -21,10 +21,30 @@ reviewed and explicitly selected.
 | Grafana | Migrated, observed, and browser OIDC/dashboard validation confirmed | SQLite on Talos; Prometheus source is Talos; Ubuntu ingress bridge retained |
 | Infisical | Migrated, observed, and secret-sync validated | App v0.166.5 retained; 795-table PostgreSQL restore on nfs-k8s; Redis reuses its original Synology NFS directory; Ubuntu ingress bridge retained |
 | Harbor | Migrated and observed | Harbor v2.15.4 and chart 1.19.4 retained; five existing Synology NFS paths rebound; Talos-specific Infisical auth; Ubuntu HTTPS ingress bridges to Talos `.70` |
+| Hindsight | Migrated and observed | Exact production image digests and existing embedded PostgreSQL directory on Synology NFS; Ubuntu HTTPS ingress bridges to Talos `.70`; Ubuntu Authentik outpost remains active |
 | Vaultwarden | Migrated and user validated | PostgreSQL on Talos; Ubuntu SQLite writer stopped; Ubuntu ingress bridges to Talos .70 |
 | MatrixRTC | LiveKit/JWT component migrated, observed, and real Element call validated | Talos `.74`; Ubuntu Services and public ingress bridge to Talos; Newt remains Ubuntu |
 | Tuwunel | Migrated, observed, and user validated | Single writer on existing Synology NFS paths; Ubuntu ingress and ClusterIP bridge to Talos `.75` |
 | Job Search Manager | Cutover prepared; deferred for Authentik outpost configuration | Ubuntu app and Garage restored; final PostgreSQL restore and Garage data verified on Talos, where the app and Garage remain stopped |
+
+Hindsight now runs on Talos with the exact production API and control-plane
+image digests. Its pre-bound Retain PV uses the same Synology NFS directory as
+the Ubuntu claim; the Ubuntu Deployments were stopped before either Talos Pod
+mounted it. The Ubuntu HelmRelease remains suspended, its Deployments stay at
+zero, and its HTTPS Ingress bridges to Talos while the more-specific Ubuntu
+Authentik outpost route remains in place. Six samples over five minutes showed
+both Talos Pods Ready with no restarts; the in-Pod API `/health` and control
+plane `/api/health` checks returned 200, and direct plus bridged HTTPS returned
+the expected redirect to `authentik.tom-mendy.com`. An authenticated UI session
+was not available in the preview browser, so browser-side sign-in remains
+unverified. Ollama is still stopped on Ubuntu and has not been moved, so
+Hindsight inference remains unavailable until that dependency is restored.
+
+For rollback, stop both Talos Deployments and wait for all Pods to exit before
+starting the Ubuntu Deployments against the same NFS directory. Restore the
+Ubuntu Ingress backend from the private snapshot in
+`~/.local/state/homelab/talos-migration/20261111-remaining-services/hindsight/rollback/`.
+Never run both clusters' Hindsight API writers at once.
 
 Job Search Manager is currently serving from Ubuntu. The Talos CloudNativePG
 operator and target cluster are ready. The final PostgreSQL dump
