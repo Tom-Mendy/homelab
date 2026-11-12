@@ -38,6 +38,8 @@ spec:
           value: "true"
     ingress:
       enabled: false
+      nginx:
+        enabled: false
     postgresql:
       enabled: false
       useExistingPostgresSecret:
