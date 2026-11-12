@@ -77,6 +77,13 @@ selectorless Service/EndpointSlice and the internal Talos host rule in the same
 reviewed Git change. The original Ubuntu Service selector and port are in the
 private rollback snapshot `searxng/source-service-before-internal-bridge.json`.
 
+OpenWebUI remains on Ubuntu. Its Ollama inference Deployment is intentionally
+at zero replicas during the GPU maintenance hold, so the Ubuntu ingress returns
+503 `no available server` for `/api/tags`. Talos can reach the Talos SearXNG
+endpoint, but an OpenWebUI cutover cannot yet pass an end-to-end model check.
+Keep inference stopped during the GPU hold; validate the model path after the
+GPU worker is available on Talos and before completing the OpenWebUI migration.
+
 Homepage uses the unchanged production image digest and the repository's
 services configuration; it has no PVC or external secret dependency. The
 Talos response through both `.70` and the retained Ubuntu ingress `.60` matched
