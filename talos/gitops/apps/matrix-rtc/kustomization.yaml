@@ -3,4 +3,6 @@ kind: Kustomization
 resources:
   - configmap.yaml
   - deployment.yaml
+  - infisical.yaml
+  - serviceaccount.yaml
   - service.yaml

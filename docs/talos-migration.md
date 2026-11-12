@@ -121,6 +121,8 @@ box means the work was verified, not merely planned.
      pending upload or download.
    - [x] User confirmed Grafana OIDC login and current Prometheus dashboard
      data in the browser on 2026-11-12.
+   - [x] User validated a real Element audio/video call through MatrixRTC on
+     2026-11-12; proceed with the Tuwunel migration.
    - [x] Move the stateless MatrixRTC LiveKit/JWT component to Talos `.74`;
      preserve Ubuntu ClusterIP and public ingress through selectorless bridges,
      then observe HTTP/WebSocket health. A real Element audio/video call is

@@ -20,7 +20,7 @@ reviewed and explicitly selected.
 | Atuin | Migrated, observed, and client sync validated | PostgreSQL and app on Talos; Ubuntu HTTPS bridge retained |
 | Grafana | Migrated, observed, and browser OIDC/dashboard validation confirmed | SQLite on Talos; Prometheus source remains Ubuntu; Ubuntu ingress bridge retained |
 | Vaultwarden | Migrated and user validated | PostgreSQL on Talos; Ubuntu SQLite writer stopped; Ubuntu ingress bridges to Talos .70 |
-| MatrixRTC | LiveKit/JWT component migrated and observed; real call pending | Talos `.74`; Ubuntu Services and public ingress bridge to Talos; Tuwunel and Newt remain Ubuntu |
+| MatrixRTC | LiveKit/JWT component migrated, observed, and real Element call validated | Talos `.74`; Ubuntu Services and public ingress bridge to Talos; Tuwunel and Newt remain Ubuntu |
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
@@ -319,11 +319,15 @@ Ubuntu Deployment is at zero and the `matrix` HelmRelease remains suspended.
 The existing `rtc.tom-mendy.com` ingress and Newt raw routes are unchanged.
 Target and bridged `/healthz` and `/` returned HTTP 200 with matching body
 hashes in 20 checks over 288.4 seconds; the WebSocket port and JWT health check
-also passed, Flux is Ready, and the Talos Pod had no restarts. A real Element
-audio/video call has not yet been tested and must pass before migrating
-Tuwunel. The target `matrix-runtime` Secret was copied from the Ubuntu source
-without logging values; it is not yet synced from Infisical, so establish the
-Talos secret source before credential rotation or rebuild.
+also passed, Flux is Ready, and the Talos Pod had no restarts. The user
+confirmed a real Element audio/video call works through the cutover.
+A dedicated `talos-matrix` Infisical identity now has No Access at organization
+scope, Viewer on project `homelab`, and Kubernetes authentication restricted
+to the Talos API, namespace `matrix`, and ServiceAccount
+`matrix-infisical-sync`; TLS verification uses the Talos CA. Flux now reconciles
+the matrix secrets from `/matrix` and `/oidc`, replacing the one-time copied
+`matrix-runtime` Secret. Confirm both InfisicalStaticSecrets report Ready before
+starting Tuwunel on Talos.
 
 To roll back this component, stop the Talos Deployment, restore the Ubuntu
 Deployment to one replica, wait for readiness, restore selectors on both
