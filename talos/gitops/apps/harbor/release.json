@@ -102,7 +102,7 @@
         },
         "existingSecret": "harbor-secrets",
         "existingSecretKey": "secret",
-        "replicas": 0
+        "replicas": 1
       },
       "jobservice": {
         "image": {
@@ -111,7 +111,7 @@
         },
         "existingSecret": "harbor-secrets",
         "existingSecretKey": "JOBSERVICE_SECRET",
-        "replicas": 0
+        "replicas": 1
       },
       "registry": {
         "registry": {
@@ -131,28 +131,28 @@
         "credentials": {
           "existingSecret": "harbor-secrets"
         },
-        "replicas": 0
+        "replicas": 1
       },
       "portal": {
         "image": {
           "repository": "mirror.gcr.io/goharbor/harbor-portal",
           "tag": "v2.15.4@sha256:01edf478505b21dba23a83c095f6ecac0c1e705690093edbab41e9a4d6754a75"
         },
-        "replicas": 0
+        "replicas": 1
       },
       "trivy": {
         "image": {
           "repository": "mirror.gcr.io/goharbor/trivy-adapter-photon",
           "tag": "v2.15.4@sha256:813ca81b4a4ea0f44f5fa81cca2645eeb58d4b1f6c66b428df9d506174bb71d9"
         },
-        "replicas": 0
+        "replicas": 1
       },
       "exporter": {
         "image": {
           "repository": "mirror.gcr.io/goharbor/harbor-exporter",
           "tag": "v2.15.4@sha256:9ffede33dc519b4be035596a72f00f354754a22a3769077731f81ee7d6852f4f"
         },
-        "replicas": 0
+        "replicas": 1
       },
       "database": {
         "internal": {
@@ -196,14 +196,14 @@
                 "kind": "StatefulSet",
                 "name": "harbor-database"
               },
-              "patch": "- op: replace\n  path: /spec/replicas\n  value: 0"
+              "patch": "- op: replace\n  path: /spec/replicas\n  value: 1"
             },
             {
               "target": {
                 "kind": "StatefulSet",
                 "name": "harbor-redis"
               },
-              "patch": "- op: replace\n  path: /spec/replicas\n  value: 0"
+              "patch": "- op: replace\n  path: /spec/replicas\n  value: 1"
             }
           ]
         }
