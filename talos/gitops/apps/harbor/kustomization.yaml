@@ -7,6 +7,7 @@
     "infisical.json",
     "storage.json",
     "repository.json",
-    "release.json"
+    "release.json",
+    "internal-http-bridge.json"
   ]
 }
