@@ -469,6 +469,20 @@ until the rollback is verified. Remove the Ubuntu Service and migration
 Endpoints after Prometheus itself has moved to Talos and its scrape is
 validated.
 
-Prometheus now runs on Talos with the pinned source chart and image digests. The source writer was stopped before the target started against the existing Synology TSDB at `10.0.0.11:/volume1/prometheus`; its Retain PV remains available for rollback. Talos direct HTTPS and the unchanged public HTTPS route both returned `/` readiness 200, with the `talos-prometheus` route marker. The target reports 20 current active targets, all up; a historical query returned the pre-cutover target count, confirming retained TSDB history. Grafana `/api/health` remained HTTP 200. The Ubuntu Deployment remains at zero, its HelmRelease suspended, and the Ubuntu selectorless Service/EndpointSlice bridge retained.
+Prometheus now runs on Talos with the pinned source chart and image digests.
+The source writer was stopped before the target started against the existing
+Synology TSDB at `10.0.0.11:/volume1/prometheus`; its Retain PV remains
+available for rollback. Talos direct HTTPS and the unchanged public HTTPS
+route both returned `/` readiness 200, with the `talos-prometheus` route
+marker. The target reports 20 current active targets, all up; a historical
+query returned the pre-cutover target count, confirming retained TSDB history.
+Grafana `/api/health` remained HTTP 200. The Ubuntu Deployment remains at
+zero, its HelmRelease suspended, and the Ubuntu selectorless
+Service/EndpointSlice bridge retained.
 
-To roll back, scale Talos Prometheus to zero and wait for its Pod to exit before restoring the original Ubuntu Service selector and deleting the migration EndpointSlice; then scale the Ubuntu Deployment to one and verify readiness. Keep its HelmRelease suspended until rollback is verified. Never run both TSDB writers at once. Prometheus logs the existing upstream warning that NFS filesystems may risk data loss; retain the tested recovery backup.
+To roll back, scale Talos Prometheus to zero and wait for its Pod to exit
+before restoring the original Ubuntu Service selector and deleting the
+migration EndpointSlice; then scale the Ubuntu Deployment to one and verify
+readiness. Keep its HelmRelease suspended until rollback is verified. Never
+run both TSDB writers at once. Prometheus logs the existing upstream warning
+that NFS filesystems may risk data loss; retain the tested recovery backup.
