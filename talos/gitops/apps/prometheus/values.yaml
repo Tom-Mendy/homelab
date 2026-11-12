@@ -84,11 +84,7 @@ kube-state-metrics:
     sha: sha256:42cfe3723a5f058171c627537fb57a3ea0f26e4380fa18555a95cb1a1b4cfc5b
 
 prometheus-node-exporter:
-  image:
-    registry: quay.io
-    repository: prometheus/node-exporter
-    tag: v1.12.1
-    digest: sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0
+  enabled: false
 
 # Consumed by the local prometheus-extras chart, not the upstream chart.
 nfsProbe:
