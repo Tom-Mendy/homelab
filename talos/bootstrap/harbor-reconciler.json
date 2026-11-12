@@ -1,0 +1,145 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Namespace",
+      "metadata": {
+        "name": "harbor",
+        "labels": {
+          "pod-security.kubernetes.io/enforce": "baseline",
+          "pod-security.kubernetes.io/audit": "baseline",
+          "pod-security.kubernetes.io/warn": "baseline"
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "talos-harbor-reconciler",
+        "namespace": "flux-system"
+      }
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "Role",
+      "metadata": {
+        "name": "talos-harbor-reconciler",
+        "namespace": "harbor"
+      },
+      "rules": [
+        {
+          "apiGroups": [
+            "",
+            "apps",
+            "batch",
+            "networking.k8s.io",
+            "source.toolkit.fluxcd.io",
+            "helm.toolkit.fluxcd.io",
+            "secrets.infisical.com"
+          ],
+          "resources": [
+            "*"
+          ],
+          "verbs": [
+            "get",
+            "list",
+            "watch",
+            "create",
+            "update",
+            "patch",
+            "delete"
+          ]
+        }
+      ]
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "RoleBinding",
+      "metadata": {
+        "name": "talos-harbor-reconciler",
+        "namespace": "harbor"
+      },
+      "subjects": [
+        {
+          "kind": "ServiceAccount",
+          "name": "talos-harbor-reconciler",
+          "namespace": "flux-system"
+        }
+      ],
+      "roleRef": {
+        "apiGroup": "rbac.authorization.k8s.io",
+        "kind": "Role",
+        "name": "talos-harbor-reconciler"
+      }
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "ClusterRole",
+      "metadata": {
+        "name": "talos-harbor-pv-reconciler"
+      },
+      "rules": [
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "persistentvolumes"
+          ],
+          "verbs": [
+            "get",
+            "list",
+            "watch",
+            "create",
+            "update",
+            "patch",
+            "delete"
+          ]
+        }
+      ]
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "ClusterRoleBinding",
+      "metadata": {
+        "name": "talos-harbor-pv-reconciler"
+      },
+      "subjects": [
+        {
+          "kind": "ServiceAccount",
+          "name": "talos-harbor-reconciler",
+          "namespace": "flux-system"
+        }
+      ],
+      "roleRef": {
+        "apiGroup": "rbac.authorization.k8s.io",
+        "kind": "ClusterRole",
+        "name": "talos-harbor-pv-reconciler"
+      }
+    },
+    {
+      "apiVersion": "kustomize.toolkit.fluxcd.io/v1",
+      "kind": "Kustomization",
+      "metadata": {
+        "name": "harbor",
+        "namespace": "flux-system"
+      },
+      "spec": {
+        "interval": "5m",
+        "retryInterval": "30s",
+        "timeout": "20m",
+        "sourceRef": {
+          "kind": "GitRepository",
+          "name": "talos-bootstrap"
+        },
+        "path": "./talos/gitops/apps/harbor",
+        "serviceAccountName": "talos-harbor-reconciler",
+        "prune": false,
+        "wait": true
+      }
+    }
+  ]
+}

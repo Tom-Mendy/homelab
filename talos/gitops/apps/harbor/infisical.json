@@ -1,0 +1,136 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "secrets.infisical.com/v1beta1",
+      "kind": "InfisicalConnection",
+      "metadata": {
+        "name": "harbor-infisical",
+        "namespace": "harbor"
+      },
+      "spec": {
+        "address": "https://infisical.home.tom-mendy.com"
+      }
+    },
+    {
+      "apiVersion": "secrets.infisical.com/v1beta1",
+      "kind": "InfisicalAuth",
+      "metadata": {
+        "name": "harbor-infisical",
+        "namespace": "harbor"
+      },
+      "spec": {
+        "method": "kubernetes",
+        "infisicalConnectionRef": {
+          "name": "harbor-infisical",
+          "namespace": "harbor"
+        },
+        "kubernetes": {
+          "identityIdRef": {
+            "name": "harbor-infisical-identity",
+            "namespace": "harbor",
+            "key": "identityId"
+          },
+          "serviceAccountRef": {
+            "name": "harbor-infisical-sync",
+            "namespace": "harbor"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "secrets.infisical.com/v1beta1",
+      "kind": "InfisicalStaticSecret",
+      "metadata": {
+        "name": "harbor-secrets",
+        "namespace": "harbor"
+      },
+      "spec": {
+        "infisicalAuthRef": {
+          "name": "harbor-infisical",
+          "namespace": "harbor"
+        },
+        "sources": [
+          {
+            "projectId": "758123bc-7eaa-4256-98a2-bb7438a783b8",
+            "environmentSlug": "prod",
+            "secretPath": "/harbor",
+            "recursive": false
+          }
+        ],
+        "syncOptions": {
+          "refreshInterval": "1m",
+          "instantUpdates": false
+        },
+        "targets": [
+          {
+            "name": "harbor-secrets",
+            "namespace": "harbor",
+            "creationPolicy": "Orphan",
+            "kind": "Secret",
+            "secretType": "Opaque",
+            "template": {
+              "engineVersion": "v1",
+              "data": {
+                "HARBOR_ADMIN_PASSWORD": "{{ .HARBOR_ADMIN_PASSWORD.Value }}",
+                "JOBSERVICE_SECRET": "{{ .HARBOR_JOBSERVICE_SECRET.Value }}",
+                "REGISTRY_HTPASSWD": "{{ .HARBOR_REGISTRY_HTPASSWD.Value }}",
+                "REGISTRY_HTTP_SECRET": "{{ .HARBOR_REGISTRY_SECRET.Value }}",
+                "REGISTRY_PASSWD": "{{ .HARBOR_REGISTRY_PASSWORD.Value }}",
+                "secret": "{{ .HARBOR_CORE_SECRET.Value }}",
+                "secretKey": "{{ .HARBOR_SECRET_KEY.Value }}"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "secrets.infisical.com/v1beta1",
+      "kind": "InfisicalStaticSecret",
+      "metadata": {
+        "name": "harbor-proxy-credentials",
+        "namespace": "harbor"
+      },
+      "spec": {
+        "infisicalAuthRef": {
+          "name": "harbor-infisical",
+          "namespace": "harbor"
+        },
+        "sources": [
+          {
+            "projectId": "758123bc-7eaa-4256-98a2-bb7438a783b8",
+            "environmentSlug": "prod",
+            "secretPath": "/harbor/proxy",
+            "recursive": false
+          }
+        ],
+        "syncOptions": {
+          "refreshInterval": "1m",
+          "instantUpdates": false
+        },
+        "targets": [
+          {
+            "name": "harbor-proxy-credentials",
+            "namespace": "harbor",
+            "creationPolicy": "Orphan",
+            "kind": "Secret",
+            "secretType": "Opaque",
+            "template": {
+              "engineVersion": "v1",
+              "data": {
+                "DOCKERHUB_USERNAME": "{{ .DOCKERHUB_USERNAME.Value }}",
+                "DOCKERHUB_PASSWORD": "{{ .DOCKERHUB_PASSWORD.Value }}",
+                "GHCR_USERNAME": "{{ .GHCR_USERNAME.Value }}",
+                "GHCR_PASSWORD": "{{ .GHCR_PASSWORD.Value }}",
+                "QUAY_USERNAME": "{{ .QUAY_USERNAME.Value }}",
+                "QUAY_PASSWORD": "{{ .QUAY_PASSWORD.Value }}"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

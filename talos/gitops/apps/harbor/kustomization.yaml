@@ -1,0 +1,12 @@
+{
+  "apiVersion": "kustomize.config.k8s.io/v1beta1",
+  "kind": "Kustomization",
+  "resources": [
+    "serviceaccount.json",
+    "identity-secret.json",
+    "infisical.json",
+    "storage.json",
+    "repository.json",
+    "release.json"
+  ]
+}
