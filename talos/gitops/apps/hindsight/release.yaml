@@ -33,7 +33,7 @@
     },
     "values": {
       "maintenance": {
-        "enabled": true
+        "enabled": false
       },
       "persistence": {
         "existingClaim": "hindsight-data"
