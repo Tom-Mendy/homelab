@@ -48,7 +48,7 @@ spec:
           name: infisical-postgres-app
           key: uri
     redis:
-      enabled: false
+      enabled: true
       architecture: standalone
       image:
         registry: mirror.gcr.io
