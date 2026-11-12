@@ -1,0 +1,9 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: job-search-manager-route-proof
+  namespace: job-search-manager
+spec:
+  headers:
+    customResponseHeaders:
+      X-Migration-Route: talos-job-search-manager

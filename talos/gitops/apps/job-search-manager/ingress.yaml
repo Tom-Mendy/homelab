@@ -4,14 +4,10 @@ metadata:
   name: job-search-manager
   namespace: job-search-manager
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/router.middlewares: job-search-manager-authentik-job-search-manager@kubernetescrd
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: job-search-manager-route-proof@kubernetescrd,job-search-manager-authentik-job-search-manager@kubernetescrd
 spec:
   ingressClassName: talos-traefik
-  tls:
-    - hosts: [suivi-stage.home.tom-mendy.com]
-      secretName: suivi-stage-home-tom-mendy-com-tls
   rules:
     - host: suivi-stage.home.tom-mendy.com
       http:

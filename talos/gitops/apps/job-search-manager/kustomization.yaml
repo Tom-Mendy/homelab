@@ -13,4 +13,6 @@ resources:
   - app-service.yaml
   - authentik-middleware.yaml
   - ingress.yaml
+  - ingress-secure.yaml
+  - route-proof.yaml
   - backup-cronjobs.yaml

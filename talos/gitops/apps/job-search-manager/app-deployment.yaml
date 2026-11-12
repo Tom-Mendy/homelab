@@ -4,7 +4,7 @@ metadata:
   name: job-search-manager
   namespace: job-search-manager
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: job-search-manager
