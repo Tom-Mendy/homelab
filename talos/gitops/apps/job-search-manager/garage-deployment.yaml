@@ -24,7 +24,7 @@ spec:
             - name: GARAGE_RPC_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: job-search-manager-runtime
+                  name: job-search-manager-garage-runtime
                   key: GARAGE_RPC_SECRET
           volumeMounts:
             - {name: config, mountPath: /config, readOnly: true}
