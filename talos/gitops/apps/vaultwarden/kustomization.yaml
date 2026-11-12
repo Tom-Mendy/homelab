@@ -9,3 +9,4 @@ resources:
   - ingress.json
   - ingress-secure.json
   - route-proof.json
+  - backup.yaml

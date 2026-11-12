@@ -1,0 +1,145 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vaultwarden-backups
+  namespace: vaultwarden
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-k8s
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vaultwarden-backup-settings
+  namespace: vaultwarden
+data:
+  age-recipient: age18m08wy50x2dxwp89ls5fyptgfd40azkjtet7wmwuyrvfdhu463gqmnp3tv
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: vaultwarden-backup
+  namespace: vaultwarden
+spec:
+  schedule: "30 3 * * *"
+  timeZone: Europe/Paris
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 86400
+      backoffLimit: 2
+      template:
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 999
+            runAsGroup: 999
+            fsGroup: 999
+            seccompProfile:
+              type: RuntimeDefault
+          initContainers:
+            - name: install-age
+              image: docker.io/library/busybox@sha256:a7dbc319b1438115a207e11930dc4bb3e643dcb3ec0bdd694bb36cd8fad289ec
+              imagePullPolicy: IfNotPresent
+              command: ["/bin/sh", "-ec"]
+              args:
+                - >-
+                  cd /tmp;
+                  wget -qO age.tar.gz https://github.com/FiloSottile/age/releases/download/v1.3.2/age-v1.3.2-linux-amd64.tar.gz;
+                  echo 'cbe24006683f8eb669266162894b9a522a1af52f2665fbc63a4bb032ed26ac10  age.tar.gz' | sha256sum -c -;
+                  tar -xzf age.tar.gz;
+                  cp age/age /tools/age;
+                  chmod 0555 /tools/age
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: tools
+                  mountPath: /tools
+          containers:
+            - name: backup
+              image: postgres:16.15@sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54
+              imagePullPolicy: IfNotPresent
+              command: ["/bin/bash", "-euo", "pipefail", "-c"]
+              args:
+                - |
+                  stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+                  stage="/backups/.${stamp}.partial"
+                  final="/backups/${stamp}"
+                  mkdir -m 0700 "$stage"
+                  trap 'rm -rf "$stage"' EXIT
+                  pg_dump --format=custom --no-owner --no-acl \
+                    --host="$PGHOST" --port="$PGPORT" \
+                    --username="$PGUSER" --dbname="$PGDATABASE" \
+                    | /tools/age --recipient "$BACKUP_AGE_RECIPIENT" \
+                        --output "$stage/postgres.dump.age"
+                  tar -C /data -czf - . \
+                    | /tools/age --recipient "$BACKUP_AGE_RECIPIENT" \
+                        --output "$stage/data.tar.gz.age"
+                  cd "$stage"
+                  sha256sum postgres.dump.age data.tar.gz.age > SHA256SUMS
+                  test -s postgres.dump.age
+                  test -s data.tar.gz.age
+                  cd /backups
+                  mv "$stage" "$final"
+                  trap - EXIT
+                  find /backups -mindepth 1 -maxdepth 1 -type d \
+                    -name '????????T??????Z' -mtime +30 -exec rm -rf -- {} +
+              env:
+                - name: PGHOST
+                  value: vaultwarden-postgres
+                - name: PGPORT
+                  value: "5432"
+                - name: PGUSER
+                  value: vaultwarden
+                - name: PGDATABASE
+                  value: vaultwarden
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: vaultwarden-postgres
+                      key: POSTGRES_PASSWORD
+                - name: BACKUP_AGE_RECIPIENT
+                  valueFrom:
+                    configMapKeyRef:
+                      name: vaultwarden-backup-settings
+                      key: age-recipient
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  memory: 512Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: data
+                  mountPath: /data
+                  readOnly: true
+                - name: backups
+                  mountPath: /backups
+                - name: tools
+                  mountPath: /tools
+                  readOnly: true
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: vaultwarden-data-pvc
+                readOnly: true
+            - name: backups
+              persistentVolumeClaim:
+                claimName: vaultwarden-backups
+            - name: tools
+              emptyDir: {}

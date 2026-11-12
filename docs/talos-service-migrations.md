@@ -17,7 +17,9 @@ reviewed and explicitly selected.
 | Prowlarr | Migrated and observed | Existing Synology config on Talos; Ubuntu ingress bridges to Talos .70; Radarr and Sonarr app connections validated |
 | qBittorrent | Migrated and observed | Existing config, NymVPN state, and downloads remain on Synology NFS; Ubuntu HTTPS ingress bridges to Talos .70 |
 | NZBGet | Migrated and observed | Existing config, NymVPN state, and downloads remain on Synology NFS; Ubuntu HTTPS ingress bridges to Talos .70 |
-| Vaultwarden | Migrated and observed; user login pending | PostgreSQL on Talos; Ubuntu SQLite writer stopped; Ubuntu ingress bridges to Talos .70 |
+| Atuin | Migrated, observed, and client sync validated | PostgreSQL and app on Talos; Ubuntu HTTPS bridge retained |
+| Grafana | Migrated and observed; browser OIDC validation pending | SQLite on Talos; Prometheus source remains Ubuntu; Ubuntu ingress bridge retained |
+| Vaultwarden | Migrated and user validated | PostgreSQL on Talos; Ubuntu SQLite writer stopped; Ubuntu ingress bridges to Talos .70 |
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
@@ -199,10 +201,12 @@ migration complete. Roll back by stopping Talos before restarting Ubuntu
 against the unchanged SQLite directory; never run both instances as writers.
 A one-time encrypted custom-format PostgreSQL dump was also created and its
 `pg_restore` catalog validated before user validation. It remains outside Git
-in the private migration state. There is not yet a recurring PostgreSQL plus
-`/data` backup job; choose a durable destination and test a full restore before
-closing Vaultwarden's backup follow-up. The user confirmed login and vault
-synchronization on 2026-11-12.
+in the private migration state. The user confirmed login and vault
+synchronization on 2026-11-12. A recurring backup CronJob is being added to
+write the PostgreSQL dump and `/data` archive encrypted with age to a separate
+`nfs-k8s` PVC; its full restore test remains pending. The backup PVC shares the
+Synology failure domain with live data and does not replace an independent or
+off-site copy.
 
 Atuin client synchronization was checked from the workstation on 2026-11-12.
 The CLI completed sync against `https://atuin.home.tom-mendy.com` with 14,931
