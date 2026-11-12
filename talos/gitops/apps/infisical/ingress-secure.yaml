@@ -7,7 +7,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.middlewares: infisical-route-proof@kubernetescrd
 spec:
-  ingressClassName: traefik
+  ingressClassName: talos-traefik
   tls:
     - hosts:
         - infisical.home.tom-mendy.com
