@@ -118,6 +118,50 @@
                 "name": "backups"
               }
             ]
+          },
+          {
+            "name": "tuwunel-backup-trigger",
+            "image": "docker.io/library/busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e",
+            "imagePullPolicy": "IfNotPresent",
+            "command": [
+              "/bin/sh",
+              "-ec"
+            ],
+            "args": [
+              "while true; do\n  until pidof tuwunel >/dev/null 2>&1; do sleep 10; done\n  sleep 120\n  if pidof tuwunel >/dev/null 2>&1; then\n    echo \"Triggering retained Tuwunel RocksDB backup\"\n    kill -USR2 \"$(pidof tuwunel)\"\n    stamp=\"$(date -u +%Y%m%dT%H%M%SZ)\"\n    mkdir -p /backup-root/media-snapshots\n    temp=\"/backup-root/media-snapshots/media-${stamp}.tar.gz.tmp\"\n    tar -czf \"$temp\" -C /state media archive\n    mv \"$temp\" \"/backup-root/media-snapshots/media-${stamp}.tar.gz\"\n    ls -1t /backup-root/media-snapshots/media-*.tar.gz | tail -n +8 | xargs -r rm -f\n    echo \"Tuwunel media/archive snapshot completed\"\n  fi\n  sleep 86400\ndone"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "runAsNonRoot": true,
+              "runAsUser": 10000,
+              "runAsGroup": 10000,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "5m",
+                "memory": "16Mi"
+              },
+              "limits": {
+                "cpu": "100m",
+                "memory": "64Mi"
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "data",
+                "mountPath": "/state",
+                "readOnly": true
+              },
+              {
+                "name": "backups",
+                "mountPath": "/backup-root"
+              }
+            ]
           }
         ],
         "dnsPolicy": "ClusterFirst",
@@ -168,7 +212,8 @@
               "claimName": "tuwunel-backups"
             }
           }
-        ]
+        ],
+        "shareProcessNamespace": true
       }
     }
   }
