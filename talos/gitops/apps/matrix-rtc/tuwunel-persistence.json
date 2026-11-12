@@ -1,0 +1,48 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "tuwunel-data",
+        "namespace": "matrix"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "storageClassName": "nfs-k8s",
+        "volumeMode": "Filesystem",
+        "volumeName": "talos-matrix-tuwunel-data",
+        "resources": {
+          "requests": {
+            "storage": "50Gi"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "tuwunel-backups",
+        "namespace": "matrix"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "storageClassName": "nfs-k8s",
+        "volumeMode": "Filesystem",
+        "volumeName": "talos-matrix-tuwunel-backups",
+        "resources": {
+          "requests": {
+            "storage": "20Gi"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -6,3 +6,7 @@ resources:
   - infisical.yaml
   - serviceaccount.yaml
   - service.yaml
+  - tuwunel-config.json
+  - tuwunel-deployment.json
+  - tuwunel-persistence.json
+  - tuwunel-services.json

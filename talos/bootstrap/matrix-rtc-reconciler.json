@@ -41,6 +41,7 @@
           ],
           "resources": [
             "configmaps",
+            "persistentvolumeclaims",
             "services"
           ],
           "verbs": [
