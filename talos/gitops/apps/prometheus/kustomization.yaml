@@ -19,3 +19,5 @@ configMapGenerator:
       - nfs-probe.py
 generatorOptions:
   disableNameSuffixHash: true
+  annotations:
+    reconcile.fluxcd.io/watch: Enabled
