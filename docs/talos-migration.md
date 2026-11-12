@@ -87,8 +87,7 @@ box means the work was verified, not merely planned.
      endpoints. Cluster-local service names do not span clusters.
 5. Migrate applications individually. Status: Portfolio, Cinny, Navidrome,
    SearXNG, Homepage, Radarr, Sonarr, Prowlarr, qBittorrent, NZBGet, Atuin,
-   Blocky, Pushgateway, MatrixRTC, and Tuwunel cut over; final user validation
-   remains for Tuwunel.
+   Blocky, Pushgateway, MatrixRTC, and Tuwunel migrated and validated.
    - [x] Move Cinny with its unchanged image and homeserver, verify routing
      rollback, and observe public HTML/config plus Matrix discovery.
    - [x] Move Navidrome after native SQLite/file recovery checks, preserve
@@ -125,8 +124,8 @@ box means the work was verified, not merely planned.
    - [x] User validated a real Element audio/video call through MatrixRTC on
      2026-11-12. Tuwunel was cut over after stopping Ubuntu and validating an
      encrypted full data archive; public endpoints and SSO flow discovery pass.
-     Confirm real Element login, existing history, and message send before
-     closing this service migration. See the
+     User confirmed post-cutover Element login, existing history, and message
+     send. See the
      [service execution record](talos-service-migrations.md).
    - [x] Move Tuwunel after stopping the Ubuntu writer and verifying an
      encrypted archive of the complete data and backup trees. Public client,
@@ -134,7 +133,7 @@ box means the work was verified, not merely planned.
      responses. Daily managed RocksDB backups and media/archive snapshots are
      enabled; the managed backup verification and archive integrity checks
      passed. A real post-cutover Element login, history check, and message send
-     remain for user confirmation.
+     were confirmed by the user in Element.
    - [x] Move the stateless MatrixRTC LiveKit/JWT component to Talos `.74`;
      preserve Ubuntu ClusterIP and public ingress through selectorless bridges,
      then observe HTTP/WebSocket health. The user confirmed a real Element

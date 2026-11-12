@@ -21,7 +21,7 @@ reviewed and explicitly selected.
 | Grafana | Migrated, observed, and browser OIDC/dashboard validation confirmed | SQLite on Talos; Prometheus source remains Ubuntu; Ubuntu ingress bridge retained |
 | Vaultwarden | Migrated and user validated | PostgreSQL on Talos; Ubuntu SQLite writer stopped; Ubuntu ingress bridges to Talos .70 |
 | MatrixRTC | LiveKit/JWT component migrated, observed, and real Element call validated | Talos `.74`; Ubuntu Services and public ingress bridge to Talos; Newt remains Ubuntu |
-| Tuwunel | Migrated and observed; user sign-in/history check pending | Single writer on existing Synology NFS paths; Ubuntu ingress and ClusterIP bridge to Talos `.75` |
+| Tuwunel | Migrated, observed, and user validated | Single writer on existing Synology NFS paths; Ubuntu ingress and ClusterIP bridge to Talos `.75` |
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
@@ -349,7 +349,8 @@ suspended. Public client, federation, server-version, and both well-known
 endpoints returned HTTP 200 after cutover with the same body hashes as before
 cutover. The client login-flows endpoint advertises SSO. A real user login,
 existing room-history check, and message send on the migrated homeserver still
-need confirmation.
+were confirmed by the user in Element after cutover; the migration observation
+is complete.
 
 Tuwunel's managed RocksDB backup is now triggered daily by a sidecar sending
 the configured `SIGUSR2`; after each signal, Tuwunel creates a managed backup
