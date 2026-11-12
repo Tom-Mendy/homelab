@@ -17,7 +17,7 @@ reviewed and explicitly selected.
 | Prowlarr | Migrated and observed | Existing Synology config on Talos; Ubuntu ingress bridges to Talos .70; Radarr and Sonarr app connections validated |
 | qBittorrent | Migrated and observed | Existing config, NymVPN state, and downloads remain on Synology NFS; Ubuntu HTTPS ingress bridges to Talos .70 |
 | NZBGet | Migrated and observed | Existing config, NymVPN state, and downloads remain on Synology NFS; Ubuntu HTTPS ingress bridges to Talos .70 |
-| Vaultwarden | PostgreSQL restored; target startup and route checks pending | Ubuntu SQLite writer is stopped; keep the encrypted final snapshot and use only one writer |
+| Vaultwarden | Migrated and observed; user login pending | PostgreSQL on Talos; Ubuntu SQLite writer stopped; Ubuntu ingress bridges to Talos .70 |
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
@@ -189,11 +189,14 @@ writer. The retry uses a dedicated PostgreSQL 16.15 Deployment with an
 encrypted archive matched all 28 tables and every row. The final stopped-writer
 snapshot decrypted and passed SQLite integrity checks. Its import matched all
 28 tables and 860 rows; non-time values matched, and timestamps differed by at
-most one microsecond. The Talos Deployment is enabled, but traffic remains on
-Ubuntu until direct and bridged health checks pass. Validate a real user login
-before resuming normal use. Roll back by stopping Talos before restarting
-Ubuntu against the unchanged SQLite directory; never run both instances as
-writers.
+most one microsecond. The Talos Deployment is enabled, with the Ubuntu ingress
+Service bridged to Talos ingress `.70`. Eleven direct and bridged samples over
+307.8 seconds returned HTTP 200 with the Talos route marker; root and API
+configuration responses matched, PostgreSQL and Vaultwarden stayed Ready, and
+neither target restarted. The Ubuntu writer remains stopped and its HelmRelease
+suspended. Validate a real user login and vault sync before considering the
+migration complete. Roll back by stopping Talos before restarting Ubuntu
+against the unchanged SQLite directory; never run both instances as writers.
 
 To roll back, suspend the Talos SearXNG Kustomization and stop its Deployment,
 then wait until its Pod is gone before starting the Ubuntu Deployment against

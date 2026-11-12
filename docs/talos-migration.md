@@ -137,9 +137,9 @@ box means the work was verified, not merely planned.
      downloads; preserve its authenticated UI, media service DNS, and HTTPS
      route, then pass a five-minute observation. It shares qBittorrent's
      outstanding Infisical registry-credential follow-up.
-   - [ ] Retry Vaultwarden after resolving the Talos SQLite pool failure. The
-     source was restored and is healthy; its encrypted final snapshot is kept
-     outside Git.
+   - [ ] Verify Vaultwarden login and vault sync after its PostgreSQL cutover.
+     The final SQLite import, route checks, and five-minute observation passed;
+     the encrypted snapshot remains outside Git.
    - [x] Deploy Portfolio on Talos with the identical production image digest,
      scoped registry credentials, separate RBAC, and verified local TLS.
    - [x] Restore its absent Pangolin resource, rehearse routing rollback to
