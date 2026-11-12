@@ -87,7 +87,8 @@ box means the work was verified, not merely planned.
      endpoints. Cluster-local service names do not span clusters.
 5. Migrate applications individually. Status: Portfolio, Cinny, Navidrome,
    SearXNG, Homepage, Radarr, Sonarr, Prowlarr, qBittorrent, NZBGet, Atuin,
-   Blocky, Pushgateway, MatrixRTC, and Tuwunel migrated and validated.
+   Blocky, Pushgateway, MatrixRTC, Tuwunel, Hindsight, and Job Search Manager
+   migrated and validated.
    - [x] Move Cinny with its unchanged image and homeserver, verify routing
      rollback, and observe public HTML/config plus Matrix discovery.
    - [x] Move Navidrome after native SQLite/file recovery checks, preserve
@@ -188,8 +189,12 @@ box means the work was verified, not merely planned.
      at zero Pods, and restart counts did not increase after startup.
    - [x] Move Hindsight on the same Synology NFS directory and exact production
      image digests; stop Ubuntu writers first, keep the Ubuntu Authentik outpost
-     and HTTPS bridge, and pass six samples over five minutes. Browser-side
-     authenticated sign-in remains unverified pending an Authentik session.
+     and HTTPS bridge, and pass six samples over five minutes. Authenticated browser
+     validation showed the existing `hermes` bank and its memories.
+   - [x] Move Job Search Manager and Garage after final stopped-writer backups;
+     restore the final PostgreSQL dump, ensure one Garage writer on the shared
+     NFS path, bridge the public HTTPS route, preserve its Authentik group
+     binding, validate the browser data, and pass six samples over five minutes.
    - Keep Forgejo and Authentik available on Ubuntu until their separate
      migration windows. Use authentik.tom-mendy.com throughout.
    - For each service: prepare target without writers, suspend its Ubuntu GitOps
