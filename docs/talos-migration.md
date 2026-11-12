@@ -164,6 +164,12 @@ box means the work was verified, not merely planned.
 6. Convert node3. Status: not started.
    - Verify all remaining Ubuntu workloads have another eligible destination.
      node1 is currently tainted and is not a general application worker.
+   - Current kubelet summary sample on 2026-11-12: Ubuntu node3 had 9.84 GiB
+     working set and 21.44 GiB available; Talos node2 had 4.69 GiB working
+     set and 10.66 GiB available. Metrics API remains unavailable. This is
+     one sample, not a consolidation guarantee; many remaining application
+     containers have no memory requests. Recheck under load and model placement
+     before draining node3.
    - Plan Ollama/GPU downtime separately and validate the Talos GPU image and
      device plugin. A single GPU cannot fail over to a machine without one.
    - Join node3 to the existing Talos cluster without another bootstrap.
