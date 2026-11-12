@@ -27,6 +27,9 @@
       "metadata": {
         "labels": {
           "app.kubernetes.io/name": "tuwunel"
+        },
+        "annotations": {
+          "checksum/tuwunel-config": "66b5ee8c492cf604a860d7df57d75355b2afec4a035a676d85267ba06d63e638"
         }
       },
       "spec": {
