@@ -138,8 +138,9 @@ box means the work was verified, not merely planned.
      route, then pass a five-minute observation. It shares qBittorrent's
      outstanding Infisical registry-credential follow-up.
    - [ ] Verify Vaultwarden login and vault sync after its PostgreSQL cutover.
-     The final SQLite import, route checks, and five-minute observation passed;
-     the encrypted snapshot remains outside Git.
+     The final SQLite import, route checks, and five-minute observation passed.
+     A one-time encrypted PostgreSQL dump is catalog-verified; recurring
+     database and `/data` backups still need a destination and restore test.
    - [x] Deploy Portfolio on Talos with the identical production image digest,
      scoped registry credentials, separate RBAC, and verified local TLS.
    - [x] Restore its absent Pangolin resource, rehearse routing rollback to

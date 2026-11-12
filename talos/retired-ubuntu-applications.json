@@ -158,6 +158,22 @@
         "talosAddress": "10.0.0.73:9091",
         "removeAfter": "Prometheus has moved to Talos and its Pushgateway scrape is validated"
       }
+    },
+    {
+      "namespace": "vaultwarden",
+      "deployment": "vaultwarden",
+      "replicas": 0,
+      "helmRelease": "vaultwarden",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "sharedNfsApplicationData": true,
+      "postgresBackend": "vaultwarden-postgres",
+      "rollback": "docs/talos-service-migrations.md",
+      "temporaryServiceBridge": {
+        "ubuntuService": "vaultwarden/vaultwarden",
+        "talosAddress": "10.0.0.70:80",
+        "removeAfter": "Vaultwarden login is validated and Ubuntu ingress no longer fronts the Talos app"
+      }
     }
   ]
 }

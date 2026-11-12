@@ -197,6 +197,11 @@ neither target restarted. The Ubuntu writer remains stopped and its HelmRelease
 suspended. Validate a real user login and vault sync before considering the
 migration complete. Roll back by stopping Talos before restarting Ubuntu
 against the unchanged SQLite directory; never run both instances as writers.
+A one-time encrypted custom-format PostgreSQL dump was also created and its
+`pg_restore` catalog validated before user validation. It remains outside Git
+in the private migration state. There is not yet a recurring PostgreSQL plus
+`/data` backup job; choose a durable destination and test a full restore before
+closing Vaultwarden's migration follow-up.
 
 To roll back, suspend the Talos SearXNG Kustomization and stop its Deployment,
 then wait until its Pod is gone before starting the Ubuntu Deployment against
