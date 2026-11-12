@@ -202,11 +202,13 @@ against the unchanged SQLite directory; never run both instances as writers.
 A one-time encrypted custom-format PostgreSQL dump was also created and its
 `pg_restore` catalog validated before user validation. It remains outside Git
 in the private migration state. The user confirmed login and vault
-synchronization on 2026-11-12. A recurring backup CronJob is being added to
-write the PostgreSQL dump and `/data` archive encrypted with age to a separate
-`nfs-k8s` PVC; its full restore test remains pending. The backup PVC shares the
-Synology failure domain with live data and does not replace an independent or
-off-site copy.
+synchronization on 2026-11-12. A daily CronJob now writes a custom-format
+PostgreSQL dump and the full `/data` directory as separate age-encrypted files
+to a dedicated 20 GiB `nfs-k8s` PVC, retaining 30 days. A backup was decrypted
+on the workstation's tmpfs, its two checksums and all 736 files were verified,
+and PostgreSQL restored successfully with 29 tables, one user, and 773 ciphers.
+The backup PVC shares the Synology failure domain with live data and does not
+replace an independent or off-site copy.
 
 Atuin client synchronization was checked from the workstation on 2026-11-12.
 The CLI completed sync against `https://atuin.home.tom-mendy.com` with 14,931

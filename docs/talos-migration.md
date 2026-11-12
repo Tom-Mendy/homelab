@@ -142,9 +142,10 @@ box means the work was verified, not merely planned.
    - [x] User confirmed Vaultwarden login and vault synchronization after its
      PostgreSQL cutover. The final SQLite import, route checks, and observation
      passed.
-   - [ ] Validate the recurring encrypted PostgreSQL and `/data` backups with
-     a full restore. The backup PVC uses `nfs-k8s`, which shares the Synology
-     failure domain with the live data.
+   - [x] Add daily encrypted PostgreSQL and `/data` backups to an independent
+     `nfs-k8s` PVC, retain 30 days, and restore a full backup on the
+     workstation. The backup PVC shares the Synology failure domain with live
+     data, so it does not replace an off-site copy.
    - [x] Deploy Portfolio on Talos with the identical production image digest,
      scoped registry credentials, separate RBAC, and verified local TLS.
    - [x] Restore its absent Pangolin resource, rehearse routing rollback to
