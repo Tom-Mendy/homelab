@@ -57,21 +57,22 @@ successfully: the `job-search-documents` bucket contained 29 objects totaling
 `/backups/objects-final-20261112T1154Z`. The application image pulled
 successfully and its health endpoint passed on Talos.
 
-The cutover is deferred because the existing Authentik forward-auth provider
-uses single-application mode. Its outpost responds on the application's
-`/outpost.goauthentik.io` path, while that path on the canonical
-`authentik.tom-mendy.com` host returns 404. The provider is assigned to the
-shared embedded outpost and its application is restricted to the
-`homelab-admins` group. Authentik documents that domain-level forward auth
-cannot enforce separate application-level user policies. Do not switch this
-provider to domain-level mode or weaken its group binding as a migration
-workaround. The cutover needs an Authentik design that preserves this access
-restriction while satisfying the canonical-host policy. The Ubuntu app, Garage,
-and scheduled backups have been restored;
-the Ubuntu HelmRelease remains suspended as it was before this cutover attempt.
-The Talos app and Garage Deployments are at zero replicas, and the restored
-target database is retained for the next attempt. Do not redirect the Ubuntu
-Ingress to Talos until the canonical Authentik forward-auth request succeeds.
+The existing Authentik provider remains in single-application mode on the shared
+embedded outpost, and the `homelab-admins` application binding remains enabled
+with policy engine `ANY`. Its forward-auth endpoint is the provider external-host
+path `https://suivi-stage.home.tom-mendy.com/outpost.goauthentik.io/auth/traefik`;
+a temporary Talos probe returned HTTP 200 and the Talos Middleware now uses this
+endpoint. Browser review confirmed the group restriction was preserved. No
+provider or group-policy change was needed.
+
+The service cutover is still deferred. The Ubuntu app, Garage, and scheduled
+backups remain available; Ubuntu remains the only active application writer.
+Talos retains the restored database and Garage data, while the app and Garage
+Deployments remain at zero replicas. A temporary start was reset by Flux before
+readiness validation; `/health/ready` returned 503 during that attempt. Diagnose
+the readiness dependency, then enable both target Deployments through GitOps. Keep
+the Ubuntu public Ingress pointed at the source until target health and
+authenticated access pass.
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
