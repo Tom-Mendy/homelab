@@ -1,0 +1,189 @@
+namespace: prometheus
+createNamespace: true
+
+storage:
+  pvName: prometheus-server-pv
+  pvcName: prometheus-server-pvc
+  size: 50Gi
+  nfsServer: 10.0.0.11
+  nfsPath: /volume1/prometheus
+
+ingress:
+  name: prometheus-ingress
+  host: prometheus.home.tom-mendy.com
+  className: ""
+  serviceName: prometheus-server
+  servicePort: 80
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+
+rbac:
+  create: true
+
+scrapeConfigs:
+  kubernetes-api-servers:
+    tls_config:
+      # The API certificate covers this DNS name, not the migrated node IP.
+      server_name: kubernetes.default.svc
+  kubernetes-nodes-cadvisor:
+    relabel_configs:
+      - action: labelmap
+        regex: __meta_kubernetes_node_label_(.+)
+      - source_labels:
+          - __meta_kubernetes_node_name
+        target_label: node
+      - source_labels:
+          - __metrics_path__
+        target_label: metrics_path
+
+alertmanager:
+  enabled: false
+
+# The reloader only reads ConfigMaps; do not share root's node-wide inotify quota.
+configmapReload:
+  prometheus:
+    image:
+      repository: quay.io/prometheus-operator/prometheus-config-reloader
+      tag: v0.94.2
+      digest: sha256:a1897c67478bc23434534e91ad3855280771196b1daf17144db9dbcb655bef71
+    containerSecurityContext:
+      runAsUser: 65534
+      runAsGroup: 65534
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+
+server:
+  replicaCount: 0
+  image:
+    repository: quay.io/prometheus/prometheus
+    tag: v3.15.1
+    digest: sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0
+    fsGroup: 0
+    runAsNonRoot: false
+  persistentVolume:
+    enabled: true
+    existingClaim: prometheus-server-pvc
+  service:
+    type: ClusterIP
+
+prometheus-pushgateway:
+  enabled: false
+
+kube-state-metrics:
+  image:
+    registry: registry.k8s.io
+    repository: kube-state-metrics/kube-state-metrics
+    tag: v2.20.0
+    sha: sha256:42cfe3723a5f058171c627537fb57a3ea0f26e4380fa18555a95cb1a1b4cfc5b
+
+prometheus-node-exporter:
+  image:
+    registry: quay.io
+    repository: prometheus/node-exporter
+    tag: v1.12.1
+    digest: sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0
+
+# Consumed by the local prometheus-extras chart, not the upstream chart.
+nfsProbe:
+  image: docker.io/library/python@sha256:8acac70227ce3b34da9453120c375cc5b66cd0b062d4dc6bc74286f81a3819e1
+  scratchSize: 1Gi
+
+# Dedicated pod discovery avoids duplicate scraping via annotated services/pods.
+extraScrapeConfigs: |
+  - job_name: nfs-worker-probe
+    scrape_interval: 30s
+    scrape_timeout: 5s
+    kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names: [prometheus]
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+        action: keep
+        regex: nfs-worker-probe
+      - source_labels: [__meta_kubernetes_pod_container_port_name]
+        action: keep
+        regex: metrics
+      - source_labels: [__meta_kubernetes_pod_phase]
+        action: keep
+        regex: Running
+      - source_labels: [__meta_kubernetes_pod_node_name]
+        target_label: node
+
+# Standalone prometheus-community/prometheus loads this file by default.
+# No Prometheus Operator and no additional notification receiver are required.
+serverFiles:
+  alerting_rules.yml:
+    groups:
+      - name: nfs-client
+        rules:
+          - alert: NFSTestStateIDStorm
+            expr: |
+              (sum by (node) (rate(node_nfs_requests_total{job="kubernetes-service-endpoints",method="TestStateID"}[5m])) > 100)
+              and on (node)
+              ((sum by (node) (rate(node_nfs_requests_total{job="kubernetes-service-endpoints",method="TestStateID"}[5m]))
+                / clamp_min(sum by (node) (rate(node_nfs_requests_total{job="kubernetes-service-endpoints"}[5m])), 1)) > 0.5)
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: NFS TEST_STATEID storm on {{ $labels.node }}
+              description: More than 100 TEST_STATEID requests/s and over half of all client NFS operations for 10 minutes. Check client state recovery and scratch probe latency before considering a controlled worker reboot.
+          - alert: NFSClientMetricsMissing
+            expr: |
+              count by (node) (nfs_probe_success{job="nfs-worker-probe"})
+              unless on (node)
+              count by (node) (node_nfs_requests_total{job="kubernetes-service-endpoints",method="TestStateID"})
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: NFS client counters missing on {{ $labels.node }}
+      - name: nfs-synthetic
+        rules:
+          - alert: NFSProbeSlow
+            expr: nfs_probe_p95_seconds{job="nfs-worker-probe"} > 0.01
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: NFS scratch p95 above 10ms on {{ $labels.node }}
+          - alert: NFSProbeFailed
+            expr: nfs_probe_success{job="nfs-worker-probe"} == 0
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: NFS scratch probe failing on {{ $labels.node }}
+          - alert: NFSProbeStale
+            expr: time() - nfs_probe_last_result_timestamp_seconds{job="nfs-worker-probe"} > 180
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: NFS scratch probe result stale on {{ $labels.node }}
+          - alert: NFSProbeScrapeMissing
+            expr: up{job="nfs-worker-probe"} == 0 or absent(up{job="nfs-worker-probe"})
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: NFS scratch exporter scrape unavailable
+          - alert: NFSProbeCoverageMissing
+            expr: |
+              (max(kube_daemonset_status_desired_number_scheduled{namespace="prometheus",daemonset="nfs-worker-probe"})
+                > max(kube_daemonset_status_number_ready{namespace="prometheus",daemonset="nfs-worker-probe"}))
+              or (max(kube_daemonset_status_desired_number_scheduled{namespace="prometheus",daemonset="nfs-worker-probe"}) == 0)
+              or absent(kube_daemonset_status_desired_number_scheduled{namespace="prometheus",daemonset="nfs-worker-probe"})
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: NFS scratch probe DaemonSet does not cover all eligible workers

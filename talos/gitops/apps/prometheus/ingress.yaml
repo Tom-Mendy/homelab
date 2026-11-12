@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: prometheus
+  namespace: prometheus
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: prometheus-prometheus-https-redirect@kubernetescrd,prometheus-prometheus-route-proof@kubernetescrd
+spec:
+  ingressClassName: talos-traefik
+  rules:
+    - host: prometheus.home.tom-mendy.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: prometheus-server
+                port:
+                  number: 80
