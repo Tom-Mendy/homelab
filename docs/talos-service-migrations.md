@@ -17,7 +17,7 @@ reviewed and explicitly selected.
 | Prowlarr | Migrated and observed | Existing Synology config on Talos; Ubuntu ingress bridges to Talos .70; Radarr and Sonarr app connections validated |
 | qBittorrent | Migrated and observed | Existing config, NymVPN state, and downloads remain on Synology NFS; Ubuntu HTTPS ingress bridges to Talos .70 |
 | NZBGet | Migrated and observed | Existing config, NymVPN state, and downloads remain on Synology NFS; Ubuntu HTTPS ingress bridges to Talos .70 |
-| Vaultwarden | PostgreSQL backend prepared; import pending | Keep the Ubuntu SQLite writer active until the target schema and converted data pass functional checks |
+| Vaultwarden | PostgreSQL restored; target startup and route checks pending | Ubuntu SQLite writer is stopped; keep the encrypted final snapshot and use only one writer |
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
@@ -183,18 +183,17 @@ Traefik.
 Vaultwarden's first Talos attempt used its SQLite database on the existing
 Synology NFS path. The Pod reached Running/Ready but failed to create the
 SQLite pool; `/alive` returned HTTP 502. The source was restored as the only
-writer and remains healthy. The encrypted final archive contains 736 files and
-passed archive and SQLite integrity checks. Because SQLite locking on NFS
-failed, the retry uses a dedicated PostgreSQL 16.15 Deployment with an
-`nfs-k8s` PVC. Its password is managed in Infisical at
-`/vaultwarden/postgres` and synchronized to a namespace Secret. Keep the
-Vaultwarden Talos Deployment at zero replicas until PostgreSQL is Ready, an
-empty schema is initialized, and a repeatable SQLite import has passed row,
-type, login, and attachment checks. At final cutover, stop the Ubuntu writer,
-take a fresh encrypted snapshot, import it into PostgreSQL, and switch traffic
-only after application checks pass. Roll back by stopping Talos before
-restarting Ubuntu against the unchanged SQLite directory; never run both
-instances as writers.
+writer. The retry uses a dedicated PostgreSQL 16.15 Deployment with an
+`nfs-k8s` PVC. Its password is synchronized from Infisical at
+`/vaultwarden/postgres`. A data-only pgloader rehearsal from the earlier
+encrypted archive matched all 28 tables and every row. The final stopped-writer
+snapshot decrypted and passed SQLite integrity checks. Its import matched all
+28 tables and 860 rows; non-time values matched, and timestamps differed by at
+most one microsecond. The Talos Deployment is enabled, but traffic remains on
+Ubuntu until direct and bridged health checks pass. Validate a real user login
+before resuming normal use. Roll back by stopping Talos before restarting
+Ubuntu against the unchanged SQLite directory; never run both instances as
+writers.
 
 To roll back, suspend the Talos SearXNG Kustomization and stop its Deployment,
 then wait until its Pod is gone before starting the Ubuntu Deployment against
