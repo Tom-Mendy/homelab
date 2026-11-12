@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: infisical-secure
+  namespace: infisical
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: infisical-route-proof@kubernetescrd
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - infisical.home.tom-mendy.com
+      secretName: infisical-tls
+  rules:
+    - host: infisical.home.tom-mendy.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: infisical-infisical-standalone-infisical
+                port:
+                  number: 8080
