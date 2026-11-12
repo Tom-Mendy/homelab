@@ -18,7 +18,8 @@ reviewed and explicitly selected.
 | qBittorrent | Migrated and observed | Existing config, NymVPN state, and downloads remain on Synology NFS; Ubuntu HTTPS ingress bridges to Talos .70 |
 | NZBGet | Migrated and observed | Existing config, NymVPN state, and downloads remain on Synology NFS; Ubuntu HTTPS ingress bridges to Talos .70 |
 | Atuin | Migrated, observed, and client sync validated | PostgreSQL and app on Talos; Ubuntu HTTPS bridge retained |
-| Grafana | Migrated, observed, and browser OIDC/dashboard validation confirmed | SQLite on Talos; Prometheus source remains Ubuntu; Ubuntu ingress bridge retained |
+| Grafana | Migrated, observed, and browser OIDC/dashboard validation confirmed | SQLite on Talos; Prometheus source is Talos; Ubuntu ingress bridge retained |
+| Infisical | Migrated, observed, and secret-sync validated | App v0.166.5 retained; 795-table PostgreSQL restore on nfs-k8s; Redis reuses its original Synology NFS directory; Ubuntu ingress bridge retained |
 | Vaultwarden | Migrated and user validated | PostgreSQL on Talos; Ubuntu SQLite writer stopped; Ubuntu ingress bridges to Talos .70 |
 | MatrixRTC | LiveKit/JWT component migrated, observed, and real Element call validated | Talos `.74`; Ubuntu Services and public ingress bridge to Talos; Newt remains Ubuntu |
 | Tuwunel | Migrated, observed, and user validated | Single writer on existing Synology NFS paths; Ubuntu ingress and ClusterIP bridge to Talos `.75` |
@@ -493,3 +494,31 @@ migration EndpointSlice; then scale the Ubuntu Deployment to one and verify
 readiness. Keep its HelmRelease suspended until rollback is verified. Never
 run both TSDB writers at once. Prometheus logs the existing upstream warning
 that NFS filesystems may risk data loss; retain the tested recovery backup.
+
+Infisical now runs on Talos with the existing application image v0.166.5 and
+Helm chart 1.8.0; this moved the service without combining an application
+upgrade. The source app and Redis were stopped before the target started. A
+final custom-format PostgreSQL dump was encrypted with Age, decrypted for
+verification, and restored into the Talos CloudNativePG PostgreSQL 17.11
+cluster. All 795 application tables were present under the `infisical` role.
+Talos Redis uses the exact production image digest and the same Synology NFS
+data directory as Ubuntu, with AOF enabled. Redis expired 49 TTL keys during
+the cutover; no keys were manually deleted.
+
+The Ubuntu ingress still terminates public TLS and forwards through a
+selectorless Service/EndpointSlice to Talos ingress `.70`. Direct Talos HTTPS
+and the unchanged public HTTPS host returned 200 with matching root response
+hashes and the `talos-infisical` route marker. `/api/status` returned 200 and
+`redisConfigured: true`. The Talos Infisical operator reauthenticated, and all
+seven Talos InfisicalStaticSecrets reported successful reconciliation. Six
+checks over five minutes passed with all target Pods Ready and zero restarts.
+Prometheus reported 8.87 GiB available on node2 at the final check.
+
+To roll back, stop the Talos app and Redis and wait for both Pods to exit
+before starting the Ubuntu Redis writer, since both clusters use the same NFS
+directory. Take a fresh encrypted dump of the Talos PostgreSQL database and
+restore it into the retained Ubuntu database before restarting the Ubuntu app;
+the old database is stale after target writes. Restore the Ubuntu Service
+selector from the private snapshot, delete `infisical-talos-ingress`, then
+start the Ubuntu app. Keep the Ubuntu HelmRelease suspended until rollback is
+verified.

@@ -175,8 +175,11 @@ box means the work was verified, not merely planned.
    - Start with a low-risk stateless application such as portfolio, then a
      service whose persistent data is easy to restore. Move dependency groups
      together only when required.
-   - Keep Forgejo, Infisical, and Authentik available on Ubuntu until their
-     separate migration windows. Use authentik.tom-mendy.com throughout.
+   - [x] Migrate Infisical to Talos without changing its application version;
+     restore PostgreSQL, reuse its Synology NFS-backed Redis state, and
+     validate public ingress plus Talos InfisicalStaticSecret reconciliation.
+   - Keep Forgejo and Authentik available on Ubuntu until their separate
+     migration windows. Use authentik.tom-mendy.com throughout.
    - For each service: prepare target without writers, suspend its Ubuntu GitOps
      reconciliation, stop all old writers and jobs, capture final data, restore
      or bind the target volumes, validate via Talos ingress, then switch traffic.
