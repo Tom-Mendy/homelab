@@ -206,7 +206,7 @@ box means the work was verified, not merely planned.
      write-stop time, cutover time, functional checks, and rollback deadline.
    - Observe one real usage cycle before the next service. Rollback after new
      writes requires recovering those writes or an explicit data-loss decision.
-6. Convert node3. Status: not started.
+6. Convert node3. Status: workload moves pending; GPU installation prep complete.
    - Verify all remaining Ubuntu workloads have another eligible destination.
      node1 is currently tainted and is not a general application worker.
    - Kubelet sample on 2026-11-12: Ubuntu node3 had 8.08 GiB pod working set
@@ -221,6 +221,21 @@ box means the work was verified, not merely planned.
      do not drain node3 on these figures alone.
    - Plan Ollama/GPU downtime separately and validate the Talos GPU image and
      device plugin. A single GPU cannot fail over to a machine without one.
+   - Talos v1.14.5 NVIDIA Image Factory schematic
+     `af8eb82417d3deaa94d2ef19c3b590b0dac1b2549d0b9b35b3da2bc325de75f7`
+     is prepared. It resolves the proprietary 580.178.04 driver and matching
+     NVIDIA container toolkit 580.178.04-v1.19.1. The private node3 candidate
+     passes strict v1.14.5 metal validation and still refuses installation:
+     its disk selector is a placeholder and `wipe` is false. The current
+     Ubuntu read-only inventory sees a GTX 1080 and several candidate disks;
+     confirm NIC MAC and exact disk from maintenance mode before replacing
+     the selector.
+   - The Ollama runbook currently states that toolkit 1.20.1 or newer is
+     required, while Talos v1.14.5 publishes toolkit 1.19.1. Keep Ollama
+     stopped until the required toolkit version is reconciled or the 1.19.1
+     Talos runtime is explicitly validated with the pinned Ollama workload.
+     See the [Talos NVIDIA driver guide][talos-nvidia] and
+     [Ollama hardware support][ollama-gpu].
    - Join node3 to the existing Talos cluster without another bootstrap.
      Two etcd voting members still require both members for quorum. Avoid
      maintenance and complete the third-member transition promptly.
@@ -231,6 +246,9 @@ box means the work was verified, not merely planned.
      node3-to-node2 rescheduling of persistent workloads.
    - Keep backups until application-level recovery is validated. The Synology
      remains a shared failure domain even with three control planes.
+
+[talos-nvidia]: https://docs.siderolabs.com/talos/v1.14/configure-your-talos-cluster/hardware-and-drivers/nvidia-gpu-proprietary
+[ollama-gpu]: https://docs.ollama.com/gpu
 
 The following evidence was collected on 2026-11-07 using context
 `kubernetes-admin@cluster.local`. Private evidence and backups are stored at
