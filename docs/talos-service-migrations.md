@@ -38,10 +38,14 @@ successfully and its health endpoint passed on Talos.
 The cutover is deferred because the existing Authentik forward-auth provider
 uses single-application mode. Its outpost responds on the application's
 `/outpost.goauthentik.io` path, while that path on the canonical
-`authentik.tom-mendy.com` host returns 404. The Talos route therefore cannot
-use the canonical Authentik hostname until an administrator configures a
-compatible domain-level outpost route without changing the current access
-policies. The Ubuntu app, Garage, and scheduled backups have been restored;
+`authentik.tom-mendy.com` host returns 404. The provider is assigned to the
+shared embedded outpost and its application is restricted to the
+`homelab-admins` group. Authentik documents that domain-level forward auth
+cannot enforce separate application-level user policies. Do not switch this
+provider to domain-level mode or weaken its group binding as a migration
+workaround. The cutover needs an Authentik design that preserves this access
+restriction while satisfying the canonical-host policy. The Ubuntu app, Garage,
+and scheduled backups have been restored;
 the Ubuntu HelmRelease remains suspended as it was before this cutover attempt.
 The Talos app and Garage Deployments are at zero replicas, and the restored
 target database is retained for the next attempt. Do not redirect the Ubuntu
