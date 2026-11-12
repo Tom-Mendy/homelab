@@ -22,6 +22,30 @@ reviewed and explicitly selected.
 | Vaultwarden | Migrated and user validated | PostgreSQL on Talos; Ubuntu SQLite writer stopped; Ubuntu ingress bridges to Talos .70 |
 | MatrixRTC | LiveKit/JWT component migrated, observed, and real Element call validated | Talos `.74`; Ubuntu Services and public ingress bridge to Talos; Newt remains Ubuntu |
 | Tuwunel | Migrated, observed, and user validated | Single writer on existing Synology NFS paths; Ubuntu ingress and ClusterIP bridge to Talos `.75` |
+| Job Search Manager | Cutover prepared; deferred for Authentik outpost configuration | Ubuntu app and Garage restored; final PostgreSQL restore and Garage data verified on Talos, where the app and Garage remain stopped |
+
+Job Search Manager is currently serving from Ubuntu. The Talos CloudNativePG
+operator and target cluster are ready. The final PostgreSQL dump
+`postgres-final-20261112T115320Z.sql.gz` passed gzip verification and restored
+11 public tables to Talos; its SHA-256 is
+`897973c877d52952b8ded148a97c780fd6640dd5b674fafa8475ef397a703764`. Garage
+was moved as a single writer onto Talos and read the existing NFS data
+successfully: the `job-search-documents` bucket contained 29 objects totaling
+4,018,668 bytes, matching the final archive at
+`/backups/objects-final-20261112T1154Z`. The application image pulled
+successfully and its health endpoint passed on Talos.
+
+The cutover is deferred because the existing Authentik forward-auth provider
+uses single-application mode. Its outpost responds on the application's
+`/outpost.goauthentik.io` path, while that path on the canonical
+`authentik.tom-mendy.com` host returns 404. The Talos route therefore cannot
+use the canonical Authentik hostname until an administrator configures a
+compatible domain-level outpost route without changing the current access
+policies. The Ubuntu app, Garage, and scheduled backups have been restored;
+the Ubuntu HelmRelease remains suspended as it was before this cutover attempt.
+The Talos app and Garage Deployments are at zero replicas, and the restored
+target database is retained for the next attempt. Do not redirect the Ubuntu
+Ingress to Talos until the canonical Authentik forward-auth request succeeds.
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
