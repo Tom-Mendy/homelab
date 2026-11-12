@@ -229,7 +229,8 @@ box means the work was verified, not merely planned.
      its disk selector is a placeholder and `wipe` is false. The current
      Ubuntu read-only inventory sees a GTX 1080 and several candidate disks;
      confirm NIC MAC and exact disk from maintenance mode before replacing
-     the selector.
+     the selector. The custom ISO is downloaded privately; SHA-256 is
+     `c2b422673985da85bf9e991e1d353acd4ad257c560d7e4ceb3875fb0d1449cb9`.
    - The Ollama runbook currently states that toolkit 1.20.1 or newer is
      required, while Talos v1.14.5 publishes toolkit 1.19.1. Keep Ollama
      stopped until the required toolkit version is reconciled or the 1.19.1
