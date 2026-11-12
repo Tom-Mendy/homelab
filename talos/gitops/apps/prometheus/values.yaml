@@ -57,7 +57,7 @@ configmapReload:
         drop: ["ALL"]
 
 server:
-  replicaCount: 0
+  replicaCount: 1
   image:
     repository: quay.io/prometheus/prometheus
     tag: v3.15.1
