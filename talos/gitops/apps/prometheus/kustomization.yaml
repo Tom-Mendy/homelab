@@ -8,7 +8,6 @@ resources:
   - nfs-probe.yaml
   - ingress.yaml
   - ingress-secure.yaml
-  - https-redirect.yaml
   - route-proof.yaml
 configMapGenerator:
   - name: prometheus-values
