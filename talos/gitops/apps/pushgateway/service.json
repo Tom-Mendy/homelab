@@ -11,6 +11,7 @@
   },
   "spec": {
     "type": "LoadBalancer",
+    "externalTrafficPolicy": "Local",
     "selector": {
       "app": "pushgateway"
     },
