@@ -87,7 +87,8 @@ box means the work was verified, not merely planned.
      endpoints. Cluster-local service names do not span clusters.
 5. Migrate applications individually. Status: Portfolio, Cinny, Navidrome,
    SearXNG, Homepage, Radarr, Sonarr, Prowlarr, qBittorrent, NZBGet, Atuin,
-   Blocky, Pushgateway, and the MatrixRTC component complete.
+   Blocky, Pushgateway, MatrixRTC, and Tuwunel cut over; final user validation
+   remains for Tuwunel.
    - [x] Move Cinny with its unchanged image and homeserver, verify routing
      rollback, and observe public HTML/config plus Matrix discovery.
    - [x] Move Navidrome after native SQLite/file recovery checks, preserve
@@ -122,13 +123,22 @@ box means the work was verified, not merely planned.
    - [x] User confirmed Grafana OIDC login and current Prometheus dashboard
      data in the browser on 2026-11-12.
    - [x] User validated a real Element audio/video call through MatrixRTC on
-     2026-11-12. Tuwunel is prepared on Talos with its existing Synology paths
-     and synchronized Infisical secrets; stop Ubuntu and archive the database
-     before starting the target writer.
+     2026-11-12. Tuwunel was cut over after stopping Ubuntu and validating an
+     encrypted full data archive; public endpoints and SSO flow discovery pass.
+     Confirm real Element login, existing history, and message send before
+     closing this service migration. See the
+     [service execution record](talos-service-migrations.md).
+   - [x] Move Tuwunel after stopping the Ubuntu writer and verifying an
+     encrypted archive of the complete data and backup trees. Public client,
+     federation, discovery, and login-flow endpoints match the pre-cutover
+     responses. Daily managed RocksDB backups and media/archive snapshots are
+     enabled; the managed backup verification and archive integrity checks
+     passed. A real post-cutover Element login, history check, and message send
+     remain for user confirmation.
    - [x] Move the stateless MatrixRTC LiveKit/JWT component to Talos `.74`;
      preserve Ubuntu ClusterIP and public ingress through selectorless bridges,
-     then observe HTTP/WebSocket health. A real Element audio/video call is
-     still required before moving Tuwunel. See the
+     then observe HTTP/WebSocket health. The user confirmed a real Element
+     call before Tuwunel moved. See the
      [service execution record](talos-service-migrations.md).
    - [ ] Continue remaining services individually. See the
      [service execution record](talos-service-migrations.md).

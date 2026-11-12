@@ -21,7 +21,7 @@ reviewed and explicitly selected.
 | Grafana | Migrated, observed, and browser OIDC/dashboard validation confirmed | SQLite on Talos; Prometheus source remains Ubuntu; Ubuntu ingress bridge retained |
 | Vaultwarden | Migrated and user validated | PostgreSQL on Talos; Ubuntu SQLite writer stopped; Ubuntu ingress bridges to Talos .70 |
 | MatrixRTC | LiveKit/JWT component migrated, observed, and real Element call validated | Talos `.74`; Ubuntu Services and public ingress bridge to Talos; Newt remains Ubuntu |
-| Tuwunel | Talos target prepared; Ubuntu source still active | Talos will mount the same Synology NFS data and backup directories through static Retain PVs; public traffic will bridge to `.75` |
+| Tuwunel | Migrated and observed; user sign-in/history check pending | Single writer on existing Synology NFS paths; Ubuntu ingress and ClusterIP bridge to Talos `.75` |
 
 SearXNG now runs on Talos with the same application and NymVPN image digests.
 The source Deployment was stopped before the Talos writer started. A read-only
@@ -330,24 +330,52 @@ the matrix secrets from `/matrix` and `/oidc`, replacing the one-time copied
 `matrix-runtime` Secret. Confirm both InfisicalStaticSecrets report Ready before
 starting Tuwunel on Talos.
 
-Tuwunel remains on Ubuntu while its Talos target is prepared. The target uses
-the exact `v1.9.4` image and the same Synology NFS directories as the source:
-50 GiB database and 20 GiB backup paths, mounted by static `nfs-k8s` Retain
-PVs without node affinity. This avoids a live copy and keeps the existing data
-available to either cluster. Talos has a separate LoadBalancer at `10.0.0.75`;
-the existing Ubuntu Service and Matrix ingress will stay in place as the
-traffic bridge. Talos will remain at zero replicas until Ubuntu is stopped and
-a full database-plus-media archive has been captured and verified. The source
-backup directory currently contains no managed snapshots; its retention
-setting does not create backups automatically. The `talos-matrix` Infisical
-identity now syncs `/matrix` and `/oidc`; both target secrets match Ubuntu by
-SHA-256 without exposing values.
+Tuwunel now runs on Talos with the exact `v1.9.4` image and the existing
+Synology NFS directories: 50 GiB database and 20 GiB backup paths, bound as
+static `nfs-k8s` Retain PVs without node affinity. The Ubuntu Deployment was
+stopped before the Talos writer started. Before cutover, a full encrypted
+archive of the stopped `/data` and `/backups` trees was created on the
+workstation; decryption and streaming tar validation passed (183 files,
+90,495,336 bytes). Its SHA-256 and private evidence are recorded outside Git.
+The target opened the existing RocksDB schema (version 17), loaded the
+existing OIDC signing key, and is Ready. `matrix-runtime` and `matrix-oidc`
+are synchronized from Infisical and their secret values matched the source by
+SHA-256 without exposing them.
+
+Talos has a dedicated LoadBalancer at `10.0.0.75`. The Ubuntu ClusterIP
+Service and existing public Matrix ingress remain as traffic bridges; the
+Ubuntu Deployment stays at zero replicas and the Matrix HelmRelease stays
+suspended. Public client, federation, server-version, and both well-known
+endpoints returned HTTP 200 after cutover with the same body hashes as before
+cutover. The client login-flows endpoint advertises SSO. A real user login,
+existing room-history check, and message send on the migrated homeserver still
+need confirmation.
+
+Tuwunel's managed RocksDB backup is now triggered daily by a sidecar sending
+the configured `SIGUSR2`; after each signal, Tuwunel creates a managed backup
+and verifies its files. Backup #2 passed the built-in verification (all 122
+files present at expected sizes). The same job archives `/data/media` and
+`/data/archive` to the backup PVC, since the managed database backup excludes
+media. Three dated media archives were listed and passed `tar -tzf` integrity
+checks; retention keeps seven. These backups share the Synology failure domain
+with live data; retain the encrypted workstation archive and arrange an
+independent/off-site copy for disaster recovery.
+
+The restarted target was observed for five minutes across 11 public samples:
+all six client, federation, server-version, discovery, and login-flows probes
+returned HTTP 200 with stable body hashes, and the Pod had no restarts. One
+probe batch overlapped the planned single-replica config rollout and returned
+HTTP 502; the next sample passed and the uninterrupted observation window
+started after the rollout. Flux and both Infisical static secrets are Ready.
 
 The migration is single-writer: never run Ubuntu and Talos Tuwunel together on
-the shared NFS database. Rollback before target writes is to stop the Talos
-Deployment and restore the Ubuntu Deployment. After target writes, stop Talos
-first, then start Ubuntu against the same NFS path. Keep the Ubuntu HelmRelease
-suspended until rollback or cutover is explicitly complete.
+the shared NFS database. To roll back, suspend Talos reconciliation, scale
+Talos Tuwunel to zero, wait for its Pod to exit, then scale Ubuntu Tuwunel to
+one and restore the original Ubuntu Service selector and remove its migration
+EndpointSlice. Keep the Ubuntu HelmRelease suspended until the rollback is
+verified. Because Talos has already written to the shared database, do not
+restore the pre-cutover archive over current data; both clusters use the same
+live directory.
 
 To roll back this component, stop the Talos Deployment, restore the Ubuntu
 Deployment to one replica, wait for readiness, restore selectors on both

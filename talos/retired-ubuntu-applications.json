@@ -192,6 +192,22 @@
         "removeAfter": "Validate a real Element audio/video call, migrate remaining Matrix traffic, and update Pangolin/Newt raw routes to Talos"
       },
       "rollback": "docs/talos-service-migrations.md"
+    },
+    {
+      "namespace": "matrix",
+      "deployment": "tuwunel",
+      "replicas": 0,
+      "helmRelease": "matrix",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "singleWriterSharedNfs": true,
+      "sharedNfsApplicationData": true,
+      "rollback": "docs/talos-service-migrations.md",
+      "temporaryServiceBridge": {
+        "ubuntuService": "matrix/tuwunel",
+        "talosAddress": "10.0.0.75:8008",
+        "removeAfter": "Public Matrix ingress and Newt routes no longer depend on Ubuntu Traefik"
+      }
     }
   ]
 }
