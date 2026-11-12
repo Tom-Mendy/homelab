@@ -4,7 +4,7 @@ metadata:
   name: job-search-manager-postgres-backup
   namespace: job-search-manager
 spec:
-  suspend: true
+  suspend: false
   schedule: "30 2 * * *"
   timeZone: Europe/Paris
   concurrencyPolicy: Forbid
@@ -41,7 +41,7 @@ metadata:
   name: job-search-manager-objects-backup
   namespace: job-search-manager
 spec:
-  suspend: true
+  suspend: false
   schedule: "0 3 * * *"
   timeZone: Europe/Paris
   concurrencyPolicy: Forbid
@@ -64,12 +64,12 @@ spec:
                 - name: AWS_ACCESS_KEY_ID
                   valueFrom:
                     secretKeyRef:
-                      name: job-search-manager-runtime
+                      name: job-search-manager-garage-runtime
                       key: S3_ACCESS_KEY_ID
                 - name: AWS_SECRET_ACCESS_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: job-search-manager-runtime
+                      name: job-search-manager-garage-runtime
                       key: S3_SECRET_ACCESS_KEY
               volumeMounts:
                 - {name: backups, mountPath: /backups}
