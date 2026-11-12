@@ -29,7 +29,7 @@
           "app.kubernetes.io/name": "tuwunel"
         },
         "annotations": {
-          "checksum/tuwunel-config": "66b5ee8c492cf604a860d7df57d75355b2afec4a035a676d85267ba06d63e638"
+          "checksum/tuwunel-config": "5674254c8c56cafb734e72af5ba547a4076650016110299853ed8d5175099488"
         }
       },
       "spec": {
