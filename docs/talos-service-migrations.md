@@ -20,6 +20,7 @@ reviewed and explicitly selected.
 | Atuin | Migrated, observed, and client sync validated | PostgreSQL and app on Talos; Ubuntu HTTPS bridge retained |
 | Grafana | Migrated, observed, and browser OIDC/dashboard validation confirmed | SQLite on Talos; Prometheus source is Talos; Ubuntu ingress bridge retained |
 | Infisical | Migrated, observed, and secret-sync validated | App v0.166.5 retained; 795-table PostgreSQL restore on nfs-k8s; Redis reuses its original Synology NFS directory; Ubuntu ingress bridge retained |
+| Harbor | Migrated and observed | Harbor v2.15.4 and chart 1.19.4 retained; five existing Synology NFS paths rebound; Talos-specific Infisical auth; Ubuntu HTTPS ingress bridges to Talos `.70` |
 | Vaultwarden | Migrated and user validated | PostgreSQL on Talos; Ubuntu SQLite writer stopped; Ubuntu ingress bridges to Talos .70 |
 | MatrixRTC | LiveKit/JWT component migrated, observed, and real Element call validated | Talos `.74`; Ubuntu Services and public ingress bridge to Talos; Newt remains Ubuntu |
 | Tuwunel | Migrated, observed, and user validated | Single writer on existing Synology NFS paths; Ubuntu ingress and ClusterIP bridge to Talos `.75` |
@@ -522,3 +523,45 @@ the old database is stale after target writes. Restore the Ubuntu Service
 selector from the private snapshot, delete `infisical-talos-ingress`, then
 start the Ubuntu app. Keep the Ubuntu HelmRelease suspended until rollback is
 verified.
+
+Harbor runs on Talos with the production chart version 1.19.4 and the same
+Harbor v2.15.4 component image digests. The Ubuntu Harbor Deployments and
+StatefulSets were stopped before Talos mounted the same five Synology NFS
+paths. Static PVs use `Retain` and no node affinity; all five target PVCs bound.
+The Ubuntu `harbor`, `harbor-config`, and `harbor-extras` HelmReleases remain
+suspended, and no Ubuntu Harbor Pod or Service endpoint remains active.
+
+Talos uses its own Infisical Kubernetes identity for namespace `harbor` and
+ServiceAccount `harbor-infisical-sync`. The `/harbor` secret and
+`/harbor/proxy` credentials synchronize successfully. The Harbor configuration
+chart recreated the expected projects and six proxy registries. OIDC remains
+`https://authentik.tom-mendy.com/application/o/harbor/`. Harbor's generated
+token-signing keypair is supplied through the external Secret
+`harbor-token-signing`; this prevents the chart from rotating it during a
+reconcile. The encrypted recovery copy is in the private migration evidence
+directory and passed Age decrypt-and-compare verification. No secret values are
+in Git.
+
+The Ubuntu Traefik HTTPS Ingress now forwards its Harbor host through a
+selectorless Service, EndpointSlice, and Endpoints at Talos ingress `.70:80`.
+Talos has a separate `web`-only HTTP Ingress for this internal bridge; its
+public/direct route remains HTTPS with the copied `harbor-tls` certificate.
+Ubuntu continues to terminate public TLS and redirects HTTP to HTTPS. Keep both
+bridge resources until public traffic no longer depends on Ubuntu Traefik.
+
+Direct Talos HTTPS and Ubuntu-bridged HTTPS both returned 200 for Harbor's
+health API and UI; all eight reported components were healthy. `/v2/` returned
+the expected unauthenticated 401, and a bearer-token exchange using the existing
+Talos pull credential retrieved the pinned NymVPN image manifest by digest
+through the Ubuntu bridge. HTTP on Ubuntu redirected to HTTPS. Six checks over
+309.1 seconds passed with all eight target Pods Ready, the Ubuntu namespace at
+zero Pods, both HTTPS routes healthy, and no restart counts increasing after
+startup.
+
+For rollback, keep the Talos release and all its Pods at zero before starting
+Ubuntu, because both clusters use the same NFS directories. Restore the saved
+Ubuntu Ingress backend paths while retaining its working ACME TLS resolver,
+then restart the source database and Redis and wait for readiness before the
+source Deployments. Keep the Ubuntu HelmReleases suspended until rollback is
+verified. The original source Ingress and workload objects are in the private
+rollback evidence directory.

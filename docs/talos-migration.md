@@ -1,6 +1,6 @@
 # Talos migration tracker
 
-Last updated: 2026-11-11. This file is the migration progress record.
+Last updated: 2026-11-12. This file is the migration progress record.
 Steps 1 and 2 are complete. Talos v1.14.5 is installed and bootstrapped on
 node2 (Kubernetes v1.36.6, node Ready). Step 3 foundation validation is
 complete, including Cilium NetworkPolicy enforcement, DNS, isolated NFS,
@@ -178,6 +178,14 @@ box means the work was verified, not merely planned.
    - [x] Migrate Infisical to Talos without changing its application version;
      restore PostgreSQL, reuse its Synology NFS-backed Redis state, and
      validate public ingress plus Talos InfisicalStaticSecret reconciliation.
+   - [x] Move Harbor to Talos with the same Harbor v2.15.4 images and chart
+     version, rebind all five existing Synology NFS paths, sync secrets with a
+     Talos-specific Infisical identity, and validate direct/public ingress, OIDC
+     settings, and an authenticated registry manifest pull. Ubuntu writers remain
+     stopped; the Ubuntu HTTPS ingress bridge stays in place for traffic.
+   - [x] Observe direct Talos and Ubuntu-bridged HTTPS for 309 seconds across
+     six healthy samples; all eight target Pods stayed Ready, the source stayed
+     at zero Pods, and restart counts did not increase after startup.
    - Keep Forgejo and Authentik available on Ubuntu until their separate
      migration windows. Use authentik.tom-mendy.com throughout.
    - For each service: prepare target without writers, suspend its Ubuntu GitOps
