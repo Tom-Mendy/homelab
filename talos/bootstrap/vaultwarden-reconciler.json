@@ -14,6 +14,7 @@
       "rules": [
         { "apiGroups": ["apps"], "resources": ["deployments"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
         { "apiGroups": [""], "resources": ["services", "persistentvolumeclaims"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
+        { "apiGroups": ["secrets.infisical.com"], "resources": ["infisicalstaticsecrets"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
         { "apiGroups": ["networking.k8s.io"], "resources": ["ingresses"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
         { "apiGroups": ["traefik.io"], "resources": ["middlewares"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
         { "apiGroups": ["apps"], "resources": ["replicasets"], "verbs": ["get", "list", "watch"] },
