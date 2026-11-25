@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: selective-gitops-proof
+  namespace: talos-gitops-validation
+data:
+  stage: first-application
+  productionApplications: "portfolio,cinny,navidrome"
+  allowedPath: talos/gitops/root

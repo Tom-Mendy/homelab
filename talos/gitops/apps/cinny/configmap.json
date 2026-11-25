@@ -1,0 +1,11 @@
+{
+  "apiVersion": "v1",
+  "kind": "ConfigMap",
+  "metadata": {
+    "name": "cinny-config",
+    "namespace": "matrix"
+  },
+  "data": {
+    "config.json": "{\n  \"defaultHomeserver\": 0,\n  \"homeserverList\": [\"matrix.tom-mendy.com\"],\n  \"allowCustomHomeservers\": false,\n  \"featuredCommunities\": {\n    \"openAsDefault\": false,\n    \"spaces\": [],\n    \"rooms\": [],\n    \"servers\": []\n  },\n  \"hashRouter\": {\n    \"enabled\": false,\n    \"basename\": \"/\"\n  }\n}\n"
+  }
+}

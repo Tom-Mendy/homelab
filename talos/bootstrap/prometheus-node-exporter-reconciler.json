@@ -1,0 +1,80 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "talos-prometheus-node-exporter-reconciler",
+        "namespace": "flux-system"
+      }
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "Role",
+      "metadata": {
+        "name": "talos-prometheus-node-exporter-reconciler",
+        "namespace": "prometheus-node-exporter"
+      },
+      "rules": [
+        {
+          "apiGroups": [""],
+          "resources": ["configmaps"],
+          "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"]
+        },
+        {
+          "apiGroups": ["source.toolkit.fluxcd.io"],
+          "resources": ["helmrepositories"],
+          "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"]
+        },
+        {
+          "apiGroups": ["helm.toolkit.fluxcd.io"],
+          "resources": ["helmreleases"],
+          "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"]
+        }
+      ]
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "RoleBinding",
+      "metadata": {
+        "name": "talos-prometheus-node-exporter-reconciler",
+        "namespace": "prometheus-node-exporter"
+      },
+      "roleRef": {
+        "apiGroup": "rbac.authorization.k8s.io",
+        "kind": "Role",
+        "name": "talos-prometheus-node-exporter-reconciler"
+      },
+      "subjects": [
+        {
+          "kind": "ServiceAccount",
+          "name": "talos-prometheus-node-exporter-reconciler",
+          "namespace": "flux-system"
+        }
+      ]
+    },
+    {
+      "apiVersion": "kustomize.toolkit.fluxcd.io/v1",
+      "kind": "Kustomization",
+      "metadata": {
+        "name": "prometheus-node-exporter",
+        "namespace": "flux-system"
+      },
+      "spec": {
+        "interval": "5m",
+        "retryInterval": "30s",
+        "timeout": "10m",
+        "sourceRef": {
+          "kind": "GitRepository",
+          "name": "talos-bootstrap"
+        },
+        "path": "./talos/gitops/apps/prometheus-node-exporter",
+        "serviceAccountName": "talos-prometheus-node-exporter-reconciler",
+        "prune": true,
+        "wait": true
+      }
+    }
+  ]
+}

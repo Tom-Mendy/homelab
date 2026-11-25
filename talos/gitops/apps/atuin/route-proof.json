@@ -1,0 +1,6 @@
+{
+  "apiVersion": "traefik.io/v1alpha1",
+  "kind": "Middleware",
+  "metadata": { "name": "atuin-route-proof", "namespace": "atuin" },
+  "spec": { "headers": { "customResponseHeaders": { "X-Migration-Route": "talos-atuin" } } }
+}

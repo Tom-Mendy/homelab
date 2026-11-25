@@ -1,7 +1,9 @@
 namespace: navidrome
 createNamespace: true
 
-replicaCount: 1
+replicaCount: 0
+# Temporary bridge until LAN DNS and ingress point directly to Talos.
+migrationBridgeAddress: 10.0.0.70
 
 # Reserve capacity during scans without capping CPU or memory bursts.
 resources:

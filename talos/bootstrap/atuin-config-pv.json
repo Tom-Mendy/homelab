@@ -1,0 +1,25 @@
+{
+  "apiVersion": "v1",
+  "kind": "PersistentVolume",
+  "metadata": {
+    "name": "atuin-config-static-pv",
+    "labels": { "migration": "talos-atuin" }
+  },
+  "spec": {
+    "capacity": { "storage": "20Gi" },
+    "accessModes": ["ReadWriteMany"],
+    "persistentVolumeReclaimPolicy": "Retain",
+    "storageClassName": "nfs-k8s",
+    "mountOptions": ["nfsvers=4.1"],
+    "nfs": {
+      "server": "10.0.0.11",
+      "path": "/volume1/k8s/atuin-atuin-config-v2-pvc-717898a7-6a05-4e19-91d7-34dbb26be28f"
+    },
+    "claimRef": {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "name": "atuin-config-v2",
+      "namespace": "atuin"
+    }
+  }
+}

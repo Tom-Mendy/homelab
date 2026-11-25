@@ -1,0 +1,51 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "nzbget-config-pvc",
+        "namespace": "nzbget",
+        "labels": { "migration": "talos-nzbget" }
+      },
+      "spec": {
+        "accessModes": ["ReadWriteOnce"],
+        "resources": { "requests": { "storage": "5Gi" } },
+        "storageClassName": "nfs-k8s",
+        "volumeName": "nzbget-config-pv"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "nzbget-nymvpn-pvc",
+        "namespace": "nzbget",
+        "labels": { "migration": "talos-nzbget" }
+      },
+      "spec": {
+        "accessModes": ["ReadWriteOnce"],
+        "resources": { "requests": { "storage": "1Gi" } },
+        "storageClassName": "nfs-k8s",
+        "volumeName": "nzbget-nymvpn-pv"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "nzbget-downloads-pvc",
+        "namespace": "nzbget",
+        "labels": { "migration": "talos-nzbget" }
+      },
+      "spec": {
+        "accessModes": ["ReadWriteMany"],
+        "resources": { "requests": { "storage": "2Ti" } },
+        "storageClassName": "nfs-k8s",
+        "volumeName": "nzbget-downloads-pv"
+      }
+    }
+  ]
+}

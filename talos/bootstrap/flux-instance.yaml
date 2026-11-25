@@ -1,0 +1,13 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: FluxInstance
+metadata:
+  name: flux
+  namespace: flux-system
+spec:
+  components:
+    - source-controller
+    - kustomize-controller
+    - helm-controller
+  distribution:
+    version: 2.9.6
+    registry: ghcr.io/fluxcd

@@ -1,0 +1,43 @@
+{
+  "apiVersion": "networking.k8s.io/v1",
+  "kind": "Ingress",
+  "metadata": {
+    "name": "ollama-direct-https",
+    "namespace": "ollama",
+    "annotations": {
+      "traefik.ingress.kubernetes.io/router.entrypoints": "websecure"
+    }
+  },
+  "spec": {
+    "ingressClassName": "talos-traefik",
+    "rules": [
+      {
+        "host": "ollama.home.tom-mendy.com",
+        "http": {
+          "paths": [
+            {
+              "backend": {
+                "service": {
+                  "name": "ollama",
+                  "port": {
+                    "name": "http"
+                  }
+                }
+              },
+              "path": "/",
+              "pathType": "Prefix"
+            }
+          ]
+        }
+      }
+    ],
+    "tls": [
+      {
+        "hosts": [
+          "ollama.home.tom-mendy.com"
+        ],
+        "secretName": "ollama-direct-tls"
+      }
+    ]
+  }
+}

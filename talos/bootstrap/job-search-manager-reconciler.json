@@ -1,0 +1,49 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    { "apiVersion": "v1", "kind": "Namespace", "metadata": { "name": "job-search-manager" } },
+    { "apiVersion": "v1", "kind": "ServiceAccount", "metadata": { "name": "job-search-manager-infisical-sync", "namespace": "job-search-manager" }, "automountServiceAccountToken": false },
+    { "apiVersion": "v1", "kind": "ServiceAccount", "metadata": { "name": "talos-job-search-manager-reconciler", "namespace": "flux-system" } },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "Role",
+      "metadata": { "name": "talos-job-search-manager-reconciler", "namespace": "job-search-manager" },
+      "rules": [
+        { "apiGroups": ["apps"], "resources": ["deployments"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
+        { "apiGroups": [""], "resources": ["services", "persistentvolumeclaims", "configmaps", "secrets", "serviceaccounts"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
+        { "apiGroups": ["batch"], "resources": ["cronjobs"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
+        { "apiGroups": ["networking.k8s.io"], "resources": ["ingresses"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
+        { "apiGroups": ["traefik.io"], "resources": ["middlewares"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
+        { "apiGroups": ["secrets.infisical.com"], "resources": ["infisicalconnections", "infisicalauths", "infisicalstaticsecrets"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
+        { "apiGroups": ["postgresql.cnpg.io"], "resources": ["clusters"], "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"] },
+        { "apiGroups": ["apps"], "resources": ["replicasets"], "verbs": ["get", "list", "watch"] },
+        { "apiGroups": [""], "resources": ["pods"], "verbs": ["get", "list", "watch"] }
+      ]
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "RoleBinding",
+      "metadata": { "name": "talos-job-search-manager-reconciler", "namespace": "job-search-manager" },
+      "roleRef": { "apiGroup": "rbac.authorization.k8s.io", "kind": "Role", "name": "talos-job-search-manager-reconciler" },
+      "subjects": [{ "kind": "ServiceAccount", "name": "talos-job-search-manager-reconciler", "namespace": "flux-system" }]
+    },
+    {
+      "apiVersion": "kustomize.toolkit.fluxcd.io/v1",
+      "kind": "Kustomization",
+      "metadata": { "name": "job-search-manager", "namespace": "flux-system" },
+      "spec": {
+        "interval": "5m",
+        "retryInterval": "30s",
+        "timeout": "10m",
+        "dependsOn": [{ "name": "cnpg" }],
+        "sourceRef": { "kind": "GitRepository", "name": "talos-bootstrap" },
+        "path": "./talos/gitops/apps/job-search-manager",
+        "serviceAccountName": "talos-job-search-manager-reconciler",
+        "prune": true,
+        "healthChecks": [{ "apiVersion": "apps/v1", "kind": "Deployment", "name": "job-search-manager", "namespace": "job-search-manager" }],
+        "wait": true
+      }
+    }
+  ]
+}

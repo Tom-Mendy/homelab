@@ -1,0 +1,44 @@
+{
+  "web": {
+    "enabled": true,
+    "configSecretName": "flux-operator-web-config",
+    "rbac": {
+      "createRoles": false
+    },
+    "ingress": {
+      "enabled": true,
+      "className": "talos-traefik",
+      "annotations": {
+        "traefik.ingress.kubernetes.io/router.entrypoints": "websecure"
+      },
+      "hosts": [
+        {
+          "host": "flux.home.tom-mendy.com",
+          "paths": [
+            {
+              "path": "/",
+              "pathType": "Prefix"
+            }
+          ]
+        }
+      ],
+      "tls": [
+        {
+          "secretName": "flux-web-direct-tls",
+          "hosts": [
+            "flux.home.tom-mendy.com"
+          ]
+        }
+      ]
+    }
+  },
+  "resources": {
+    "requests": {
+      "cpu": "50m",
+      "memory": "64Mi"
+    },
+    "limits": {
+      "memory": "256Mi"
+    }
+  }
+}

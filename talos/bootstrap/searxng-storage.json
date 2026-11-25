@@ -1,0 +1,51 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolume",
+      "metadata": {
+        "name": "talos-searxng-nymvpn"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "capacity": {
+          "storage": "1Gi"
+        },
+        "mountOptions": [
+          "nfsvers=4.1"
+        ],
+        "nfs": {
+          "path": "/volume1/k8s/searxng-searxng-nymvpn-pvc-pvc-46eb3805-f192-4865-bd43-d8e7ee0699ac",
+          "server": "10.0.0.11"
+        },
+        "persistentVolumeReclaimPolicy": "Retain",
+        "storageClassName": "nfs-k8s",
+        "volumeMode": "Filesystem"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "searxng-nymvpn-pvc",
+        "namespace": "searxng"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "1Gi"
+          }
+        },
+        "storageClassName": "nfs-k8s",
+        "volumeName": "talos-searxng-nymvpn"
+      }
+    }
+  ]
+}

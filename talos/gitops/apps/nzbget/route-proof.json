@@ -1,0 +1,6 @@
+{
+  "apiVersion": "traefik.io/v1alpha1",
+  "kind": "Middleware",
+  "metadata": { "name": "nzbget-route-proof", "namespace": "nzbget" },
+  "spec": { "headers": { "customResponseHeaders": { "X-Migration-Route": "talos-nzbget" } } }
+}

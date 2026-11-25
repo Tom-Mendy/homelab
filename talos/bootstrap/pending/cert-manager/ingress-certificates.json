@@ -1,0 +1,474 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "hindsight-tls",
+        "namespace": "agent"
+      },
+      "spec": {
+        "secretName": "hindsight-tls",
+        "dnsNames": [
+          "hindsight.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "atuin-tls",
+        "namespace": "atuin"
+      },
+      "spec": {
+        "secretName": "atuin-tls",
+        "dnsNames": [
+          "atuin.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "authentik-server-direct-tls",
+        "namespace": "authentik"
+      },
+      "spec": {
+        "secretName": "authentik-server-direct-tls",
+        "dnsNames": [
+          "authentik.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "blocky-tls",
+        "namespace": "blocky"
+      },
+      "spec": {
+        "secretName": "blocky-tls",
+        "dnsNames": [
+          "blocky.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "flux-web-direct-tls",
+        "namespace": "flux-system"
+      },
+      "spec": {
+        "secretName": "flux-web-direct-tls",
+        "dnsNames": [
+          "flux.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "forgejo-direct-tls",
+        "namespace": "forgejo"
+      },
+      "spec": {
+        "secretName": "forgejo-direct-tls",
+        "dnsNames": [
+          "forgejo.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "forgejo-home-direct-tls",
+        "namespace": "forgejo"
+      },
+      "spec": {
+        "secretName": "forgejo-home-direct-tls",
+        "dnsNames": [
+          "forgejo.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "grafana-tls",
+        "namespace": "grafana"
+      },
+      "spec": {
+        "secretName": "grafana-tls",
+        "dnsNames": [
+          "grafana.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "harbor-tls",
+        "namespace": "harbor"
+      },
+      "spec": {
+        "secretName": "harbor-tls",
+        "dnsNames": [
+          "harbor.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "homepage-tls",
+        "namespace": "homepage"
+      },
+      "spec": {
+        "secretName": "homepage-tls",
+        "dnsNames": [
+          "homepage.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "infisical-tls",
+        "namespace": "infisical"
+      },
+      "spec": {
+        "secretName": "infisical-tls",
+        "dnsNames": [
+          "infisical.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "suivi-stage-tls",
+        "namespace": "job-search-manager"
+      },
+      "spec": {
+        "secretName": "suivi-stage-tls",
+        "dnsNames": [
+          "suivi-stage.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "cinny-tls",
+        "namespace": "matrix"
+      },
+      "spec": {
+        "secretName": "cinny-tls",
+        "dnsNames": [
+          "chat.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "matrix-direct-tls",
+        "namespace": "matrix"
+      },
+      "spec": {
+        "secretName": "matrix-direct-tls",
+        "dnsNames": [
+          "matrix.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "prowlarr-tls",
+        "namespace": "media"
+      },
+      "spec": {
+        "secretName": "prowlarr-tls",
+        "dnsNames": [
+          "prowlarr.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "radarr-tls",
+        "namespace": "media"
+      },
+      "spec": {
+        "secretName": "radarr-tls",
+        "dnsNames": [
+          "radarr.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "sonarr-tls",
+        "namespace": "media"
+      },
+      "spec": {
+        "secretName": "sonarr-tls",
+        "dnsNames": [
+          "sonarr.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "navidrome-tls",
+        "namespace": "navidrome"
+      },
+      "spec": {
+        "secretName": "navidrome-tls",
+        "dnsNames": [
+          "navidrome.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "nzbget-tls",
+        "namespace": "nzbget"
+      },
+      "spec": {
+        "secretName": "nzbget-tls",
+        "dnsNames": [
+          "nzbget.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "ollama-direct-tls",
+        "namespace": "ollama"
+      },
+      "spec": {
+        "secretName": "ollama-direct-tls",
+        "dnsNames": [
+          "ollama.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "open-webui-direct-tls",
+        "namespace": "ollama"
+      },
+      "spec": {
+        "secretName": "open-webui-direct-tls",
+        "dnsNames": [
+          "openwebui.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "portfolio-tls",
+        "namespace": "portfolio"
+      },
+      "spec": {
+        "secretName": "portfolio-tls",
+        "dnsNames": [
+          "tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "prometheus-tls",
+        "namespace": "prometheus"
+      },
+      "spec": {
+        "secretName": "prometheus-tls",
+        "dnsNames": [
+          "prometheus.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "qbittorrent-tls",
+        "namespace": "qbittorrent"
+      },
+      "spec": {
+        "secretName": "qbittorrent-tls",
+        "dnsNames": [
+          "torrent.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "searxng-tls",
+        "namespace": "searxng"
+      },
+      "spec": {
+        "secretName": "searxng-tls",
+        "dnsNames": [
+          "searxng.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    },
+    {
+      "apiVersion": "cert-manager.io/v1",
+      "kind": "Certificate",
+      "metadata": {
+        "name": "vaultwarden-tls",
+        "namespace": "vaultwarden"
+      },
+      "spec": {
+        "secretName": "vaultwarden-tls",
+        "dnsNames": [
+          "vaultwarden.home.tom-mendy.com"
+        ],
+        "issuerRef": {
+          "name": "letsencrypt-cloudflare",
+          "kind": "ClusterIssuer"
+        }
+      }
+    }
+  ]
+}

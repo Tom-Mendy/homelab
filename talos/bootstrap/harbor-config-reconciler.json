@@ -1,0 +1,21 @@
+{
+  "apiVersion": "kustomize.toolkit.fluxcd.io/v1",
+  "kind": "Kustomization",
+  "metadata": {
+    "name": "harbor-config",
+    "namespace": "flux-system"
+  },
+  "spec": {
+    "interval": "5m",
+    "retryInterval": "30s",
+    "timeout": "10m",
+    "sourceRef": {
+      "kind": "GitRepository",
+      "name": "talos-bootstrap"
+    },
+    "path": "./talos/gitops/apps/harbor-config",
+    "serviceAccountName": "talos-harbor-reconciler",
+    "prune": false,
+    "wait": true
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "applications": [
+    "atuin",
+    "blocky",
+    "cinny",
+    "grafana",
+    "harbor",
+    "hindsight",
+    "homepage",
+    "infisical",
+    "matrix-rtc",
+    "navidrome",
+    "nzbget",
+    "portfolio",
+    "prometheus",
+    "prowlarr",
+    "pushgateway",
+    "qbittorrent",
+    "radarr",
+    "searxng",
+    "sonarr",
+    "vaultwarden"
+  ],
+  "automaticImageUpdates": false,
+  "productionTraffic": "requires per-application cutover"
+}

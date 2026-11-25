@@ -1,0 +1,52 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "tuwunel",
+        "namespace": "matrix"
+      },
+      "spec": {
+        "type": "ClusterIP",
+        "selector": {
+          "app.kubernetes.io/name": "tuwunel"
+        },
+        "ports": [
+          {
+            "name": "http",
+            "port": 8008,
+            "protocol": "TCP",
+            "targetPort": "http"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "tuwunel-talos",
+        "namespace": "matrix"
+      },
+      "spec": {
+        "type": "LoadBalancer",
+        "loadBalancerIP": "10.0.0.75",
+        "externalTrafficPolicy": "Local",
+        "selector": {
+          "app.kubernetes.io/name": "tuwunel"
+        },
+        "ports": [
+          {
+            "name": "http",
+            "port": 8008,
+            "protocol": "TCP",
+            "targetPort": "http"
+          }
+        ]
+      }
+    }
+  ]
+}

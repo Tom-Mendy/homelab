@@ -1,0 +1,19 @@
+{
+  "controllerManager": {
+    "manager": {
+      "image": {
+        "repository": "docker.io/infisical/kubernetes-operator",
+        "tag": "v0.11.16@sha256:0edfbde22637d50e52d2539b21fc3da397fc7033eea8d8baa8074f57d3e4b9fa"
+      }
+    }
+  },
+  "defaultInfisicalAuth": {
+    "enabled": false
+  },
+  "defaultInfisicalConnection": {
+    "enabled": false
+  },
+  "telemetry": {
+    "enabled": false
+  }
+}

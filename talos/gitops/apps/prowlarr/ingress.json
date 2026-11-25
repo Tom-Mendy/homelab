@@ -1,0 +1,36 @@
+{
+  "apiVersion": "networking.k8s.io/v1",
+  "kind": "Ingress",
+  "metadata": {
+    "name": "prowlarr",
+    "namespace": "media",
+    "annotations": {
+      "traefik.ingress.kubernetes.io/router.entrypoints": "web",
+      "traefik.ingress.kubernetes.io/router.middlewares": "media-prowlarr-route-proof@kubernetescrd"
+    }
+  },
+  "spec": {
+    "ingressClassName": "talos-traefik",
+    "rules": [
+      {
+        "host": "prowlarr.home.tom-mendy.com",
+        "http": {
+          "paths": [
+            {
+              "path": "/",
+              "pathType": "Prefix",
+              "backend": {
+                "service": {
+                  "name": "prowlarr",
+                  "port": {
+                    "number": 9696
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

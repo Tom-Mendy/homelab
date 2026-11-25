@@ -1,0 +1,67 @@
+{
+  "apiVersion": "networking.k8s.io/v1",
+  "kind": "Ingress",
+  "metadata": {
+    "name": "matrix-direct-https",
+    "namespace": "matrix",
+    "annotations": {
+      "traefik.ingress.kubernetes.io/router.entrypoints": "websecure"
+    }
+  },
+  "spec": {
+    "ingressClassName": "talos-traefik",
+    "rules": [
+      {
+        "host": "matrix.tom-mendy.com",
+        "http": {
+          "paths": [
+            {
+              "backend": {
+                "service": {
+                  "name": "tuwunel",
+                  "port": {
+                    "name": "http"
+                  }
+                }
+              },
+              "path": "/_matrix",
+              "pathType": "Prefix"
+            },
+            {
+              "backend": {
+                "service": {
+                  "name": "tuwunel",
+                  "port": {
+                    "name": "http"
+                  }
+                }
+              },
+              "path": "/_tuwunel",
+              "pathType": "Prefix"
+            },
+            {
+              "backend": {
+                "service": {
+                  "name": "tuwunel",
+                  "port": {
+                    "name": "http"
+                  }
+                }
+              },
+              "path": "/.well-known/matrix",
+              "pathType": "Prefix"
+            }
+          ]
+        }
+      }
+    ],
+    "tls": [
+      {
+        "hosts": [
+          "matrix.tom-mendy.com"
+        ],
+        "secretName": "matrix-direct-tls"
+      }
+    ]
+  }
+}

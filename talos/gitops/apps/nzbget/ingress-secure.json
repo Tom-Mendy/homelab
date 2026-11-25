@@ -1,0 +1,26 @@
+{
+  "apiVersion": "networking.k8s.io/v1",
+  "kind": "Ingress",
+  "metadata": {
+    "name": "nzbget-secure",
+    "namespace": "nzbget",
+    "annotations": {
+      "traefik.ingress.kubernetes.io/router.entrypoints": "websecure",
+      "traefik.ingress.kubernetes.io/router.middlewares": "nzbget-nzbget-route-proof@kubernetescrd"
+    }
+  },
+  "spec": {
+    "ingressClassName": "talos-traefik",
+    "rules": [{
+      "host": "nzbget.home.tom-mendy.com",
+      "http": {
+        "paths": [{
+          "path": "/",
+          "pathType": "Prefix",
+          "backend": { "service": { "name": "nzbget", "port": { "number": 6789 } } }
+        }]
+      }
+    }],
+    "tls": [{ "hosts": ["nzbget.home.tom-mendy.com"], "secretName": "nzbget-tls" }]
+  }
+}

@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - postgres-cluster.yaml
+  - repository.yaml
+  - release.yaml
+  - route-proof.yaml
+  - ingress.yaml
+  - ingress-secure.yaml

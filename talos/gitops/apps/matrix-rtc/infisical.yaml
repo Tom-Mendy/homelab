@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: talos-matrix-infisical-identity
+  namespace: matrix
+type: Opaque
+stringData:
+  identityId: 36efa294-20ed-451c-896e-ca3ae808ad2d
+---
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalConnection
+metadata:
+  name: matrix-infisical
+  namespace: matrix
+spec:
+  address: https://infisical.home.tom-mendy.com
+---
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalAuth
+metadata:
+  name: matrix-infisical
+  namespace: matrix
+spec:
+  method: kubernetes
+  infisicalConnectionRef:
+    name: matrix-infisical
+    namespace: matrix
+  kubernetes:
+    identityIdRef:
+      name: talos-matrix-infisical-identity
+      namespace: matrix
+      key: identityId
+    serviceAccountRef:
+      name: matrix-infisical-sync
+      namespace: matrix
+---
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalStaticSecret
+metadata:
+  name: matrix-runtime
+  namespace: matrix
+spec:
+  infisicalAuthRef:
+    name: matrix-infisical
+    namespace: matrix
+  sources:
+    - projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+      environmentSlug: prod
+      secretPath: /matrix
+      recursive: false
+  targets:
+    - name: matrix-runtime
+      namespace: matrix
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          registration-shared-secret: "{{ .MATRIX_REGISTRATION_SHARED_SECRET.Value }}"
+          LIVEKIT_KEY: "{{ .LIVEKIT_KEY.Value }}"
+          LIVEKIT_SECRET: "{{ .LIVEKIT_SECRET.Value }}"
+  syncOptions:
+    refreshInterval: 1m
+    instantUpdates: false
+---
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalStaticSecret
+metadata:
+  name: matrix-oidc
+  namespace: matrix
+spec:
+  infisicalAuthRef:
+    name: matrix-infisical
+    namespace: matrix
+  sources:
+    - projectId: "758123bc-7eaa-4256-98a2-bb7438a783b8"
+      environmentSlug: prod
+      secretPath: /oidc
+      recursive: false
+  targets:
+    - name: matrix-oidc
+      namespace: matrix
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          oidc-client-secret: "{{ .MATRIX_OIDC_CLIENT_SECRET.Value }}"
+  syncOptions:
+    refreshInterval: 1m
+    instantUpdates: false

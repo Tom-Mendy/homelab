@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-cloudflare
+spec:
+  acme:
+    email: admin@tom-mendy.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-cloudflare-account
+    solvers:
+      - selector:
+          dnsZones: [tom-mendy.com]
+        dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: traefik-cloudflare-dns
+              key: CF_DNS_API_TOKEN

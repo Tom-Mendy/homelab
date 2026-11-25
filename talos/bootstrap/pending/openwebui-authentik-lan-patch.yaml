@@ -1,0 +1,8 @@
+# Merge patch for StatefulSet ollama/open-webui.
+spec:
+  template:
+    spec:
+      hostAliases:
+        - ip: 10.0.0.70
+          hostnames:
+            - authentik.tom-mendy.com

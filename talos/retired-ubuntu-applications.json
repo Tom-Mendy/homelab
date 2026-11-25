@@ -1,0 +1,213 @@
+{
+  "retired": [
+    {
+      "namespace": "portfolio",
+      "helmReleaseNamespace": "flux-system",
+      "helmRelease": "portfolio",
+      "deployment": "portfolio",
+      "replicas": 0,
+      "keepSuspended": true,
+      "rollback": "docs/talos-portfolio-migration.md"
+    },
+    {
+      "namespace": "matrix",
+      "deployment": "cinny",
+      "replicas": 0,
+      "componentOnly": true,
+      "helmRelease": "matrix",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true
+    },
+    {
+      "namespace": "navidrome",
+      "deployment": "navidrome",
+      "replicas": 0,
+      "helmRelease": "navidrome",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "singleWriterSharedNfs": true
+    },
+    {
+      "namespace": "searxng",
+      "deployment": "searxng",
+      "replicas": 0,
+      "helmRelease": "searxng",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "singleWriterSharedNfs": true,
+      "rollback": "docs/talos-service-migrations.md"
+    },
+    {
+      "namespace": "homepage",
+      "deployment": "homepage",
+      "replicas": 0,
+      "helmRelease": "homepage",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "rollback": "docs/talos-service-migrations.md"
+    },
+    {
+      "namespace": "media",
+      "deployment": "radarr",
+      "replicas": 0,
+      "helmRelease": "media",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "singleWriterSharedNfs": true,
+      "rollback": "docs/talos-service-migrations.md"
+    },
+    {
+      "namespace": "media",
+      "deployment": "sonarr",
+      "replicas": 0,
+      "helmRelease": "media",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "singleWriterSharedNfs": true,
+      "rollback": "docs/talos-service-migrations.md"
+    },
+    {
+      "namespace": "media",
+      "deployment": "prowlarr",
+      "replicas": 0,
+      "helmRelease": "media",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "singleWriterSharedNfs": true,
+      "rollback": "docs/talos-service-migrations.md"
+    },
+    {
+      "namespace": "media",
+      "deployment": "qbittorrent",
+      "replicas": 0,
+      "helmRelease": "media",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "singleWriterSharedNfs": true,
+      "rollback": "docs/talos-service-migrations.md"
+    },
+    {
+      "namespace": "media",
+      "deployment": "nzbget",
+      "replicas": 0,
+      "helmRelease": "media",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "singleWriterSharedNfs": true,
+      "rollback": "docs/talos-service-migrations.md"
+    },
+    {
+      "namespace": "atuin",
+      "deployment": "atuin",
+      "replicas": 0,
+      "helmRelease": "atuin",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "rollback": "docs/talos-service-migrations.md",
+      "singleWriterSharedNfs": true
+    },
+    {
+      "namespace": "atuin",
+      "deployment": "postgres",
+      "replicas": 1,
+      "helmRelease": "atuin",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "rollback": "docs/talos-service-migrations.md",
+      "logicalRestoreRequired": true,
+      "keepAvailableForRollback": true
+    },
+    {
+      "namespace": "blocky",
+      "deployment": "blocky",
+      "replicas": 0,
+      "helmRelease": "blocky",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "rollback": "docs/talos-service-migrations.md",
+      "temporaryServiceBridge": {
+        "ubuntuAddress": "10.0.0.61",
+        "talosAddress": "10.0.0.71",
+        "removeAfter": "DHCP and statically configured DNS clients point directly to Talos"
+      }
+    },
+    {
+      "namespace": "grafana",
+      "deployment": "grafana",
+      "replicas": 0,
+      "helmRelease": "grafana",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "singleWriterSharedNfs": true,
+      "rollback": "docs/talos-service-migrations.md",
+      "temporaryServiceBridge": {
+        "talosAddress": "10.0.0.72:3000",
+        "removeAfter": "Ubuntu ingress no longer fronts Grafana"
+      }
+    },
+    {
+      "namespace": "prometheus",
+      "deployment": "prometheus-prometheus-pushgateway",
+      "replicas": 0,
+      "helmRelease": "prometheus",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "rollback": "docs/talos-service-migrations.md",
+      "temporaryServiceBridge": {
+        "ubuntuService": "prometheus/prometheus-prometheus-pushgateway",
+        "talosAddress": "10.0.0.73:9091",
+        "removeAfter": "Prometheus has moved to Talos and its Pushgateway scrape is validated"
+      }
+    },
+    {
+      "namespace": "vaultwarden",
+      "deployment": "vaultwarden",
+      "replicas": 0,
+      "helmRelease": "vaultwarden",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "sharedNfsApplicationData": true,
+      "postgresBackend": "vaultwarden-postgres",
+      "rollback": "docs/talos-service-migrations.md",
+      "temporaryServiceBridge": {
+        "ubuntuService": "vaultwarden/vaultwarden",
+        "talosAddress": "10.0.0.70:80",
+        "removeAfter": "Vaultwarden login is validated and Ubuntu ingress no longer fronts the Talos app"
+      }
+    },
+    {
+      "namespace": "matrix",
+      "deployment": "matrix-rtc",
+      "replicas": 0,
+      "componentOnly": true,
+      "helmRelease": "matrix",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "temporaryServiceBridge": {
+        "ubuntuServices": [
+          "matrix/matrix-rtc",
+          "matrix/matrix-rtc-jwt"
+        ],
+        "talosAddress": "10.0.0.74",
+        "removeAfter": "Validate a real Element audio/video call, migrate remaining Matrix traffic, and update Pangolin/Newt raw routes to Talos"
+      },
+      "rollback": "docs/talos-service-migrations.md"
+    },
+    {
+      "namespace": "matrix",
+      "deployment": "tuwunel",
+      "replicas": 0,
+      "helmRelease": "matrix",
+      "helmReleaseNamespace": "flux-system",
+      "keepSuspended": true,
+      "singleWriterSharedNfs": true,
+      "sharedNfsApplicationData": true,
+      "rollback": "docs/talos-service-migrations.md",
+      "temporaryServiceBridge": {
+        "ubuntuService": "matrix/tuwunel",
+        "talosAddress": "10.0.0.75:8008",
+        "removeAfter": "Public Matrix ingress and Newt routes no longer depend on Ubuntu Traefik"
+      }
+    }
+  ]
+}

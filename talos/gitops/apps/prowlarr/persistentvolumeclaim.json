@@ -1,0 +1,20 @@
+{
+  "apiVersion": "v1",
+  "kind": "PersistentVolumeClaim",
+  "metadata": {
+    "name": "prowlarr-config-pvc",
+    "namespace": "media"
+  },
+  "spec": {
+    "accessModes": [
+      "ReadWriteOnce"
+    ],
+    "resources": {
+      "requests": {
+        "storage": "5Gi"
+      }
+    },
+    "volumeName": "prowlarr-config-talos-pv",
+    "storageClassName": "nfs-k8s"
+  }
+}

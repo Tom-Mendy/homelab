@@ -1,0 +1,39 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: legacy-blocky
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.0.0.61/32
+  autoAssign: false
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: legacy-blocky
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - legacy-blocky
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: blocky-legacy-vip
+  namespace: blocky
+  annotations:
+    metallb.io/loadBalancerIPs: 10.0.0.61
+spec:
+  type: LoadBalancer
+  selector:
+    app: blocky
+  ports:
+    - name: dns
+      port: 53
+      protocol: UDP
+      targetPort: 53
+    - name: http
+      port: 4000
+      protocol: TCP
+      targetPort: 4000

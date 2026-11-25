@@ -1,0 +1,45 @@
+{
+  "apiVersion": "networking.k8s.io/v1",
+  "kind": "Ingress",
+  "metadata": {
+    "name": "authentik-server-direct-https",
+    "namespace": "authentik",
+    "annotations": {
+      "traefik.ingress.kubernetes.io/router.entrypoints": "websecure",
+      "traefik.ingress.kubernetes.io/router.middlewares": "authentik-authentik-public-https@kubernetescrd",
+      "traefik.ingress.kubernetes.io/router.priority": "150"
+    }
+  },
+  "spec": {
+    "ingressClassName": "talos-traefik",
+    "rules": [
+      {
+        "host": "authentik.tom-mendy.com",
+        "http": {
+          "paths": [
+            {
+              "backend": {
+                "service": {
+                  "name": "authentik-server",
+                  "port": {
+                    "number": 80
+                  }
+                }
+              },
+              "path": "/",
+              "pathType": "Prefix"
+            }
+          ]
+        }
+      }
+    ],
+    "tls": [
+      {
+        "hosts": [
+          "authentik.tom-mendy.com"
+        ],
+        "secretName": "authentik-server-direct-tls"
+      }
+    ]
+  }
+}

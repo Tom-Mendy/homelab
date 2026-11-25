@@ -6,7 +6,8 @@
   "properties": {
     "namespace": { "type": "string", "minLength": 1 },
     "createNamespace": { "type": "boolean" },
-    "replicaCount": { "type": "integer", "minimum": 1 },
+    "replicaCount": { "type": "integer", "minimum": 0 },
+    "migrationBridgeAddress": { "type": "string", "description": "Temporary Talos ingress address while the Ubuntu frontend is retained." },
     "resources": {
       "type": "object",
       "additionalProperties": false,

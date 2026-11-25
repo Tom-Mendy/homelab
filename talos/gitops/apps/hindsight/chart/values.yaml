@@ -1,0 +1,61 @@
+namespace: agent
+
+# Explicit GitOps quiescence gate; never enable without a prepared resume change.
+maintenance:
+  enabled: true
+
+image:
+  repository: ghcr.io/vectorize-io/hindsight-api
+  digest: sha256:1ba631f950a04460feff6b1e212bad3cdf127b0cfb3d765bdcba12f512481d7b
+  pullPolicy: IfNotPresent
+
+service:
+  port: 8888
+
+controlPlane:
+  image:
+    repository: ghcr.io/vectorize-io/hindsight-control-plane
+    tag: 0.10.3@sha256:bf436b78e85b0438afda8d2e4b1fce01b9d12f135a742d1cc276b741766f212d
+    pullPolicy: IfNotPresent
+  service:
+    port: 9999
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+ingress:
+  enabled: true
+  host: hindsight.home.tom-mendy.com
+  className: talos-traefik
+  tls:
+    secretName: hindsight-tls
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    traefik.ingress.kubernetes.io/router.middlewares: agent-authentik-hindsight@kubernetescrd
+
+persistence:
+  storageClass: nfs-k8s
+  size: 10Gi
+  existingClaim: hindsight-data
+
+authentik:
+  forwardAuthAddress: https://hindsight.home.tom-mendy.com/outpost.goauthentik.io/auth/traefik
+
+ollama:
+  url: http://ollama.ollama.svc.cluster.local:11434/v1
+  model: SparkLLM/Spark-X2.5-4B:latest
+  timeout: 600
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 2Gi
+  limits:
+    cpu: "2"
+    memory: 6Gi

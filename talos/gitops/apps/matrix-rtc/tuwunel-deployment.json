@@ -1,0 +1,223 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "tuwunel",
+    "namespace": "matrix",
+    "labels": {
+      "app.kubernetes.io/name": "tuwunel"
+    },
+    "annotations": {
+      "secrets.infisical.com/auto-reload": "true"
+    }
+  },
+  "spec": {
+    "progressDeadlineSeconds": 600,
+    "replicas": 1,
+    "revisionHistoryLimit": 10,
+    "selector": {
+      "matchLabels": {
+        "app.kubernetes.io/name": "tuwunel"
+      }
+    },
+    "strategy": {
+      "type": "Recreate"
+    },
+    "template": {
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/name": "tuwunel"
+        },
+        "annotations": {
+          "checksum/tuwunel-config": "5674254c8c56cafb734e72af5ba547a4076650016110299853ed8d5175099488"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "args": [
+              "--config",
+              "/etc/tuwunel/tuwunel.toml"
+            ],
+            "image": "ghcr.io/matrix-construct/tuwunel:v1.9.4@sha256:0e86c6164d6c9f5b60291938eb61ad8395021c37fe58d47a963ea7edddbedaec",
+            "imagePullPolicy": "IfNotPresent",
+            "livenessProbe": {
+              "failureThreshold": 3,
+              "httpGet": {
+                "path": "/_tuwunel/server_version",
+                "port": "http",
+                "scheme": "HTTP"
+              },
+              "initialDelaySeconds": 30,
+              "periodSeconds": 30,
+              "successThreshold": 1,
+              "timeoutSeconds": 1
+            },
+            "name": "tuwunel",
+            "ports": [
+              {
+                "containerPort": 8008,
+                "name": "http",
+                "protocol": "TCP"
+              }
+            ],
+            "readinessProbe": {
+              "failureThreshold": 3,
+              "httpGet": {
+                "path": "/_tuwunel/server_version",
+                "port": "http",
+                "scheme": "HTTP"
+              },
+              "initialDelaySeconds": 5,
+              "periodSeconds": 10,
+              "successThreshold": 1,
+              "timeoutSeconds": 1
+            },
+            "resources": {
+              "limits": {
+                "cpu": "2",
+                "memory": "2Gi"
+              },
+              "requests": {
+                "cpu": "250m",
+                "memory": "512Mi"
+              }
+            },
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "volumeMounts": [
+              {
+                "mountPath": "/etc/tuwunel/tuwunel.toml",
+                "name": "config",
+                "readOnly": true,
+                "subPath": "tuwunel.toml"
+              },
+              {
+                "mountPath": "/run/secrets/oidc-client-secret",
+                "name": "oidc",
+                "readOnly": true,
+                "subPath": "oidc-client-secret"
+              },
+              {
+                "mountPath": "/run/secrets/registration-shared-secret",
+                "name": "runtime",
+                "readOnly": true,
+                "subPath": "registration-shared-secret"
+              },
+              {
+                "mountPath": "/var/lib/tuwunel",
+                "name": "data"
+              },
+              {
+                "mountPath": "/var/lib/tuwunel-backups",
+                "name": "backups"
+              }
+            ]
+          },
+          {
+            "name": "tuwunel-backup-trigger",
+            "image": "docker.io/library/busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e",
+            "imagePullPolicy": "IfNotPresent",
+            "command": [
+              "/bin/sh",
+              "-ec"
+            ],
+            "args": [
+              "while true; do\n  until pidof tuwunel >/dev/null 2>&1; do sleep 10; done\n  sleep 120\n  if pidof tuwunel >/dev/null 2>&1; then\n    echo \"Triggering retained Tuwunel RocksDB backup\"\n    kill -USR2 \"$(pidof tuwunel)\"\n    stamp=\"$(date -u +%Y%m%dT%H%M%SZ)\"\n    mkdir -p /backup-root/media-snapshots\n    temp=\"/backup-root/media-snapshots/media-${stamp}.tar.gz.tmp\"\n    tar -czf \"$temp\" -C /state media archive\n    mv \"$temp\" \"/backup-root/media-snapshots/media-${stamp}.tar.gz\"\n    ls -1t /backup-root/media-snapshots/media-*.tar.gz | tail -n +8 | xargs -r rm -f\n    echo \"Tuwunel media/archive snapshot completed\"\n  fi\n  sleep 86400\ndone"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "runAsNonRoot": true,
+              "runAsUser": 10000,
+              "runAsGroup": 10000,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "5m",
+                "memory": "16Mi"
+              },
+              "limits": {
+                "cpu": "100m",
+                "memory": "64Mi"
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "data",
+                "mountPath": "/state",
+                "readOnly": true
+              },
+              {
+                "name": "backups",
+                "mountPath": "/backup-root"
+              }
+            ]
+          }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": false,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {
+          "fsGroup": 10000,
+          "runAsGroup": 10000,
+          "runAsNonRoot": true,
+          "runAsUser": 10000,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "terminationGracePeriodSeconds": 30,
+        "volumes": [
+          {
+            "configMap": {
+              "defaultMode": 420,
+              "name": "tuwunel-config"
+            },
+            "name": "config"
+          },
+          {
+            "name": "oidc",
+            "secret": {
+              "defaultMode": 420,
+              "secretName": "matrix-oidc"
+            }
+          },
+          {
+            "name": "runtime",
+            "secret": {
+              "defaultMode": 420,
+              "secretName": "matrix-runtime"
+            }
+          },
+          {
+            "name": "data",
+            "persistentVolumeClaim": {
+              "claimName": "tuwunel-data"
+            }
+          },
+          {
+            "name": "backups",
+            "persistentVolumeClaim": {
+              "claimName": "tuwunel-backups"
+            }
+          }
+        ],
+        "shareProcessNamespace": true
+      }
+    }
+  }
+}

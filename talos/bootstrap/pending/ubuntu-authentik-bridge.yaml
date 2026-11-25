@@ -1,0 +1,27 @@
+# Apply to Ubuntu only. The existing Ingress resources retain public TLS.
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentik-talos-bridge
+  namespace: authentik
+spec:
+  ports:
+    - name: http
+      port: 80
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: authentik-talos-bridge
+  namespace: authentik
+  labels:
+    kubernetes.io/service-name: authentik-talos-bridge
+addressType: IPv4
+ports:
+  - name: http
+    port: 80
+    protocol: TCP
+endpoints:
+  - addresses: ["10.0.0.70"]
+    conditions:
+      ready: true

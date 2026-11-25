@@ -1,0 +1,38 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolume",
+      "metadata": {
+        "name": "prowlarr-config-talos-pv",
+        "labels": {
+          "migration": "talos-prowlarr"
+        }
+      },
+      "spec": {
+        "capacity": {
+          "storage": "5Gi"
+        },
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "persistentVolumeReclaimPolicy": "Retain",
+        "storageClassName": "nfs-k8s",
+        "nfs": {
+          "path": "/volume1/k8s/media-prowlarr-config-pvc-pvc-04fa3812-ab36-4e02-84d2-0c21aa8189a6",
+          "server": "10.0.0.11"
+        },
+        "mountOptions": [
+          "nfsvers=4.1"
+        ],
+        "volumeMode": "Filesystem",
+        "claimRef": {
+          "namespace": "media",
+          "name": "prowlarr-config-pvc"
+        }
+      }
+    }
+  ]
+}

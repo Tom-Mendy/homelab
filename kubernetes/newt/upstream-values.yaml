@@ -19,6 +19,27 @@ newtInstances:
     blueprintFile: /etc/newt/blueprint.yaml
     blueprintData: |
       public-resources:
+        gaseous-carphophis-vermis:
+          targets:
+          - hostname: 10.0.0.70
+            method: http
+            port: 80
+          name: Cinny
+          mode: http
+          full-domain: chat.tom-mendy.com
+          ssl: true
+        portfolio:
+          name: Portfolio
+          mode: http
+          full-domain: tom-mendy.com
+          ssl: true
+          host-header: tom-mendy.com
+          auth:
+            sso-enabled: false
+          targets:
+            - hostname: 10.0.0.70
+              method: http
+              port: 80
         radarr:
           name: Radarr
           mode: http
@@ -29,7 +50,7 @@ newtInstances:
           auth:
             sso-enabled: false
           targets:
-            - hostname: 10.0.0.60
+            - hostname: 10.0.0.70
               method: https
               port: 443
         sonarr:
@@ -42,7 +63,33 @@ newtInstances:
           auth:
             sso-enabled: false
           targets:
-            - hostname: 10.0.0.60
+            - hostname: 10.0.0.70
+              method: https
+              port: 443
+        watchful-common-vole:
+          name: torrent
+          mode: http
+          full-domain: torrent.tom-mendy.com
+          ssl: true
+          host-header: torrent.tom-mendy.com
+          tls-server-name: torrent.tom-mendy.com
+          auth:
+            sso-enabled: false
+          targets:
+            - hostname: 10.0.0.70
+              method: https
+              port: 443
+        stupid-european-hamster:
+          name: Coder
+          mode: http
+          full-domain: coder.tom-mendy.com
+          ssl: true
+          host-header: coder.tom-mendy.com
+          tls-server-name: coder.tom-mendy.com
+          auth:
+            sso-enabled: false
+          targets:
+            - hostname: 10.0.0.70
               method: https
               port: 443
     # Health probes need a writable file while the image filesystem stays read-only.

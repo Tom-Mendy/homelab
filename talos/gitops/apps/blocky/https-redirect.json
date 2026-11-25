@@ -1,0 +1,14 @@
+{
+  "apiVersion": "traefik.io/v1alpha1",
+  "kind": "Middleware",
+  "metadata": {
+    "name": "blocky-https-redirect",
+    "namespace": "blocky"
+  },
+  "spec": {
+    "redirectScheme": {
+      "scheme": "https",
+      "permanent": true
+    }
+  }
+}

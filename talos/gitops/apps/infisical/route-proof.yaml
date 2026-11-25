@@ -1,0 +1,9 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: route-proof
+  namespace: infisical
+spec:
+  headers:
+    customResponseHeaders:
+      X-Migration-Route: talos-infisical

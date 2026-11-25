@@ -1,0 +1,186 @@
+{
+  "apiVersion": "v1",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "nvidia-device-plugin",
+        "namespace": "kube-system",
+        "labels": {
+          "app.kubernetes.io/managed-by": "Helm",
+          "helm.toolkit.fluxcd.io/name": "ollama",
+          "helm.toolkit.fluxcd.io/namespace": "flux-system"
+        }
+      }
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "ClusterRole",
+      "metadata": {
+        "name": "nvidia-device-plugin",
+        "namespace": null,
+        "labels": {
+          "app.kubernetes.io/managed-by": "Helm",
+          "helm.toolkit.fluxcd.io/name": "ollama",
+          "helm.toolkit.fluxcd.io/namespace": "flux-system"
+        }
+      },
+      "rules": [
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "nodes"
+          ],
+          "verbs": [
+            "get",
+            "list",
+            "watch"
+          ]
+        }
+      ]
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "ClusterRoleBinding",
+      "metadata": {
+        "name": "nvidia-device-plugin",
+        "namespace": null,
+        "labels": {
+          "app.kubernetes.io/managed-by": "Helm",
+          "helm.toolkit.fluxcd.io/name": "ollama",
+          "helm.toolkit.fluxcd.io/namespace": "flux-system"
+        }
+      },
+      "roleRef": {
+        "apiGroup": "rbac.authorization.k8s.io",
+        "kind": "ClusterRole",
+        "name": "nvidia-device-plugin"
+      },
+      "subjects": [
+        {
+          "kind": "ServiceAccount",
+          "name": "nvidia-device-plugin",
+          "namespace": "kube-system"
+        }
+      ]
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "DaemonSet",
+      "metadata": {
+        "name": "nvidia-device-plugin-daemonset",
+        "namespace": "kube-system",
+        "labels": {
+          "app.kubernetes.io/managed-by": "Helm",
+          "helm.toolkit.fluxcd.io/name": "ollama",
+          "helm.toolkit.fluxcd.io/namespace": "flux-system"
+        }
+      },
+      "spec": {
+        "revisionHistoryLimit": 10,
+        "selector": {
+          "matchLabels": {
+            "name": "nvidia-device-plugin-ds"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "name": "nvidia-device-plugin-ds"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "args": [
+                  "--fail-on-init-error=true",
+                  "--device-discovery-strategy=nvml"
+                ],
+                "image": "nvcr.io/nvidia/k8s-device-plugin:v0.20.1@sha256:27c1b2553a690ca3d29889dcd61df97525d46f58272c0be8dc63c2b18f120075",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "nvidia-device-plugin-ctr",
+                "resources": {},
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                  {
+                    "mountPath": "/var/lib/kubelet/device-plugins",
+                    "name": "device-plugin"
+                  }
+                ]
+              }
+            ],
+            "dnsPolicy": "ClusterFirst",
+            "nodeSelector": {
+              "kubernetes.io/hostname": "node3"
+            },
+            "priorityClassName": "system-node-critical",
+            "restartPolicy": "Always",
+            "runtimeClassName": "nvidia",
+            "schedulerName": "default-scheduler",
+            "securityContext": {},
+            "serviceAccount": "nvidia-device-plugin",
+            "serviceAccountName": "nvidia-device-plugin",
+            "terminationGracePeriodSeconds": 30,
+            "tolerations": [
+              {
+                "effect": "NoSchedule",
+                "key": "node-role.kubernetes.io/control-plane",
+                "operator": "Exists"
+              },
+              {
+                "effect": "NoSchedule",
+                "key": "node-role.kubernetes.io/master",
+                "operator": "Exists"
+              }
+            ],
+            "volumes": [
+              {
+                "hostPath": {
+                  "path": "/var/lib/kubelet/device-plugins",
+                  "type": ""
+                },
+                "name": "device-plugin"
+              }
+            ]
+          }
+        },
+        "updateStrategy": {
+          "rollingUpdate": {
+            "maxSurge": 0,
+            "maxUnavailable": 1
+          },
+          "type": "RollingUpdate"
+        }
+      }
+    },
+    {
+      "apiVersion": "node.k8s.io/v1",
+      "kind": "RuntimeClass",
+      "metadata": {
+        "name": "nvidia"
+      },
+      "handler": "nvidia",
+      "scheduling": {
+        "nodeSelector": {
+          "kubernetes.io/hostname": "node3"
+        }
+      }
+    }
+  ],
+  "kind": "List",
+  "metadata": {
+    "resourceVersion": ""
+  }
+}
