@@ -33,7 +33,7 @@
         "automountServiceAccountToken": false,
         "containers": [
           {
-            "image": "harbor.home.tom-mendy.com/portfolio/portfolio:latest@sha256:08333a8094b51d51ff777e6dff3ffdabfa89e859a8da88b95d9f6f85ea778b38",
+            "image": "harbor.home.tom-mendy.com/portfolio/portfolio:sha-a86247c59504925f696cbc4a3c89a39ac7474ede@sha256:3840a49285c0ee74fbd18a16adc27a626da8fdd0e745311c5408deae49f88d5e",
             "imagePullPolicy": "IfNotPresent",
             "livenessProbe": {
               "failureThreshold": 3,
