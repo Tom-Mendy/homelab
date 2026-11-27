@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - arc.yaml
   - arc-runner-set-sumfeet.yaml
+  - infisical.yaml

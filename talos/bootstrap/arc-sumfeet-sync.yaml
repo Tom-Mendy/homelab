@@ -15,6 +15,9 @@ rules:
   - apiGroups: [source.toolkit.fluxcd.io]
     resources: [ocirepositories]
     verbs: [get, list, watch, create, patch, update]
+  - apiGroups: [secrets.infisical.com]
+    resources: [infisicalconnections, infisicalauths, infisicalstaticsecrets]
+    verbs: [get, list, watch, create, patch, update]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -60,3 +63,44 @@ spec:
   serviceAccountName: talos-arc-reconciler
   prune: false
   wait: true
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: github-runners-infisical-sync
+  namespace: arc-runners
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: github-runners-infisical-token
+  namespace: arc-runners
+rules:
+  - apiGroups: [""]
+    resources: [serviceaccounts/token]
+    resourceNames: [github-runners-infisical-sync]
+    verbs: [create]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: github-runners-infisical-token
+  namespace: arc-runners
+subjects:
+  - kind: ServiceAccount
+    namespace: infisical-operator
+    name: infisical-opera-controller-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: github-runners-infisical-token
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: github-runners-infisical-identity
+  namespace: arc-runners
+type: Opaque
+stringData:
+  identityId: 7b887000-ae48-4603-8ed2-89a5bd6f1f5e
