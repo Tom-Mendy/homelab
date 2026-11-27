@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: talos-arc-reconciler
+  namespace: flux-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: talos-arc-reconciler
+rules:
+  - apiGroups: [helm.toolkit.fluxcd.io]
+    resources: [helmreleases]
+    verbs: [get, list, watch, create, patch, update]
+  - apiGroups: [source.toolkit.fluxcd.io]
+    resources: [ocirepositories]
+    verbs: [get, list, watch, create, patch, update]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: talos-arc-reconciler
+  namespace: arc-systems
+subjects:
+  - kind: ServiceAccount
+    name: talos-arc-reconciler
+    namespace: flux-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: talos-arc-reconciler
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: talos-arc-reconciler
+  namespace: arc-runners
+subjects:
+  - kind: ServiceAccount
+    name: talos-arc-reconciler
+    namespace: flux-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: talos-arc-reconciler
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: arc-sumfeet
+  namespace: flux-system
+spec:
+  interval: 5m
+  retryInterval: 30s
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: talos-bootstrap
+  path: ./talos/gitops/apps/arc-sumfeet
+  serviceAccountName: talos-arc-reconciler
+  prune: false
+  wait: true

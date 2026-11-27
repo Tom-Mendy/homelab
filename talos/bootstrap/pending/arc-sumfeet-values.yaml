@@ -1,0 +1,7 @@
+minRunners: 1
+maxRunners: 1
+
+template:
+  spec:
+    imagePullSecrets:
+      - name: sumfeet-harbor-pull

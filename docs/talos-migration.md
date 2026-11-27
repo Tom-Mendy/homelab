@@ -1,5 +1,167 @@
 # Talos migration tracker
 
+The production etcd CA rotation completed on 2026-11-26. The three
+phases staged overlapping trust, switched certificates, and removed the
+previous CA. Each phase rebooted one node at a time. All three voting
+members and direct Kubernetes API readiness checks passed after each
+reboot. The final applied Raft indexes matched. Each node trusted only
+the replacement CA, and its peer certificate verified against that CA.
+The pre- and post-rotation snapshots passed checksum verification.
+The three-member etcd 3.7.3 rehearsal preserved data and writes through
+the rotation and rejected the old client afterward. A rehearsal without
+restarts failed at the first issuer switch.
+Harbor and the CloudNativePG operator recovered after container image
+pulls delayed their startup.
+Several pending workloads were rescheduled to nodes with cached images.
+All six CloudNativePG databases returned to healthy. Harbor, Authentik,
+Forgejo, and Infisical returned HTTP 200 on their health endpoints, and
+the Sumfeet runner accepted a GitHub Actions job after recovery.
+Open WebUI recovered on node3 after its old pod on node1 terminated.
+Open WebUI and Ollama both returned HTTP 200. The Hindsight and
+Harbor configuration Flux charts and releases returned to Ready after
+reconciliation against the existing Git artifact.
+
+Blocky now allows `mcp.posthog.com` and `oauth.posthog.com` in its
+strict list group. Flux rolled out the change with the existing
+Blocky image. Both DNS addresses returned public IPv4 and IPv6 answers for
+the two names and preserved the Forgejo LAN mapping. The PostHog
+OAuth metadata endpoint returned HTTP 200 through normal DNS.
+Codex reached the OAuth consent step. User authorization is pending.
+
+On 2026-11-27 Authentik returned HTTP 503 and reported two corrupt
+PostgreSQL indexes. Both were rebuilt concurrently and the replacement
+server pod passed readiness. Infisical Redis failed to load its AOF.
+The repair removed a 65,281-byte zero-filled gap and retained the four
+complete commands after it. The repaired copy passed Redis validation
+and started in an isolated container. The original archive was saved
+outside the cluster, and the original incremental file was retained on
+Synology. Redis and Infisical returned to Ready. A subsequent baseline
+probe passed for both DNS addresses, all six PostgreSQL clusters,
+and the application health endpoints. The source of the corruption was
+not established.
+
+The Sumfeet ARC scale set `arc-runner-set-sumfleet-tom` now runs on Talos.
+ARC 0.15.1 uses the existing repository configuration, a project pull-only
+Harbor credential, and a dedicated runner namespace for Docker-in-Docker.
+GitHub reported the Talos runner online and idle, and the runner reported
+that it was listening for jobs. The runner also reached its Docker daemon.
+The Talos override keeps one runner online and caps concurrency at one.
+Flux now manages the existing ARC controller and Sumfeet scale set
+from the digest-pinned charts in the `arc-sumfeet` Kustomization.
+The pinned chart renders matched both installed releases before adoption.
+Both HelmReleases and the Kustomization reported Ready after adoption.
+The GitHub and Harbor credentials remain Kubernetes Secret references.
+Automated credential synchronization remains pending. The existing
+GitHub runner identity returned HTTP 401 during Kubernetes TokenReview
+with a token from its Talos service account. The temporary service account
+used for the probe was removed. The running ARC releases still use the
+verified Kubernetes Secrets. Update the identity through an Infisical
+administrator session and validate a separate sync target before
+switching the existing Secret.
+
+The Talos API authority was rotated on all three nodes. The previous
+client configuration was rejected by every node, and the replacement at
+`~/kube/talosconfig` authenticated to each one. All nodes stayed Ready
+and etcd reported matching applied Raft indexes. A pre-rotation etcd
+snapshot and the new machine configurations were verified and stored
+privately. Kubernetes API trust, etcd trust and the service-account
+signing key are separate. The Kubernetes API rotation has now
+completed. An initial run stopped during trust staging after a private
+key fragment appeared in an inspected log. Its temporary trust was
+removed, and a different CA was staged and applied one node at a time.
+All three APIs rejected the previous administrator credential, and the
+replacement kubeconfig is installed at `~/kube/talos-homelab.yaml`.
+All four Infisical identities authenticate with the final CA as their
+sole trust anchor. The post-rotation etcd snapshot passed checksum
+readback, and all three machine configuration exports passed validation.
+All 58 projected service-account tokens used by running pods were
+verified before removing the previous public key. Talos applied the
+change on one control plane at a time without host reboots. Each API
+passed readiness, advertised only the replacement key, rejected the
+old Infisical reviewer token, and accepted its replacement. A second
+audit confirmed all 58 projected tokens used the replacement key. The
+post-change etcd snapshot passed checksum verification.
+The exposed Kubernetes bootstrap token was replaced in all machine
+configurations and revoked in the API. TokenReview accepted the
+replacement and rejected the old token. The Talos machine bootstrap
+token was also replaced and checked in the live trust service on all
+three nodes. Etcd uses its CA for both peer and client trust. Service-account signing
+changes require new Infisical reviewer JWTs and checks for workloads
+using mounted service-account tokens.
+
+Harbor switched to the visible Infisical identity `talos-harbor-sync`.
+It has no organization role privileges and Viewer access in the homelab
+project. Kubernetes authentication is restricted to the existing Harbor
+sync service account, with API TLS verification enabled. A fresh login
+using a token for that service account succeeded before the switch.
+The former identity remains available for rollback. Flux now reconciles
+Harbor and Blocky from commit `132d80b3d59eb8c4107c7a24d78dcf49b719e3c4`,
+which contains the new identity and tested DNS configuration.
+
+Navidrome was stopped on node2 and then started on node3 with the same
+Synology data and music volumes. The ingress briefly returned HTTP 502
+before the application returned HTTP 200. Node2 was uncordoned and the
+Navidrome Flux Kustomization resumed and reported Ready.
+
+The API VIP returned Ready on all 15 probes during a controlled node1
+reboot. The node returned Ready with a new boot ID. Each control-plane API
+also passed direct TLS readiness checks, and the etcd members reported the
+same applied Raft index. A test file on the existing validation NFS claim
+survived moves from node2 to node3, node1, and back to node2. In a separate
+test, node2 relinquished the API VIP without rebooting. Node3 took over
+and the VIP passed readiness probes. Node2's configuration was restored.
+The outage preflight found all
+six CloudNativePG primaries on node2, with zero allowed disruptions.
+Fresh logical backups for the six clusters passed gzip and SHA-256
+verification. All six dumps also restored into separate local PostgreSQL
+instances using their source major versions. The restore stopped on
+SQL errors and matched each COPY row count against the dump. The local
+bootstrap postgres role already existed, so the restore stream skipped
+only its duplicate CREATE ROLE statement. The saved dumps are unchanged.
+All six original PVCs are bound to Synology NFS volumes with no node
+affinity.
+
+For each relocation, cordon node2 and gracefully delete only the current
+primary pod. Wait for CloudNativePG to recreate it elsewhere. Verify
+that it uses the original PVC UID, accepts queries as primary, and
+passes its application check before proceeding. Leave the PDBs enabled
+and preserve all PVCs. An orderly stop can include CloudNativePG's
+three-minute smart shutdown timeout. Confirm a way to restore power
+before a full shutdown.
+
+All six primaries were relocated to node3 one at a time. Each accepted
+a PostgreSQL query as primary and passed its application check. The
+original six PVC UIDs and all six PDBs were preserved. The first move
+also waited for the PostgreSQL image to download. The pinned database
+images were warmed on the surviving nodes before the later moves.
+The remaining managed workloads were evicted individually and checked
+for Ready replicas on node1 or node3. Only static control-plane pods,
+DaemonSets, and four standalone test pods remained on node2. Node2
+was uncordoned after relocation. At the final
+sample, kubelet reported 4.43 GiB available on node1 and 21.16 GiB on
+node3. The API VIP, both Blocky addresses, and the application checks
+passed. A new etcd snapshot passed SHA-256 verification. Physical access was
+confirmed before shutting down node2.
+The private outage probe script passed a baseline run for both surviving
+APIs, the API VIP, both Blocky addresses, six PostgreSQL clusters, and
+application health. All 61 probe rounds passed during the 30-minute node2 shutdown.
+The API VIP, both surviving API endpoints, both DNS addresses, all six
+PostgreSQL clusters, and the sampled applications passed every round.
+Minimum available memory was 4.37 GiB on node1 and 17.55 GiB on node3.
+After power-on, node2 returned Ready and its direct Kubernetes API
+passed readiness. All three etcd voters reported the same applied Raft
+index and leader. Node2 was uncordoned and the health probes passed again.
+
+Cloudflare's DNS-only wildcard for `*.home.tom-mendy.com` now points to
+`10.0.0.70`. The distinct Talos API record still points to `10.0.0.65`.
+Job Search Manager recovered after the DNS change, installation of a
+project-scoped Harbor pull credential, and repair of the registry's
+internal password hash. The Deployment pulled its existing pinned image.
+The corrected registry hash was saved in Infisical and synchronized back
+to Kubernetes. Both the mounted and synchronized hashes matched the
+registry password. The project pull credential retrieved the pinned
+manifest from Harbor and its SHA-256 matched.
+
 Talos cert-manager v1.21.3 issued all 27 production ingress certificates
 through Let's Encrypt and Cloudflare DNS-01. Traefik served the newly issued
 certificates on the LAN VIP. The Coder certificate renews on 2027-01-24.
@@ -25,14 +187,14 @@ Matrix, Cinny, qBittorrent, Radarr, Sonarr, and DNS on both Talos VIPs.
 The Ubuntu ingress VIP was restored as a rollback path.
 
 Fresh Ubuntu and Talos etcd snapshots and a Git bundle passed checksum
-readback. The revised node1 candidate excludes the old Flannel document
-and passed strict validation with the Talos v1.14.5 client. Its disk
-selector still intentionally matches no device. The non-GPU Talos ISO
-passed checksum verification. The next physical step is to install the SSD
-in node1 and boot the ISO into maintenance mode. Preserve the Ubuntu HDD
-for rollback. Confirm the wired NIC and SSD serial in maintenance mode,
-then join the existing cluster as a third control plane. Keep node2 and
-node3 online throughout. CI runners remain paused.
+readback. Node1 booted the verified non-GPU Talos v1.14.5 ISO. Its wired
+MAC and SanDisk SSD WWID matched the observed hardware. The final
+configuration excluded Flannel and selected only that SSD. Node1 booted
+from the SSD and joined the existing cluster as its third control plane.
+All three nodes became Ready, all three etcd members are voting, and the
+API VIP passed its readiness check. A post-join etcd snapshot passed
+checksum readback. Controlled node failure tests remain pending. Preserve
+the Ubuntu HDD for rollback. CI runners remain paused.
 
 Both Forgejo LAN names now resolve to Talos ingress at `10.0.0.70`
 through both DNS resolvers. Traefik serves the imported TLS certificates
@@ -73,9 +235,8 @@ the internal host alias to Talos. A signed-in session was not tested.
 Blocky now answers with the Talos ingress VIP `10.0.0.70` for 13 names
 whose direct HTTPS routes were checked. The new answers were verified
 through Talos DNS `10.0.0.71` and the Ubuntu relay `10.0.0.61`.
-The Blocky Kustomization is suspended until the pinned Git source
-includes the new mappings and rolling deployment strategy. Talos has
-since taken over the Ubuntu DNS relay address.
+The pinned Git source now includes the Blocky mappings and rolling
+deployment strategy. Talos has also taken over the Ubuntu DNS relay address.
 
 Newt moved from Ubuntu node1 to Talos node3 using the same tunnel identity.
 The Ubuntu Deployment is stopped. The restored Matrix RTC service name
@@ -528,7 +689,7 @@ box means the work was verified, not merely planned.
    - Join node3 to the existing Talos cluster without another bootstrap.
      Two etcd voting members still require both members for quorum. Avoid
      maintenance and complete the third-member transition promptly.
-7. Convert node1 and validate recovery. Status: awaiting SSD and ISO boot.
+7. Convert node1 and validate recovery. Status: joined, failure tests pending.
    - Keep the Ubuntu control plane until nothing depends on the old cluster.
    - Join node1 as the third Talos control plane. Verify API endpoint failover.
    - Test loss of one machine at a time, including node2-to-node3 and

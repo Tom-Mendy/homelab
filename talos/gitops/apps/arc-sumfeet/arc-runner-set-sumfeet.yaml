@@ -1,0 +1,60 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: arc-runner-set-sumfeet
+  namespace: arc-runners
+spec:
+  interval: 1h
+  url: oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
+  ref:
+    digest: sha256:2ae7e43db61047aa3c4182e73c8f58ace35e796fa07d41b64fb3c39e81e1f365
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: arc-runner-set-sumfeet
+  namespace: arc-runners
+spec:
+  interval: 15m
+  releaseName: arc-runner-set-sumfeet
+  targetNamespace: arc-runners
+  storageNamespace: arc-runners
+  chartRef:
+    kind: OCIRepository
+    name: arc-runner-set-sumfeet
+  values:
+    containerMode:
+      type: dind
+    controllerServiceAccount:
+      name: arc-gha-rs-controller
+      namespace: arc-systems
+    githubConfigSecret: arc-github-auth-sumfeet
+    githubConfigUrl: https://github.com/MrAmarok/sumfeet
+    maxRunners: 1
+    minRunners: 1
+    runnerScaleSetName: arc-runner-set-sumfleet-tom
+    scaleSetLabels:
+      - self-hosted
+      - dev
+    template:
+      spec:
+        containers:
+          - command:
+              - /home/runner/run.sh
+            image: harbor.home.tom-mendy.com/runners/sumfeet-actions-runner@sha256:90e45f1551f4c7a617b1838c97f70695e2c8bc05759a823ec03a824654760b62
+            name: runner
+            resources:
+              limits:
+                cpu: '4'
+                memory: 4Gi
+              requests:
+                cpu: 500m
+                memory: 512Mi
+        imagePullSecrets:
+          - name: sumfeet-harbor-pull
+  dependsOn:
+    - name: arc
+      namespace: arc-systems
