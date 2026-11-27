@@ -12,6 +12,29 @@ Never commit that identity, decrypted exports, or private evidence to Git.
 The identity and backup set are on the same workstation. This is not an
 off-site backup, and losing both loses this recovery copy.
 
+The NixOS user timer `homelab-postgres-recovery.timer` runs daily at
+04:15 local time. It uses `~/.config/homelab-recovery/postgres-backup.sh`
+and the explicit Talos kubeconfig. The script streams six complete
+PostgreSQL logical cluster dumps, including roles, to age encryption.
+It verifies the gzip and dump completion markers after decryption and
+publishes a dated set with SHA-256 checksums only after all six pass.
+
+The workstation stores completed sets in
+`~/.local/state/homelab/postgres-recovery/` with owner-only permissions.
+It retains completed sets and any interrupted encrypted output. The
+first manual service run passed; the automatic timer's first run has
+yet to occur. The workstation and recovery key are at the same site.
+
+The 2026-11-27 Talos recovery kit is stored in
+`~/.local/state/homelab/talos-recovery-kit.IOSiP255/`. It contains an
+encrypted Git bundle of main and the exact live Flux revision, a fresh
+encrypted etcd snapshot, and the three encrypted live machine
+configurations. All five ciphertext checksums passed. Git verified
+the bundle. The Talos client validated the three machine configurations
+in strict metal mode. The snapshot started in a network-isolated
+etcd 3.7.3 instance and returned a count of 2,145 Kubernetes registry
+keys. This recovery test covered etcd separately from Kubernetes.
+
 Completed recovery evidence:
 
 - All six CloudNativePG application databases have successful logical restore

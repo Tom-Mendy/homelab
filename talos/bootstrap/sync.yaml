@@ -9,7 +9,7 @@ spec:
   url: ssh://git@10.0.0.76/Tom-Mendy/homelab.git
   ref:
     branch: migration/talos-bootstrap-20261111
-    commit: ed090197a8dee3c6b3a744258bcbd1ca0699bec2
+    commit: e2f125eb758ed94de8044d566fd93bdd252eae77
   secretRef:
     name: talos-forgejo-direct-readonly
   ignore: |

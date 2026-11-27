@@ -1,0 +1,63 @@
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalConnection
+metadata:
+  name: github-runners-infisical
+  namespace: arc-runners
+spec:
+  address: https://infisical.home.tom-mendy.com
+---
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalAuth
+metadata:
+  name: github-runners-infisical
+  namespace: arc-runners
+spec:
+  method: kubernetes
+  infisicalConnectionRef:
+    name: github-runners-infisical
+    namespace: arc-runners
+  kubernetes:
+    identityIdRef:
+      name: github-runners-infisical-identity
+      namespace: arc-runners
+      key: identityId
+    serviceAccountRef:
+      name: github-runners-infisical-sync
+      namespace: arc-runners
+---
+apiVersion: secrets.infisical.com/v1beta1
+kind: InfisicalStaticSecret
+metadata:
+  name: sumfeet-github-auth
+  namespace: arc-runners
+spec:
+  infisicalAuthRef:
+    name: github-runners-infisical
+    namespace: arc-runners
+  sources:
+    - projectId: 758123bc-7eaa-4256-98a2-bb7438a783b8
+      environmentSlug: prod
+      secretPath: /github-runners
+      recursive: false
+  targets:
+    - name: arc-github-auth-sumfeet
+      namespace: arc-runners
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: Opaque
+      template:
+        engineVersion: v1
+        data:
+          github_token: '{{ .sumfleet_github_token.Value }}'
+    - name: sumfeet-harbor-pull
+      namespace: arc-runners
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: kubernetes.io/dockerconfigjson
+      template:
+        engineVersion: v1
+        data:
+          .dockerconfigjson: '{{ .SUMFEET_HARBOR_DOCKER_CONFIG_JSON.Value }}'
+  syncOptions:
+    refreshInterval: 1m
+    instantUpdates: false

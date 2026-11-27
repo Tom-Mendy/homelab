@@ -1,5 +1,19 @@
 # Talos migration tracker
 
+The local Talos cutover passed its closing checks on 2026-11-27.
+All three nodes, the desired Deployment and StatefulSet replicas,
+and the Flux HelmReleases and Kustomizations were Ready. No Bound PV
+used node-local storage. The Sumfeet runner pod was Ready on node2.
+Public DNS and HTTPS probes reached Authentik, Coder, Forgejo, Matrix,
+and Cinny. The three protected media routes returned their expected
+login redirects. The legacy Ubuntu ingress VIP did not accept HTTP
+or HTTPS, and Forgejo returned the repository HEAD over Git.
+
+The first automatic runs of the new PostgreSQL schedules remain to
+be checked after their next overnight window. Off-site replication
+is deferred at the operator's request. The Synology and encrypted
+NixOS recovery copies remain in service.
+
 The production etcd CA rotation completed on 2026-11-26. The three
 phases staged overlapping trust, switched certificates, and removed the
 previous CA. Each phase rebooted one node at a time. All three voting
@@ -21,16 +35,20 @@ Open WebUI and Ollama both returned HTTP 200. The Hindsight and
 Harbor configuration Flux charts and releases returned to Ready after
 reconciliation against the existing Git artifact.
 
-Blocky now allows `mcp.posthog.com` and `oauth.posthog.com` in its
-strict list group. Flux rolled out the change with the existing
-Blocky image. Both DNS addresses returned public IPv4 and IPv6 answers for
-the two names and preserved the Forgejo LAN mapping. The PostHog
-OAuth metadata endpoint returned HTTP 200 through normal DNS.
+Blocky now allows `app.posthog.com`, `mcp.posthog.com`, and
+`oauth.posthog.com` in its strict list group. Flux rolled out the change with
+the existing Blocky image. Both DNS addresses returned public IPv4 and IPv6
+answers for
+Both preserved the Forgejo LAN mapping. The
+OAuth metadata and PostHog sign-in endpoints returned HTTP 200 through
+normal DNS.
 Codex reached the OAuth consent step. User authorization is pending.
 
 On 2026-11-27 Authentik returned HTTP 503 and reported two corrupt
 PostgreSQL indexes. Both were rebuilt concurrently and the replacement
-server pod passed readiness. Infisical Redis failed to load its AOF.
+server pod passed readiness. A fresh post-repair dump restored all 231
+application tables in an isolated PostgreSQL 17 instance. Infisical
+Redis then failed to load its AOF.
 The repair removed a 65,281-byte zero-filled gap and retained the four
 complete commands after it. The repaired copy passed Redis validation
 and started in an isolated container. The original archive was saved
@@ -39,6 +57,18 @@ Synology. Redis and Infisical returned to Ready. A subsequent baseline
 probe passed for both DNS addresses, all six PostgreSQL clusters,
 and the application health endpoints. The source of the corruption was
 not established.
+
+All six CloudNativePG application databases have active daily logical
+backups. The existing Job Search Manager schedule was retained. Flux
+manages five new schedules for Authentik, Coder, Forgejo, Infisical,
+and Open WebUI. Their manual runs succeeded, and archives read from
+Synology on a different node restored into isolated PostgreSQL 17
+instances. The five schedules retain 30 days on separate NFS claims.
+The first scheduled runs are still pending. These claims share the
+Synology failure domain with the live data. The NixOS workstation now
+takes a separate encrypted copy of all six PostgreSQL clusters daily at
+04:15 local time. The first manual run verified decryption and checksums.
+A copy outside the site and the first timed run remain unverified.
 
 The Sumfeet ARC scale set `arc-runner-set-sumfleet-tom` now runs on Talos.
 ARC 0.15.1 uses the existing repository configuration, a project pull-only
@@ -50,14 +80,15 @@ Flux now manages the existing ARC controller and Sumfeet scale set
 from the digest-pinned charts in the `arc-sumfeet` Kustomization.
 The pinned chart renders matched both installed releases before adoption.
 Both HelmReleases and the Kustomization reported Ready after adoption.
-The GitHub and Harbor credentials remain Kubernetes Secret references.
-Automated credential synchronization remains pending. The existing
-GitHub runner identity returned HTTP 401 during Kubernetes TokenReview
-with a token from its Talos service account. The temporary service account
-used for the probe was removed. The running ARC releases still use the
-verified Kubernetes Secrets. Update the identity through an Infisical
-administrator session and validate a separate sync target before
-switching the existing Secret.
+Infisical now synchronizes the Sumfeet GitHub token through Flux. The
+existing runner identity uses the replacement Talos reviewer and
+verified API TLS. The controller can mint tokens only for the named
+runner sync service account. The staging and production Kubernetes
+Secret values matched, and synchronization reported success after
+cutover. The same sync now manages the Harbor pull-only credential.
+Its staging Secret matched production byte for byte and a test pod
+pulled the pinned runner image with it. Flux reported Ready and
+Infisical confirmed reconciliation of both production targets.
 
 The Talos API authority was rotated on all three nodes. The previous
 client configuration was rejected by every node, and the replacement at
@@ -591,7 +622,8 @@ box means the work was verified, not merely planned.
      then observe HTTP/WebSocket health. The user confirmed a real Element
      call before Tuwunel moved. See the
      [service execution record](talos-service-migrations.md).
-   - [ ] Continue remaining services individually. See the
+   - [x] Complete the service cutovers and validate public access with
+     the legacy Ubuntu ingress VIP offline. See the
      [service execution record](talos-service-migrations.md).
    - [x] Move Homepage with the unchanged image and configuration; preserve
      its URL through the Ubuntu ingress bridge and pass a five-minute
@@ -657,7 +689,7 @@ box means the work was verified, not merely planned.
      write-stop time, cutover time, functional checks, and rollback deadline.
    - Observe one real usage cycle before the next service. Rollback after new
      writes requires recovering those writes or an explicit data-loss decision.
-6. Convert node3. Status: workload moves pending; GPU installation prep complete.
+6. Convert node3. Status: joined Talos and validated GPU inference.
    - Verify all remaining Ubuntu workloads have another eligible destination.
      node1 is currently tainted and is not a general application worker.
    - Kubelet sample on 2026-11-12: Ubuntu node3 had 8.08 GiB pod working set
@@ -689,11 +721,23 @@ box means the work was verified, not merely planned.
    - Join node3 to the existing Talos cluster without another bootstrap.
      Two etcd voting members still require both members for quorum. Avoid
      maintenance and complete the third-member transition promptly.
-7. Convert node1 and validate recovery. Status: joined, failure tests pending.
+7. Convert node1 and validate recovery. Status: joined and recovery tested.
    - Keep the Ubuntu control plane until nothing depends on the old cluster.
    - Join node1 as the third Talos control plane. Verify API endpoint failover.
-   - Test loss of one machine at a time, including node2-to-node3 and
-     node3-to-node2 rescheduling of persistent workloads.
+   - The sustained node2 outage and rejoin passed. The 30-minute node3
+     outage also passed all 61 probe rounds on 2026-11-27. All six
+     PostgreSQL primaries moved to node2 with the original Synology PVCs.
+     Managed applications moved to node1 or node2. Open WebUI remained
+     available and Ollama GPU inference was intentionally unavailable.
+     The two surviving API endpoints, API VIP, both DNS addresses,
+     all six databases, and sampled applications passed. Minimum
+     available memory was 2.12 GiB on node1 and 7.13 GiB on node2.
+     All six fresh logical archives and the new etcd snapshot passed
+     checksum verification. After power-on, node3 passed direct API
+     readiness and all three etcd voters reported the same applied
+     Raft index. Node3 was uncordoned. Ollama generated 16 tokens with
+     deepseek-r1:8b and reported the model fully resident in GPU VRAM.
+     The post-rejoin application, database, and DNS probes passed.
    - Keep backups until application-level recovery is validated. The Synology
      remains a shared failure domain even with three control planes.
 
@@ -706,8 +750,8 @@ The following evidence was collected on 2026-11-07 using context
 This directory is outside Git and accessible only by its owner. It is on the
 NixOS workstation, independent of the Kubernetes cluster and Synology. It is
 not an off-site backup. Resource exports do not replace application backups or
-an etcd snapshot. The Git bundle predates this tracker and needs refreshing
-after the migration configuration is committed.
+an etcd snapshot. This historical bundle was superseded by the verified
+2026-11-27 recovery kit in the backup and recovery record.
 
 - All three nodes are Ready, running Kubernetes v1.34.3 on Ubuntu 24.04.5 LTS.
 - There are 47 PVCs. None uses local-path. All Bound PVs use NFS and no PV has

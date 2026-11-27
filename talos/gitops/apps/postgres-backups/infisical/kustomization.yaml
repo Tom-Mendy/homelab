@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: infisical
+namePrefix: infisical-
+resources:
+  - ../../authentik-backup
+patches:
+  - target:
+      kind: CronJob
+      name: authentik-postgres-backup
+    patch: |
+      - op: replace
+        path: /metadata/name
+        value: postgres-backup
+      - op: replace
+        path: /spec/schedule
+        value: "35 2 * * *"
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/volumes/0/persistentVolumeClaim/claimName
+        value: infisical-postgres-backups
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/containers/0/env
+        value:
+          - {name: BACKUP_NAME, value: infisical}
+          - {name: PGHOST, value: infisical-postgres-rw}
+          - {name: PGDATABASE, value: infisicalDB}
+          - {name: PGUSER, value: infisical}
+          - {name: PGSSLMODE, value: require}
+          - {name: PGCONNECT_TIMEOUT, value: "10"}
+          - name: PGPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: infisical-postgres-app
+                key: password
+  - target:
+      kind: PersistentVolumeClaim
+      name: authentik-postgres-backups
+    patch: |
+      - op: replace
+        path: /metadata/name
+        value: postgres-backups
