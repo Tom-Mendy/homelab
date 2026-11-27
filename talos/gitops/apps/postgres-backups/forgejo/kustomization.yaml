@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: forgejo
+namePrefix: forgejo-
+resources:
+  - ../../authentik-backup
+patches:
+  - target:
+      kind: CronJob
+      name: authentik-postgres-backup
+    patch: |
+      - op: replace
+        path: /metadata/name
+        value: postgres-backup
+      - op: replace
+        path: /spec/schedule
+        value: "25 2 * * *"
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/volumes/0/persistentVolumeClaim/claimName
+        value: forgejo-postgres-backups
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/containers/0/env
+        value:
+          - {name: BACKUP_NAME, value: forgejo}
+          - {name: PGHOST, value: forgejo-postgres-rw}
+          - {name: PGDATABASE, value: forgejo}
+          - {name: PGUSER, value: forgejo}
+          - {name: PGSSLMODE, value: require}
+          - {name: PGCONNECT_TIMEOUT, value: "10"}
+          - name: PGPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: forgejo-postgres-app
+                key: password
+  - target:
+      kind: PersistentVolumeClaim
+      name: authentik-postgres-backups
+    patch: |
+      - op: replace
+        path: /metadata/name
+        value: postgres-backups

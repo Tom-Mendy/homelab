@@ -43,13 +43,14 @@ spec:
                 - |
                   umask 077
                   stamp=$(date -u +%Y%m%dT%H%M%SZ)
-                  archive=$(mktemp /backups/.authentik.XXXXXX)
+                  archive=$(mktemp /backups/.postgres.XXXXXX)
                   trap 'rm -f "$archive"' EXIT
                   pg_dump --no-password --format=custom --file="$archive"
                   pg_restore --list "$archive" > /dev/null
-                  mv "$archive" "/backups/authentik-$stamp.dump"
-                  find /backups -maxdepth 1 -type f -name 'authentik-*.dump' -mtime +30 -delete
+                  mv "$archive" "/backups/$BACKUP_NAME-$stamp.dump"
+                  find /backups -maxdepth 1 -type f -name "$BACKUP_NAME-*.dump" -mtime +30 -delete
               env:
+                - {name: BACKUP_NAME, value: authentik}
                 - {name: PGHOST, value: authentik-postgres-rw}
                 - {name: PGDATABASE, value: authentik}
                 - {name: PGUSER, value: authentik}
