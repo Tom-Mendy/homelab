@@ -49,6 +49,15 @@ spec:
         engineVersion: v1
         data:
           github_token: '{{ .sumfleet_github_token.Value }}'
+    - name: sumfeet-harbor-pull
+      namespace: arc-runners
+      kind: Secret
+      creationPolicy: Orphan
+      secretType: kubernetes.io/dockerconfigjson
+      template:
+        engineVersion: v1
+        data:
+          .dockerconfigjson: '{{ .SUMFEET_HARBOR_DOCKER_CONFIG_JSON.Value }}'
   syncOptions:
     refreshInterval: 1m
     instantUpdates: false
