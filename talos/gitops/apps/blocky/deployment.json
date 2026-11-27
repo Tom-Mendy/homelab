@@ -28,7 +28,7 @@
           "app": "blocky"
         },
         "annotations": {
-          "checksum/blocky-config": "777d16022137e18424b8764e28b73287829a70a1c59522bc56e220bd756845e1",
+          "checksum/blocky-config": "e1e614ab619c3a16829c91b445b5c764aad9d1e976eedf2043aa8a08dc512336",
           "prometheus.io/scrape": "true",
           "prometheus.io/path": "/metrics",
           "prometheus.io/port": "4000"
