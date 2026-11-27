@@ -8,8 +8,7 @@ spec:
   timeout: 60s
   url: ssh://git@10.0.0.76/Tom-Mendy/homelab.git
   ref:
-    branch: migration/talos-bootstrap-20261111
-    commit: e2f125eb758ed94de8044d566fd93bdd252eae77
+    branch: main
   secretRef:
     name: talos-forgejo-direct-readonly
   ignore: |
